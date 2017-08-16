@@ -1,0 +1,28 @@
+<h3 class="help" id="input_files">Template Data</h3>
+<div class="help">
+<p> 
+Template data can be loaded in two ways. For immunological applications
+you can directly load IMGT template sequences. In this case, 
+the allowed binding regions are automatically set to the leader regions and
+no additional adjustments need to be made.</p>
+<p>For other application scenarios, you can upload your template sequences (in 5' to 3' direction) either as a FASTA or CSV (downloaded from the tool) file.</p>
+<p>When inputting templates as a FASTA File, you should consider the following parameters:</p>
+<ul class="help">
+<li><span>Header fields: The selected order of header variables should reflect the structure of the header entries in your input template FASTA file. You can choose from a set of pre-defined categories: <i>ACCESSION</i>, <i>GROUP</i>, <i>SPECIES</i>, and <i>FUNCTION</i>. Information contained the header is later used for identifying individual template sequences. Note that among these fields, currently only the <i>GROUP</i> field has an impact on the result visualizations. </span>
+</li>
+<li>
+<span>Header field delimiter: The header field delimiter is the character that separates the individual information fields in the template FASTA file. For example, if you have template headers such as<br>
+<i>>X1234|MAPK|Homo_sapiens</i><br>
+then you would have <i>|</i> as a delimiter of the fields <i>ACCESSION</i>, <i>GROUP</i>, and <i>SPECIES</i>. 
+</span>
+</li>
+<li><span>Header ID field: The header variable that should be used to identify the template sequences. Since this should be a unique identifier, you should probably use the <i>ACCESSION</i> field for this. Using <i>ACCESSION</i> as the identifier, in the example above, the identifier of the template would be <i>X1234</i>.</span>
+</li>
+</ul>
+</div>
+<h4 class="help">Allowed binding regions</h4>
+<div class="help">
+<p>To define the primer target binding regions, you can either provide template-specific (individual) binding regions or uniform binding regions. Individual binding regions are supplied by providing FASTA files with the template-specific regions where forward and reverse primers should bind.</p>
+<p>To specify a binding range that is identical for all template sequences, you can simply select a positional range in the templates where primer binding should occur. Note that the positional range has to be provided relative to the 5' end of the templates and relative to the 3' end of templates for forward and reverse primers, respectively.</p>
+<p>In case that you you want to also consider binding events outside the target region (off-target binding), you can adjust allowed <i>Off-target binding ratio</i> to a non-zero value in the settings before starting an analysis.</p>
+</div>

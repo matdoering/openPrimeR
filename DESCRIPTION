@@ -1,0 +1,121 @@
+Package: openPrimeR
+Title: Multiplex PCR Primer Design and Analysis
+Version: 0.99.0
+Authors@R: c(person("Matthias", "Döring", 
+                    email = "mdoering@mpi-inf.mpg.de", 
+                    role = c("aut", "cre")),
+            person("Nico", "Pfeifer", 
+                    email = "pfeifer@informatik.uni-tuebingen.de", 
+                    role = c("aut"))
+            )
+Description: An implementation of methods for designing, evaluating,
+    and comparing primer sets for multiplex PCR.
+    Primers are designed by solving a set cover problem such that
+    the number of covered template sequences is maximized with
+    the smallest possible set of primers.
+    To guarantee that high-quality primers are generated,
+    only primers fulfilling constraints on their physicochemical properties 
+    are selected. All relevant functions are accessible through
+    a user-friendly Shiny application.
+Depends:
+    R (>= 3.4.0)
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Imports:
+    iterators (>= 1.0.8),
+    Biostrings (>= 2.38.4),
+    XML (>= 3.98-1.4),
+    scales (>= 0.4.0),
+    reshape2 (>= 1.4.1),
+    seqinr (>= 3.3-3),
+    IRanges (>= 2.4.8),
+    GenomicRanges (>= 1.22.4),
+    ggplot2 (>= 2.1.0),
+    plyr (>= 1.8.4),
+    dplyr (>= 0.5.0),
+    stringdist (>= 0.9.4.1),
+    stringr (>= 1.0.0),
+    RColorBrewer (>= 1.1-2),
+    DECIPHER (>= 1.16.1),
+    lpSolveAPI (>= 5.5.2.0-17),
+    digest (>= 0.6.9),
+    Hmisc (>= 3.17-4),
+    ape (>= 3.5),
+    BiocGenerics (>= 0.16.1),
+    S4Vectors (>= 0.8.11),
+    foreach (>= 1.4.3),
+    magrittr (>= 1.5),
+    distr (>= 2.6),
+    distrEx (>= 2.6),
+    fitdistrplus (>= 1.0-7),
+    uniqtag (>= 1.0),
+    openxlsx (>= 4.0.17),
+    grid (>= 3.1.0),
+    grDevices (>= 3.1.0),
+    stats (>= 3.1.0),
+    utils (>= 3.1.0),
+    methods (>= 3.1.0)
+Suggests:
+    shiny (>= 1.0.2),
+    shinyjs (>= 0.9),
+    shinyBS (>= 0.61),
+    DT (>= 0.2),
+    testthat (>= 1.0.2),
+    knitr (>= 1.13),
+    rmarkdown (>= 1.0),
+    devtools (>= 1.12.0),
+    doParallel (>= 1.0.10),
+    pander (>= 0.6.0),
+    learnr (>= 0.9),
+    data.table (>= 1.10.4)
+SystemRequirements: MAFFT (>= 7.305),
+    OligoArrayAux (>= 3.8),
+    ViennaRNA (>= 2.2.4),
+    MELTING (>= 5.1.1),
+    Pandoc (>= 1.12.3)
+biocViews: Software, BiologicalQuestion, Coverage
+VignetteBuilder: knitr
+Collate: 
+    'Comparison.R'
+    'templates.R'
+    'primers.R'
+    'IO.R'
+    'IO_view.R'
+    'Ippolito.R'
+    'RefCoverage.R'
+    'Tiller.R'
+    'ambiguity.R'
+    'check_stop_codons.R'
+    'con_annealing_temperature.R'
+    'con_dimerization.R'
+    'con_gc_clamp.R'
+    'con_gc_ratio.R'
+    'con_melting_temperature.R'
+    'con_primer_coverage.R'
+    'con_primer_efficiency.R'
+    'con_primer_secondary_structures.R'
+    'con_repeats.R'
+    'con_runs.R'
+    'con_template_secondary_structures.R'
+    'constraints.R'
+    'constraints_eval.R'
+    'errors.R'
+    'filters.R'
+    'helper_functions.R'
+    'initialize_primers.R'
+    'initialize_primers_tree.R'
+    'openPrimeR.R'
+    'optimization_ILP.R'
+    'optimization_algo.R'
+    'optimization_global.R'
+    'optimization_greedy.R'
+    'plots_comparison.R'
+    'settings.R'
+    'plots_constraints.R'
+    'plots_coverage.R'
+    'plots_filtering.R'
+    'primer_significance.R'
+    'startApp.R'
+    'zzz.R'

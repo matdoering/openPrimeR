@@ -1,0 +1,211 @@
+## Designing primers
+You can design novel primer sets via `design_primers()`. Before you can start designing primers, you should perform the following steps:
+
+1. Load the template sequences
+2. Annotate the target binding regions in the templates
+3. Define the primer design settings
+4. Learn how to customize the primer design function
+
+You should already be familiar with steps 1 to 3 from the previous tutorial sections, so we will only quickly recapitulate these steps and then focus on using the priemr design function. In this part of the tutorial, we will design forward primers for the leaders of the heavy chain of human germline immunoglobulins and will set up the template sequences accordingly in the following.
+
+### Loading templates
+We will load the functional human immunologublin heavy chain variable segments from a FASTA file with `read_templates()`:
+
+```{r load_templates_design, exercise = TRUE}
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+# Load the template data
+```
+
+```{r load_templates_design-solution}
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+# Load the template data
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                              delim = "|")
+```
+
+```{r loaded_templates_design}
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+# Load the template data
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                              delim = "|")
+```
+
+### Annotating binding regions
+We will adjust the target binding regions uniformly across all templates  with `assign_binding_regions()`. This ensures that the primers are designed for the first positions of the leader:
+
+```{r binding_uniform, exercise = TRUE, exercise.setup = "loaded_templates_design"}
+# Specify the first 30 bases as the binding region for forward primers:
+```
+
+```{r binding_uniform-solution}
+# Specify the first 30 bases as the binding region for forward primers:
+template.df <- assign_binding_regions(template.df, fw = c(1,30))
+```
+
+### Defining the design settings
+Let's load the default settings for designing primers via `read_settings()`:
+
+```{r read_settings_design, exercise = TRUE}
+# Load default settings from a supplied XML file:
+xml.file <- system.file("extdata", "settings", "A_Taq_PCR_design.xml",
+              package = "openPrimeR")
+```
+
+```{r read_settings_design-solution, exercise = TRUE}
+# Load default settings from a supplied XML file:
+xml.file <- system.file("extdata", "settings", "A_Taq_PCR_design.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+```
+
+```{r loaded_settings_design_pre}
+# Load default settings from a supplied XML file:
+xml.file <- system.file("extdata", "settings", "A_Taq_PCR_design.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+```
+
+Having loaded the supplied settings, it is your job to verify the settings for your primer design task. Here is a list of considerations that may be relevant for you:
+
+* Are the specified constraints appropriate? Primers that do not fulfill the specified constraints may be removed during the filtering procedure. Hence, if the constraints are too narrow, the designed primer set may be too large. You can check/modify the constraints via `constraints()`.
+* Are the specified constraint limits appropriate? The constraint limits define the speed at which the constraints are relaxed in case that no suitable set of primers could be found. The constraint limits can be checked/modified with `constraintLimits()`.
+* Are the coverage constraints appropriate? The coverage constraints determine when a template is expected to be amplified by a primer. For designing primers, a more stringent coverage definition should be used to ensure that the designed set of primers is likely to amplify all target templates. The coverage conditions can be accessed via `cvg_constraints()`.
+* Are the specified constraint options appropriate? Most importantly, ensure that the maximal number of mismatches is in accordance with your requirements. The constraint options can be modified with `conOptions()`.
+* Do the specified PCR conditions match your experimental conditions? It is particularly important to ensure that the ion concentrations match your experimental setup to guarantee that the thermodynamic calculations are accurate. The PCR conditions can be accessed with `PCR()`. 
+
+Possible fields for each slot of the settings object are described in the openPrimeR manual. Inactive options are shown when printing the settings object:
+
+
+```{r print_settings, exercise = TRUE, exercise.setup = "loaded_settings_design_pre"}
+# Print the settings object to view the currently active settings, as well as the inactive settings
+```
+
+```{r print_settings-solution}
+# Print the settings object to view the currently active settings, as well as other possible, inactive settings
+print(settings)
+```
+
+### Overview of the primer design procedure
+
+The `design_primers()` function consists of three phases:
+
+1. Initialization of primer candidates.
+2. Filtering of primer candidates according to the constraints.
+3. Selection of an optimized set of primers.
+
+### Initialization of primer candidates
+
+The procedure for initializing a set of primers is controlled by the `init.algo` argument. When set to `naive`, primers are initialized by extracting substrings from the input templates. If `init.algo` is set to `tree`, degenerate primeres are created. The maximal degeneration can be controlled via the `max.degen` argument.
+
+### Filtering of primers
+
+The filtering procedure is most affected by the constraints that are provided in the `settings` object passed to `design_primers`. However, there are also other arguments that influence the filtering procedure. Most importantly, `required.cvg` provides a numeric in the range [0,1] which indicates the desired coverage ratio of the templates. If the desired coverage ratio can't be achieved because too many primers have been filtered, a relaxation procedure is initialized. This procedure adjusts the constraints such that more primer candidates are selected in order to reach the target coverage.
+
+### Selection of optimal primers
+
+The selection of an optimal set of primers (i.e. solving the set cover problem) can be performed either by a greedy algorithm or an integer linear program. While the worst-case runtime of the greedy algorithm is less than that of the integer linear program, the integer linear program may be able to find a smaller set of optimal primers than the greedy algorithm. To use the greedy algorithm, you can set the `opti.algo` argument to `Greedy` and to use an integer linear program instead, you can set `opti.algo` to `ILP`.
+
+### Using the primer design function
+
+Let's design some primers targeting the leaders of the heavy chain immunologublins. Note that the primer design procedure needs some time to finish.
+
+```{r design_settings, exercise = TRUE, message = FALSE}
+# Load templates
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                              delim = "|")
+# Define binding regions
+template.df <- assign_binding_regions(template.df, fw = c(1,30))
+# Load settings
+xml.file <- system.file("extdata", "settings", "A_Taq_PCR_design.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+# Modify settings
+constraints(settings)$primer_length <- c("min" = 18, "max" = 18)
+# Design forward primers (only for 'target.templates' to save time) with naive initialization, and greedy optimization; store in 'design.data'
+set.seed(1)
+target.templates <- template.df[sample(nrow(template.df), 10),]
+design.data <- design_primers(target.templates, "fw", settings,
+                init.algo = "naive", opti.algo = "Greedy")
+```
+
+```{r design_settings-solution, message = FALSE}
+# Load templates
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                              delim = "|")
+# Define binding regions
+template.df <- assign_binding_regions(template.df, fw = c(1,30))
+# Load settings
+xml.file <- system.file("extdata", "settings", "A_Taq_PCR_design.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+# Modify settings
+constraints(settings)$primer_length <- c("min" = 18, "max" = 18)
+# Design forward primers (only for 'target.templates' to save time) with naive initialization, and greedy optimization:
+set.seed(1)
+target.templates <- template.df[sample(nrow(template.df), 10),]
+design.data <- design_primers(target.templates, "fw", settings,
+                init.algo = "naive", opti.algo = "Greedy")
+```
+
+Excellent! Let's verify the quality of the designed primers:
+
+```{r design_settings_setup}
+# Load templates
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                              delim = "|")
+# Define binding regions
+template.df <- assign_binding_regions(template.df, fw = c(1,30))
+# Load settings
+xml.file <- system.file("extdata", "settings", "A_Taq_PCR_design.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+# Modify settings
+constraints(settings)$primer_length <- c("min" = 18, "max" = 18)
+# Design forward primers (only for the first 5 templates) with naive initialization, and greedy optimization:
+set.seed(1)
+target.templates <- template.df[sample(nrow(template.df), 10),]
+design.data <- design_primers(target.templates, "fw", settings,
+                init.algo = "naive", opti.algo = "Greedy")
+```
+
+```{r design_analysis1, exercise = TRUE, exercise.setup="design_settings_setup", message = FALSE}
+# Determine the size of the optimized set:
+
+# Determine the coverage of the optimized set
+
+# Visualize the constraints
+
+# Which constraints were used for the design?
+
+# Which primers passed the filtering procedure?
+```
+
+```{r design_analysis1-solution}
+# Determine the size of the optimized set:
+primer.df <- design.data$opti
+asS3(primer.df)
+# Determine the coverage of the optimized set
+plot_template_cvg(primer.df, target.templates)
+# Visualize the constraints
+plot_constraint_deviation(primer.df, settings)
+# Which constraints were used for the design?
+design.data$used_constraints
+# Which primers passed the filtering procedure?
+design.data$filtered$data
+```
+
+The results demonstrate that the designed primers fulfill the constraints very well and that all templates could be covered.

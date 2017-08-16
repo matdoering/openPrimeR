@@ -1,0 +1,68 @@
+## Version 0.99.0
+- Settings xml file only has a single constraint category now. Filtering and optimization constraints are differentiated by the tool logic and the accessors now.
+- Added 2nd Tiller set for IGHV
+- Validity check for settings XML
+- Recomputed all comparison data
+- Updated all analysis scripts
+- Primer view plot: coverage status depends on directionality now
+
+## Version 0.97.0
+- Restructured the package
+- Added documentation to all functions
+- Modified interfaces for exported functions
+- Wrote Vignette
+- Updated frontend documentation
+
+## 0.9 (2016-02-2017)
+###Features:
+- Optimization: after investigating efficient heuristics for set cover ILPs (Caprari et al.) for a while, it turned out that the dimerization condition prevents having an efficient Lagrangian heuristic for the primer design problem. Hence, we keep on using lpsolve to find a solution to the ILP without any relaxations.
+- Initialization: primer initialization has a large influence on the runtime and quality of results. Our previous, naive initialization of primers did not allow for the introduction of ambiguities in the primers. Hence, I implemented a tree-consensus based approach to construct degenerate primers. This approach also allows for the construction of primers only in regions with high conservations to reduce the runtime.
+- Dimerization: dimerization computations are very costly. I looked into a dynamic programming algorithm, but it turned out that it is not very useful in our scenario as it only makes sense for primers that are subsequences of each other. This isn't the case for us due to our filtering procedure. I should look into other approaches for improving the runtime of dimerization computations at some time.
+- Updated Dockerfile for new version dependencies
+- Initialization: changed from RAxML to hclust due to better tree structure. Naive primer sequences are now created for all primers in addition to the degenerate sequences to ensure full coverage of each template by primer candidates.
+- Optimization: redundant primers are now automatically removed by solving an SCP with the remaining primers and templates with an ILP.
+- UI: Constraint dependencies are automatically considered when activating/deactivating certain optimization constraints requiring target temperatures (Tm Delta)
+- Specificity now considers binding to another strand as false positives
+## 0.85
+###Features: 
+- New UI: removed clutter; added linear workflows
+- Changed the definition of GC clamp (has to occur directly at the 3' end and be consecutive)
+- Added template secondary structure analysis and optimization of template binding region
+- Allowed region is strict by default now: the primer is not allowed to extend over the allowed region, but there is an option to allow binding if it overlaps the allowed region also. 
+- Partial sequences from IMGT can be removed
+- Disambiguation of primers
+- Selection of optimal primer subsets with ILPs
+- Added plots visualizing constraint values, also for comparing primer sets
+
+###Bug fixes:
+- Handling of paths with spaces (escapes) for tool installation. However, paths with spaces are still not recommended (doesn't work on mac: libtools)
+- Reduced the spread of Tm sets such that we have abs(Tm - targetTemperature) <=  TmLimit / 2. This limits the maximal melting temperature spread of two primers in a set to TmLimit.
+
+## 0.80 (2016-09-23)
+###Features:
+- Implemented a cancel option for long computations (only integrated into frontend for initialize button yet)
+- Optimization with linear programs through option in frontend
+- New dimerization check integrated into frontend
+- Added license information (GPL v2.0)
+- Added, but then removed stop buttons for actions in the app (efficiencies couldn't be calculated due to issues with the parallel backend)
+
+
+###Analyses:
+- ILP performance
+- Dimerization validation
+
+###Bug fixes:
+- Fixed the alignment bug during stop codon check (indels not allowed anymore) and mismatch table
+- Modified the dimerization constraint of ILPs such that the constraint is alway
+s pairwise.
+- Improved the temperature penalty upper bound cutoff value to increase speed of
+ ILP optimization
+
+
+## 0.75 (2016-07-21)
+###Features:
+
+- Docker integration with version 0.75 at mdoering88/primer_design
+- Linear programs backend
+
+

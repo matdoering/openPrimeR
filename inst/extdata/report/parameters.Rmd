@@ -1,0 +1,50 @@
+# Analysis settings
+
+\begin{center}
+\textbf{\textcolor{blue}{Please verify that the analysis was performed with the desired settings!}}
+\end{center}
+
+```{r analysis_settings, results = 'asis'}
+# CONSTRAINTS TABLE
+used.settings.fw <- NULL
+used.settings.rev <- NULL
+if (length(params$used_settings) == 0 || params$used_settings[1] == "NA") {
+    used.settings.fw <- NULL
+    used.settings.rev <- NULL
+} else if (length(params$used_settings) == 1) {
+    if (names(params$used_settings) == "fw") {
+        used.settings.fw <- openPrimeR::constraints(params$used_settings[[1]])
+        used.settings.rev <- NULL
+    } else {
+        used.settings.rev <- openPrimeR::constraints(params$used_settings[[1]])
+        used.settings.fw <- NULL
+    }
+} else if (length(params$used_settings) == 2) {
+   used.settings.fw <- openPrimeR::constraints(params$used_settings$fw)
+   used.settings.rev <- openPrimeR::constraints(params$used_settings$rev)
+} else {
+    stop("Unsupported used settings length. Please input a list with the settings object for forward and reverse design.")
+}
+constraint.tab <- openPrimeR:::create.constraint.table(openPrimeR::constraints(params$settings), 
+                            constraints.used.fw = used.settings.fw,
+                            constraints.used.rev = used.settings.rev, format.type = "report")
+caption.A <- "Constraints on the physicochemical properties of primers. The column \\textit{Target range} summarizes the user-specified constraints."
+caption.B <- "The \\textit{Used range} columns indicate the actually applied constraints during the optimization procedure for forward (\\textit{fw}) and reverse (\\textit{rev}) primers, respectively."
+if (length(used.settings.fw) == 0 && length(used.settings.rev) == 0) {
+    # no primer design (used) settings available
+    caption <- caption.A
+} else {
+    # used settings (design) available
+    caption <- paste(caption.A, caption.B)
+}
+knitr::kable(constraint.tab, row.names = FALSE, caption = caption, longtable = TRUE)
+# OPTIONS TABLE
+tab <- openPrimeR:::create.options.table(openPrimeR::conOptions(params$settings), "report")
+knitr::kable(tab, row.names = FALSE, caption = "Options for the active constraints. \\textit{Allowed mismatches} refers to the maximal allowed number of mismatches between a primer and a template. \\textit{Allowed off-target binding ratio} indicates the ratio of primers that are allowed to bind to non-target regions. \\textit{Binding region definition} defines whether primers shall bind within the target region (\\textit{within}) or are only required to overlap with the target region (\\textit{any}).", longtable = TRUE)
+# COVERAGE SETTINGS TABLE 
+tab <- openPrimeR:::create.constraint.table(openPrimeR::cvg_constraints(params$settings), format.type = "report")
+knitr::kable(tab, row.names = FALSE, caption = "The conditions for primer coverage. \\textit{Stop codons} indicates whether mismatch binding events are allowed to induce stop codons (\\textit{1}) or not (\\textit{0}). \\textit{Efficiency} indicates the required amplification efficiency of the primers. \\textit{Annealing} gives the required free energy of annealing. \\textit{3\' Mismatch Position} indicates the positions in the primers (from the 3\' end such that \\textit{1} indicates the last position) for which mismatches are allowed.", longtable = TRUE)
+# PCR TABLE
+tab <- openPrimeR:::create.PCR.table(openPrimeR::PCR(params$settings), "report")
+knitr::kable(tab, row.names = FALSE, caption = "The experimental conditions that were used to evaluate the primers.", longtable = TRUE)
+```

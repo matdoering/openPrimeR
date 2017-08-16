@@ -1,0 +1,38 @@
+%\linespread{1.3}
+
+% set position for report logo:
+\usepackage{wallpaper}
+\addtolength{\wpXoffset}{7.5cm}
+\addtolength{\wpYoffset}{-12.5cm}
+\CenterWallPaper{0.175}{logo_text.png}
+
+% non-floating tables:
+%\usepackage{longtable}
+% determined by longtable arg from pandoc!
+\usepackage{float}
+% support for landscape mode:
+\usepackage{lscape}
+\usepackage{rotating} % rotation
+% increase caption width
+\usepackage[width=.8\textwidth]{caption}
+% pandoc does not parse latex env - https://groups.google.com/forum/?fromgroups=#!topic/pandoc-discuss/oZETB5Ii1Cw
+\newcommand{\blandscape}{\begin{landscape}}
+\newcommand{\elandscape}{\end{landscape}}
+
+% Make new page before each section
+\let\stdsection\section
+\renewcommand\section{\newpage\stdsection}
+
+% penalty adjustment
+%\clubpenalty=10000      %kara za sierotki
+%\widowpenalty=10000  % nie pozostawiaj wdów
+%\brokenpenalty=10000    % nie dziel wyrazów miêdzy stronami
+%\exhyphenpenalty=999999   % nie dziel s³ów z myœlnikiem
+%\righthyphenmin=3     % dziel minimum 3 litery
+
+% modify positions where floats can be placed
+%\renewcommand{\topfraction}{0.95}
+%\renewcommand{\bottomfraction}{0.95}
+%\renewcommand{\textfraction}{0.05}
+%\renewcommand{\floatpagefraction}{0.35}
+ 

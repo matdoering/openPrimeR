@@ -1,0 +1,183 @@
+## Primer coverage
+
+```{r cvg_setup1}
+xml.file <- system.file("extdata", "settings", "B_Taq_PCR_evaluate.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+constraints(settings) <- constraints(settings)[names(constraints(settings)) != "gc_clamp"]
+constraints(settings)$primer_coverage <- c("min" = 5)
+conOptions(settings)$allowed_mismatches <- 0
+conOptions(settings)$allowed_other_binding_ratio <- 0
+conOptions(settings)$allowed_region_definition <- "any"
+
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+delim <- "|"
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                                delim = "|")
+leader.fasta <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_leader.fasta", package = "openPrimeR")
+template.df <- assign_binding_regions(template.df, fw = leader.fasta, rev = NULL)
+template.df <- adjust_binding_regions(template.df, 
+        c(-max(template.df$Allowed_End_fw), 0), NULL)
+
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+primer.df <- read_primers(fasta.file)
+```
+
+To learn more about the properties of the primers, we can use `check_constraints()`. In this part of the tutorial, we will specifically deal with the coverage of the templates that is afforded by the primers. To analyze only the coverage, you can supply `primer_coverage` to the `active.constraints` argument of `check_constraints()`:
+
+```{r check1, exercise = TRUE, exercise.setup = "cvg_setup1", message = FALSE}
+# Evaluate the primer coverage and store the results in 'constraint.df'
+```
+
+```{r check1-solution}
+# Evaluate the primer coverage and store the results in 'constraint.df'
+constraint.df <- check_constraints(primer.df, template.df, settings, active.constraints = "primer_coverage")
+```
+
+```{r cvg_setup2}
+xml.file <- system.file("extdata", "settings", "B_Taq_PCR_evaluate.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+constraints(settings) <- constraints(settings)[names(constraints(settings)) != "gc_clamp"]
+constraints(settings)$primer_coverage <- c("min" = 5)
+conOptions(settings)$allowed_mismatches <- 0
+conOptions(settings)$allowed_other_binding_ratio <- 0
+conOptions(settings)$allowed_region_definition <- "any"
+
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+delim <- "|"
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                                delim = "|")
+leader.fasta <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_leader.fasta", package = "openPrimeR")
+template.df <- assign_binding_regions(template.df, fw = leader.fasta, rev = NULL)
+template.df <- adjust_binding_regions(template.df, 
+        c(-max(template.df$Allowed_End_fw), 0), NULL)
+
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+primer.df <- read_primers(fasta.file)
+constraint.df <- check_constraints(primer.df, template.df, settings, active.constraints = "primer_coverage")
+```
+
+Please investigate the structure of `constraint.df`. The column `primer_coverage` provides the number of covered templates and the column `Covered_Seqs` gives comma-separated strings with the identifiers of the covered templates. Let's try to find the primer with the highest coverage as well as the template sequences that are covered by the primer:
+
+```{r highest_cvg, exercise = TRUE, exercise.setup = "cvg_setup2"}
+# Investigate the structure of the primers and then find the primer with the highest coverage and the templates that it covers
+```
+
+```{r highest_cvg-solution}
+asS3(constraint.df)
+max.idx <- which.max(constraint.df$primer_coverage)
+max.ID <- primer.df$ID[max.idx]
+print(max.ID)
+covered.templates.id <- strsplit(constraint.df$Covered_Seqs[max.idx], split = ",")[[1]]
+covered.templates <- template.df$ID[match(covered.templates.id, template.df$Identifier)]
+print(covered.templates)
+```
+
+Great! Let's visualize which templates are covered by the primers using `plot_template_cvg()`. 
+
+```{r template_cvg_plot, exercise = TRUE, exercise.setup = "cvg_setup2"}
+plot_template_cvg(constraint.df, template.df)
+```
+
+In the plot, `Identity Coverage` indicates the coverage when requiring full complementarity, while `Expected Coverage` provides the coverage when applying the coverage constraints. Since we didn't allow for any mismatches, both coverage values are basically identical. `Available Templates` provides the number of template sequences per group. From the plot we can see that, when we don't allow for any mismatches, about 47% of the templates are covered by the primers and that IGHV3, IGHV4, IGHV5, and IGHV7 are (partially) covered. To find out which primer amplifies which template groups, we can use `plot_primer_cvg`:
+
+```{r primer_cvg_plot, exercise = TRUE, exercise.setup = "cvg_setup2"}
+# Plot the primer coverage
+```
+
+
+```{r primer_cvg_plot-solution}
+plot_primer_cvg(constraint.df, template.df)
+```
+
+This plot reveals that each primer binds with 100% complementarity only to individual groups of templates; note that the primer `VH_1` targets only IGHV7, which consists of a single template sequence. 
+
+Our analysis was extremely conservative, since we didn't consider mismatch binding events. To more accurately estimate the coverage of the primers, let's ramp up the number of considered template-primer binding events by allowing to 7 mismatches using `conOptions()`:
+
+
+```{r mod_settings_cvg, exercise = TRUE, exercise.setup = "cvg_setup"}
+# Increase the number of allowed mismatches to 7
+```
+
+
+```{r mod_settings_cvg-solution}
+conOptions(settings)$allowed_mismatches <- 7
+```
+
+```{r cvg_setup3}
+xml.file <- system.file("extdata", "settings", "B_Taq_PCR_evaluate.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+constraints(settings) <- constraints(settings)[names(constraints(settings)) != "gc_clamp"]
+constraints(settings)$primer_coverage <- c("min" = 5)
+conOptions(settings)$allowed_mismatches <- 7
+conOptions(settings)$allowed_other_binding_ratio <- 0
+conOptions(settings)$allowed_region_definition <- "any"
+
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+delim <- "|"
+template.df <- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                                delim = "|")
+leader.fasta <- system.file("extdata", "IMGT_data", "templates", 
+        "Homo_sapiens_IGH_functional_leader.fasta", package = "openPrimeR")
+template.df <- assign_binding_regions(template.df, fw = leader.fasta, rev = NULL)
+template.df <- adjust_binding_regions(template.df, 
+        c(-max(template.df$Allowed_End_fw), 0), NULL)
+
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+primer.df <- read_primers(fasta.file)
+constraint.df <- check_constraints(primer.df, template.df, settings, active.constraints = "primer_coverage")
+```
+
+Let's re-analyze the coverage with the changed settings using `check_constraints()`:
+
+
+```{r cvg2, exercise = TRUE, exercise.setup = "cvg_setup3"}
+# Compute the coverage again
+```
+
+```{r cvg2-solution}
+constraint.df <- check_constraints(primer.df, template.df, settings, active.constraints = "primer_coverage")
+```
+
+Let's visualize the template and primer coverage again to identify how the coverage has changed:
+
+
+```{r cvg_plots2, exercise = TRUE, exercise.setup = "cvg_setup3"}
+# Plot the template coverage and the primer coverage
+```
+
+```{r cvg_plots2-solution}
+plot_template_cvg(constraint.df, template.df)
+plot_primer_cvg(constraint.df, template.df)
+```
+
+The new results are impressively different to the previous ones. When we allow for more mismatches, quite a large percentage of templates are estimated to be covered and even the `VH_1` primer is revealed to cover multiple template groups at the same time. We can take a closer look at the distribution of coverage events occuring for different numbers of mismatches between primers and templates by supplying the boolean `per.mismatch` argument to the two plotting functions:
+
+
+```{r cvg_plots3, exercise = TRUE, exercise.setup = "cvg_setup3"}
+# Plot the template coverage and the primer coverage, stratified by mismatches
+```
+
+```{r cvg_plots3-solution}
+plot_template_cvg(constraint.df, template.df, per.mismatch = TRUE)
+plot_primer_cvg(constraint.df, template.df, per.mismatch = TRUE)
+```
+
+These plots reveal that allowing for only 1 mismatch already provides more than 50% coverage and that most coverage events of `VH_1` occur with at least 6 mismatches.
+
+Note that the estimated coverage takes into account only the properties of the primers that are directly associated with binding to a template (e.g. free energy and mismatches). Of course, there are many more properties that can influence whether an amplifiaction is successful or not. 
+
+For example, if a primer forms a complex with another primer in a multiplex reaction, this may greatly reduce product yields. Therefore, the estimated coverage should be used as an indicator for the coverage can be achieved if the other properties of the primers are reasonable. To determine if this is the case, we will analyze these properties in the next part of the tutorial.

@@ -1,0 +1,39 @@
+---
+title: "openPrimeR Tutorial"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+# global variables don't work for some reason ...
+library(learnr)
+library(openPrimeR)
+tutorial_options(exercise.timelimit = 500)
+```
+
+```{r child = 'preliminaries.Rmd'}
+```
+
+```{r child = 'loading_templates.Rmd'}
+```
+
+```{r child = 'loading_primers.Rmd'}
+```
+
+```{r child = 'loading_settings.Rmd'}
+```
+
+```{r child = 'primer_coverage.Rmd'}
+```
+
+```{r child = 'evaluate_constraints.Rmd'}
+```
+
+```{r child = 'compare_primers.Rmd'}
+```
+
+```{r child = 'designing_primers.Rmd'}
+```

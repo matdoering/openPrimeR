@@ -1,0 +1,23 @@
+#' Evaluated Primer Data from Tiller et al.
+#'
+#' Primer and template data for IGHV from Tiller et al.
+#'
+#' @docType data
+#' @name Tiller
+#'
+#' @usage data(Tiller)
+#'
+#' @format \code{tiller.primer.df} provides a \code{Primers} object, \code{tiller.template.df} provides the corresponding \code{Templates} object, and \code{tiller.settings} provides the \code{DesignSettings} object that was used
+#' for evaluating \code{tiller.primer.df}.
+#' DesignSettings object \code{tiller.settings}.
+#'
+#' @keywords datasets
+#' @aliases tiller.template.df tiller.primer.df tiller.settings
+#'
+#' @references Tiller, Thomas, et al. "Efficient generation of monoclonal antibodies from single human B cells by single cell RT-PCR and expression vector cloning." Journal of immunological methods 329.1 (2008): 112-124.
+#' @examples
+#' data(Tiller)
+#' tiller.primer.df
+#' tiller.template.df
+#' constraints(tiller.settings)
+NULL

@@ -1,0 +1,13 @@
+<h3 class="help" id="tools_required">Which factors influence primer design?</h3>
+<div class="help" style = "max-width:80%">
+<p>In some cases it may be difficult to design suitable primer sets. The following elements determine whether a successful design is possible:
+<ul>
+<li>Template sequences: The more divergent the template sequences are, the harder it is to find a small set of primers for amplifying all sequences. Choosing a suitable, conserved target region across all templates can increase the chance of finding a small primer set.</li>
+<li>Allowed primer degeneracy: The more degenerate bases are allowed, the smaller the possible size of a primer set. However, typically not too much degeneracy should be allowed because the primer concentrations of each disambiguated sequence decreases exponentially with the degree of degeneracy.</li>
+<li>Constraints for primer design: Tight selection constraints on primer properties may discard too many potentially useful primers, particularly if the allowed binding region in the templates is difficult; in this case you should relax the constraints. For example, not requiring a GC clamp may increase the potential coverage of a designed primer set.</li>
+<li>Coverage conditions: By ramping up the allowed number of mismatches or modifying the binding criteria of primers, you may obtain increased theoretical coverages of the templates. Note, however, that the selected coverage estimation method for primer design should typically be highly specific in order to ensure the experimental coverage of the full set of templates.</i>
+<li>The primer design algorithm: An integer linear program could yield a smaller primer set than a greedy algorithm.</li>
+<li>The desired coverage ratio: If you are also satisfied when not all sequences are covered, you can specify another setting for the target coverage ratio than 100%. In this case, the primer design algorithm will terminate sooner, potentially relaxing fewer constraints than when the target coverage ratio is at 100%.</li>
+<li>The specified PCR conditions: It is crucial that the specified PCR settings match your laboratory conditions. If not, the actual properties of the primers (e.g. coverage or dimerization) may deviate considerably from the computed properties.</li>
+</ul>
+</div>

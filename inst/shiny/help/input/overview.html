@@ -1,0 +1,26 @@
+<h3 class="help">Selection of Analysis Type</h3>
+<div class="help">
+<p>Before starting an analysis, you should first choose an appropriate analysis type. There are three analysis modes:
+<ul>
+<li>Evaluation of existing primers</li>
+<li>Design of primers</li>
+<li>Comparison of primer sets</li>
+</ul>
+</p>
+</div>
+<h3 class="help">Upload of Template Data</h3>
+<div class="help">
+    <p>To start an analysis, it is first necessary to upload the template sequences for the PCR. Afterwards, it is possible to adjust the allowed regions for primer binding.</p>
+    <p>openPrimeR supports two modes of operation regarding primers. First, existing primers can be analyzed by uploading a FASTA file with oligomers. Second, new primers can be designed using an automated primer generation procedure that starts with the initialization of candidate primers.</p>
+    <p>To explore the features of the tool, it is possible to automatically load data sets for templates and primers by choosing one of the example data sets.</p>
+</div>
+    <h3 class="help" id="input_files">Template Data</h3>
+<div class="help">
+<p> 
+DNA templates for amplification should be uploaded under <i>Template Data</i> as FASTA files with nucleotides given in 5' to 3' direction. The sequences can contain IUPAC ambiguity codes, which are fully supported by openPrimeR. Before uploading a FASTA file, it is important to configure the structure of the template headers in the settings.</p>
+<p>Allowed regions for primer binding in the templates can be specified either by a FASTA file, or, by specifying a positional range in the templates where primer binding is allowed. A setting to allow primers to bind also to additional regions in the templates also exists.</p>
+</div>
+<h3 class="help">Primer Data</h3>
+<div class="help">
+    <p>Primers targeting the input templates can be uploaded in the <i>Data</i> tab under <i>Primers</i> by selecting a FASTA-formatted file containing the primers in 5' to 3' direction. The primer sequences can contain IUPAC ambiguity codes and the headers should be annotated with keywords identifying forward and reverse primers.
+</div>

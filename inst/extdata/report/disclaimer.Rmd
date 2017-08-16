@@ -1,0 +1,14 @@
+```{r vignette_options, echo = FALSE, include = FALSE}
+# can't disable longtable, it's a pandoc default -> ugly table breaks are the reuslt!
+options(knitr.kable.NA = '') # ignore NAs in tables
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = FALSE,
+                      fig.width = 7, fig.height = 7, fig.pos = 'H',
+                      fig.align='center') # out.extra: force latex figures
+#options(knitr.table.format = "pandoc") 
+# set figure size
+old.theme <- ggplot2::theme_get()
+ggplot2::theme_set(ggplot2::theme_grey(base_size = 10)) 
+```
+\begin{center}
+\textbf{\textcolor{blue}{openPrimeR is a research tool - we do not guarantee for any result!}}
+\end{center} 

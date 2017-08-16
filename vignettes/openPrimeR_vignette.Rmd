@@ -1,0 +1,529 @@
+---
+title: "Designing and analyzing multiplex PCR primers with openPrimeR"
+author: "Matthias Döring"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{openPrimeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r vignette_options, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(openPrimeR)
+ggplot2::theme_set(ggplot2::theme_grey(base_size = 12)) 
+```
+
+openPrimeR provides functionalities for designing and analyzing multiplex polymerase chain reaction (PCR) primers. In the following, we introduce typical workflows for three application scenarios, namely designing primers, analyzing primers, and comparing primer sets.
+
+# Overview of the package
+openPrimeR was developed to provide a rational approach for evaluating and designing primers for multiplex PCR such that multiple template sequences are amplified at the same time. The concept of *coverage* is of critical importance for multiplex PCR as it describes the number of templates that can be amplified with a set of primers. This package was specifically developed to enable researchers to evaluate the coverage of existing sets of primers as well as to design novel primer sets that maximize the coverage with a minimal number of primers. To provide a user-friendly tool, we created a Shiny app. Moreover, the package enables the computation of the most important PCR-related physicochemical properties of primers to gauge whether a set of primers can provide high yields. The following list provides research questions that may be answered using openPrimeR:
+
+## Which templates are amplified by the primers? 
+* Where do the primers bind? Do the primers bind specifically to the target region?
+* What is the probability that a primer amplifies a certain template?
+* Which groups of templates are not amplified by the primers? 
+* Do the primers bind with mismatches? If so, do the primers introduce substitutions in the amino acid sequence or even stop codons?
+* If the primers cover templates redundantly, is it possible to reduce the size of the primer set?
+
+## How well do the primers fulfill desired physicochemical properties?
+* Which constraints on physicochemical properties are fulfilled and which are broken?
+* To which extent do the primers deviate from the constraints?
+* What is the significance of a primer set with regard to constraint fulfillment?
+* Which primers may be problematic and should be excluded?
+
+## Among multiple sets of primers, which seems to be the best for a specific task?
+* Which primer set achieves the highest coverage?
+* Which primer set fulfills the constraints best?
+* Which primer set binds in the desired region?
+
+## What is the smallest set of primers that covers all of the template sequences?
+* Is it possible to design a small set of primers for the given template sequences?
+
+
+# Preliminaries
+
+openPrimeR requires external programs for some features, particularly for computing the physicochemical properties of primers.
+Please make sure you have the following tools installed on your system such that they are in your system's path:
+
+- [MELTING](http://www.ebi.ac.uk/biomodels/tools/melting/) (>= 5.1.1): For melting temperature computations.
+- [ViennaRNA](http://www.tbi.univie.ac.at/RNA/) (>= 2.2.4): For secondary structure prediction.
+- [OligoArrayAux](http://unafold.rna.albany.edu/OligoArrayAux.php) (>= 3.8): For primer efficiency computations as performed by [DECIPHER](https://bioconductor.org/packages/release/bioc/html/DECIPHER.html).
+- [MAFFT](http://mafft.cbrc.jp/alignment/software/) (>= 7.305): For computing multiple sequence alignments.
+- [Pandoc](http://pandoc.org) (>= 1.19.1): For creating PDF reports.
+
+If you would like to be able to access the immunoglobulin repository [IMGT](http://www.imgt.org/) from the openPrimeR Shiny app, you should additionally fulfill the following dependencies:
+
+- [PhantomJS](http://phantomjs.org/) (>= 2.1): For headless website calls.
+- [Python](http://www.python.org) (>=2.7.9) and the [selenium](http://selenium-python.readthedocs.io/) (>=3.0.1) module: For data extraction scripts.
+
+openPrimeR will automatically check for all dependencies and inform you about any missing dependencies when the package is attached:
+
+```{r check_dependencies, message = FALSE, warning = FALSE, eval = FALSE}
+library(openPrimeR)
+```
+
+Note that the tool is still functional if there are missing external programs. However, we recommend that all dependencies are fulfilled to guarantee the best user experience.
+
+# Using the Shiny app
+The openPrimeR Shiny application can be started via `startApp()`, which should should open the application in your default browser. If this is not the case, please consider the console output and manually open the displayed URL in your preferred web browser. For more information on how to use the app, please consider the instructions provided in the app itself. In the following, we will solely focus on how to use the R package itself.
+
+# Loading data
+In order to design primers, we only need to load a set of template sequences and define the target binding regions. To analyze and compare the properties of existing primer sets, we also need to load one or multiple sets of primers. The following table summarizes the possible input data formats for each task:
+
+```{r loading_data_table, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Task             | Templates | Primers      | Input file format  |
+|------------------|-----------|--------------|--------------------|
+| Design primers   | &#10003;  |              | FASTA, CSV         |
+| Analyze primers  | &#10003;  | &#10003;     | FASTA, CSV         |
+| Compare primers  | &#10003;  | &#10003;     | FASTA, CSV         |
+"
+cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+```
+
+## Loading templates
+To load a set of template sequences, we simply input the path to a valid [FASTA](https://en.wikipedia.org/wiki/FASTA_format) file and use `read_templates()`. In the following code snippet, we store the path to a FASTA file that is provided with the package in `fasta.file`. This file contains the template sequences. In our case, we will load sequences of the human heavy chain immunoglobulin genes:
+
+```{r simple_load_templates, message = FALSE, warning = FALSE}
+# Specify a FASTA file containing the templates:
+fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+                "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
+# Load the template sequences from 'fasta.file'
+seq.df.simple <- read_templates(fasta.file)
+```
+
+Having loaded the template sequences successfully, we can investigate the structure of `seq.df.simple`, which is a `Templates` object. Since the `Templates` class is derived from `data.frame`, you can use it in the same was as any data frame. For example, we can retrieve the header of the first template sequence via
+
+```{r header_structure, message = FALSE, warning = FALSE}
+seq.df.simple$Header[1]
+```
+
+As you can see, the headers of the templates contain several pieces of information that are separated by pipe symbols (`|`), among others:
+
+* **Accession:** M99641
+* **IGH gene group information:** IGHV1-18\*01
+* **Species:** Homo sapiens
+* **Function:** F (functional)
+
+To load these annotations into the `Templates` object, we will now provide additional arguments to `read_templates()`. We are particularly interested in loading the group information as this information is important for interpreting the results later. In the next code snippet, we use the `hdr.structure` variable to annotate the meta-information that is provided by the headers of the FASTA file. Moreover, we provide the `delim` argument to `read_templates()` to specify that the pipe symbol is used to separated individual fields and supply the `id.column` argument to identify which field should be used as the identifier in the `Templates` object:
+
+```{r load_templates, message = FALSE, warning = FALSE}
+hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+seq.df <- read_templates(fasta.file, hdr.structure, delim = "|", id.column = "GROUP")
+```
+
+Since we have specified to load the accession, group, species, and function from the FASTA headers, we can now retrieve these values from `seq.df`. For example, for the first template we can retrieve the following information:
+
+```{r loaded_header_structure, message = FALSE, warning = FALSE}
+# Show the loaded metadata for the first template
+c(seq.df$Accession[1], seq.df$Group[1], seq.df$Species[1], seq.df$Function[1])
+# Show the ID (group) of the first template
+seq.df$ID[1]
+```
+
+Note that only the `GROUP` annotation has an impact on the analysis in terms of visualizing the results later. The other fields can be set arbitrarily and do not have any impact. If there is no metadata that you wish to load, you can simply use the `read_templates()` call used to declare `seq.df.simple`. In this case, all templates are considered to belong to a single default group.
+
+Upon loading templates with `read_templates()`, the primer binding region is set to the first 30 bases for forward primers and to the last 30 bases for reverse primers, where *first* refers to the 5' end and *last* refers to the 3' end.
+We can review the target binding regions of forward and reverse primers by accessing `seq.df$Allowed_fw` or `seq.df$Allowed_rev`, respectively:
+
+```{r default_binding_regions, message = FALSE, warning = FALSE}
+# Show the binding region of the first template for forward primers
+seq.df$Allowed_fw[1]
+# Show the corresponding interval in the templates
+c(seq.df$Allowed_Start_fw[1], seq.df$Allowed_End_fw[1])
+# Show the binding region of the first template for reverse primers
+seq.df$Allowed_rev[1]
+# Show the corresponding interval in the templates
+c(seq.df$Allowed_Start_rev[1], seq.df$Allowed_End_rev[1])
+```
+
+In the following sections, we describe two ways in which the primer binding regions can be defined using `assign_binding_regions()`.
+
+### Uniform binding regions
+To assign a uniform target binding region to all templates, you can specify positional intervals indicating the binding regions for forward and reverse primers. For forward primers, the interval is specified relative to the template 5' end, while for reverse primers, the interval is specified relative to the 3' end. In the following example, we set the binding region of forward primers (`fw`) to the first 50 template bases and to the last 40 bases for reverse primers (`rev`):
+
+```{r assign_uniform_binding, message = FALSE, warning = FALSE}
+template.df.uni <- assign_binding_regions(seq.df, fw = c(1,50), rev = c(1,40))
+```
+
+Note that we have supplied the interval [1,40] to allow binding in the last 40 bases of the templates for reverse primers. This is because the binding region for reverse primers is provided relative to the 3' end, while the binding region of forward primers is provided relative to the 5' end. In this way, the reverse binding region can be annotated independent of the length of individual templates.
+
+Let's verify the different binding regions for forward and reverse primers using the first template sequence: 
+
+```{r uniform_binding_regions, message = FALSE, warning = FALSE}
+# Show the new forward binding region (first 50 bases)
+template.df.uni$Allowed_fw[1]
+# Show the new reverse binding region (last 40 bases)
+template.df.uni$Allowed_rev[1]
+```
+
+### Individual binding regions
+Individual binding regions can be assigned to each template by providing a FASTA file for each primer direction containing the target binding regions for the primers. The FASTA headers of these files should match the headers in the template FASTA file that was provided earlier. In the following example, we use a FASTA file that is provided with the package to define the individual binding regions for the forward primers only. In this case, the FASTA file specifies the leaders of the human heavy chain immunoglobulin sequences that have been loaded in `seq.df`:
+
+```{r assign_individual_binding, message = FALSE, warning = FALSE}
+l.fasta.file <- system.file("extdata", "IMGT_data", "templates", 
+                "Homo_sapiens_IGH_functional_leader.fasta", package = "openPrimeR")
+template.df <- assign_binding_regions(seq.df, fw = l.fasta.file, rev = NULL)
+```
+
+The binding regions for forward primers may now be different for each template. For example, the binding regions for the following two templates occur at different positions in the templates:
+
+```{r assign_individual_binding_out, message = FALSE, warning = FALSE}
+# An example of two templates with different binding regions
+c(template.df$Allowed_Start_fw[1], template.df$Allowed_End_fw[1])
+c(template.df$Allowed_Start_fw[150], template.df$Allowed_End_fw[150])
+```
+
+Note, that since we did not supply individual binding regions for reverse primers, their binding regions were not adjusted:
+
+```{r assign_individual_binding_example_rev, message = FALSE, warning = FALSE}
+# Verify that the binding region for reverse primers did not change for the first template:
+template.df$Allowed_rev[1]
+```
+
+## Loading and writing settings
+Before we can start an analysis, we need to define the analysis settings. openPrimeR supplies predefined XML files specifying default settings for different applications:
+
+```{r available_settings, message = FALSE, warning = FALSE}
+list.files(system.file("extdata", "settings", package = "openPrimeR"), pattern = "*\\.xml")
+```
+
+In our case, we select the high-stringency primer design conditions for Taq polymerase and load the `DesignSettings` object with `read_settings())`:
+
+```{r load_settings, message = FALSE, warning = FALSE}
+settings.xml <- system.file("extdata", "settings", 
+                    "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
+settings <- read_settings(settings.xml)
+```
+
+You can use `str(settings)` to explore the structure of `settings`:
+
+```{r settings_slots, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Slot             | Getter/Setter |  Purpose |
+|------------------|---------------|----------|
+| `Input_Constraints` | `constraints()` | Desired values for primer properties |
+| `Input_Constraint_Boundaries` | `constraintLimits()`  | Limits for relaxing constraints during primer design |
+| `Coverage_Constraints` | `cvg_constraints()` | Constraints for estimating the coverage |
+| `PCR_conditions` | `PCR()`  | Experimental PCR conditions |
+| `constraint_settings` | `conOptions()` | Settings for evaluating the constraints |
+
+"
+cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+```
+
+Since the `settings` object contains all the relevant information for the analysis of primers, you should review and possibly customize the settings before starting an analysis. Particularly make sure that the PCR conditions specified in the settings agree with your experimental conditions. For example, the PCR sodium ion concentration can be accessed via `PCR(settings)$Na_concentration`. Moreover, the coverage constraints should typically contain one constraint (e.g. `coverage_model`, `primer_efficiency`, or `annealing_DeltaG`). Moreover, for designing primers, you should select a coverage constraint that provides highly specific coverage calls. For the purpose of this vignette, however, we will not apply any coverage constraints and instead stringently limit the number of mismatches between primers and templates:
+
+```{r cvg_constraint_setup, message = FALSE, warning = FALSE}
+# No constraints on primer coverage (not recommended!)
+cvg_constraints(settings) <- list()
+# Instead consider all primers binding with up to 3 mismatches to cover the corresponding templates
+conOptions(settings)$allowed_mismatches <- 3
+```
+
+You should also make sure that the requirements physicochemical constraints for high-quality primers fulfill your expectations. For example, if we do not want to filter designed primers using the GC clamp criterion, we can remove the requirement for a GC clamp in the following way:
+
+```{r change_settings1, message = FALSE, warning = FALSE}
+design.settings <- settings
+constraints(design.settings) <- constraints(design.settings)[!grepl(
+                            "gc_clamp", names(constraints(design.settings)))]
+```
+
+We may also want to design only primers of a specific length. To generate only primers of length 25, we could specify this via
+
+```{r change_settings2, message = FALSE, warning = FALSE}
+constraints(design.settings)[["primer_length"]] <- c("min" = 25, "max" = 25)
+```
+
+For designing primers we may also want to prevent any mismatch binding. To implement this, we simply set
+
+```{r change_settings3, message = FALSE, warning = FALSE}
+conOptions(design.settings)[["allowed_mismatches"]] <- 0
+```
+
+For more possible customizations, please refer to the documentation of the settings class, which can be accessed via `?DesignSettings`. 
+
+Having customized the settings, we can store the modified settings to disk in the following way:
+
+```{r write_settings, message = FALSE, warning = FALSE, eval = FALSE}
+out.file <- tempfile("settings", fileext = ".xml")
+write_settings(design.settings, out.file)
+```
+
+The next time we want to perform an analysis, we can simply load the stored settings using the `read_settings` function using `out.file` as an argument.
+
+# Designing primers
+
+Since the loaded template sequences contain only the variable region of the human immunoglobulins and not the constant region, we will restrict ourselves to designing only forward primers. To design primers, we need only a single function, namely `design_primers()`, which requires the settings specified in `design.settings` and the templates and binding regions provided in `template.df`. By setting `mode.directionality` to 'fw', we specify that we want to design forward primers only. The other possible choices are `rev` for designing only reverse primers and `both` for designing both forward and reverse primers. 
+Moreover, we subset `template.df` to the first two template sequences to limit the runtime of the design procedure for this example:
+
+```{r design_primers, message = FALSE, warning = FALSE, eval = TRUE}
+# Design forward primers for the first two templates
+optimal.primers <- design_primers(template.df[1:2,], mode.directionality = "fw",
+                                  settings = design.settings)
+```
+
+`optimal.primers` is a list in which the optimal primers are stored in `optimal.primers$opti` and the corresponding filtered primers are stored in `optimal.primers$filtered`. The optimal primer sets for all evaluated melting temperatures are stored in `optimal.primers$all_results`. We can use the `summary()` function to get an overview of the properties of the designed primers:
+
+```{r view_designed_primers, message = FALSE, warning = FALSE}
+# Create an overview of the optimal primers
+print(summary(optimal.primers$opti))
+```
+
+The primer design function can be customized in many ways. The `init.algo` argument can be used to specify how the initial set of primers is generated. By default, this is done by extracting substrings from the template sequences ('naive'). A tree-based initialization strategy producing degenerate primers can be activated by setting `init.algo` to 'tree', which is favorable for related template sequences.
+
+Another important argument is `required.cvg`, which defines the desired coverage ratio of the templates. By default, this is set to 1 indicating that 100% of templates should be covered. If the desired coverage cannot be reached with a primer set fulfilling all properties specified via the `settings` argument, the constraints are relaxed in order to reach the target coverage. This behavior can be deactivated by setting `required.cvg` to 0. 
+
+The `opti.algo` argument specifies the algorithm that is used for optimizing the primer sets. By default, this is a greedy algorithm ('Greedy'), but we can also select an integer linear program ('ILP'). The ILP ensures that designed primer sets are minimal, but this comes at the cost of a worst-case exponential runtime. Hence, the ILP is recommended for small template sets. For larger sets of templates, the default ('Greedy') should be used, which provides an approximate solution in polynomial runtime.
+
+To conclude the primer design task, let's store the designed primers as a FASTA file:
+
+```{r store_primers, message = FALSE, warning = FALSE, eval = FALSE}
+out.file <- tempfile("my_primers", fileext = ".fasta")
+write_primers(optimal.primers$opti, out.file)
+```
+
+# Analyzing primers
+
+In the following, we will analyze the physicochemical properties of an existing primer set. Since the set of primers we have designed earlier is quite small, we will load a new set of primers first.
+
+## Loading primers
+Similarly to templates, primers can also be loaded from a FASTA file. Similarly to ensuring that the information in the header is loaded correctly via `read_templates()`, you should make sure that the primer directionalities are correctly annotated in the FASTA file. This means that the header of every primer should contain a keyword that uniquely identifies the primer to either be a forward or reverse primer. The FASTA file we are going to load contains the forward primers that were designed for the variable region of human IGH genes by [Ippolito et al.](https://www.ncbi.nlm.nih.gov/pubmed/22558161). Since all primers are forward primers, the headers of all primers in the FASTA file are annotated with the '\_fw' keyword. Therefore, we set the `fw.id` argument for `read_primers()` accordingly:
+
+```{r read_primers, message = FALSE, warning = FALSE}
+# Define the FASTA primer file to load
+primer.location <- system.file("extdata", "IMGT_data", "primers", "IGHV", 
+                               "Ippolito2012.fasta", package = "openPrimeR")
+# Load the primers
+primer.df <- read_primers(primer.location, fw.id = "_fw")
+```
+
+We can view the identifiers and sequences of the primers in the following way:
+
+```{r view_primers, message = FALSE, warning = FALSE}
+print(primer.df[, c("ID", "Forward")]) 
+```
+
+## Evaluation of biochemical constraints
+To determine which biochemical constraints are fulfilled by the loaded primers, we can use `check_constraints()`, which requires only the set of primers, a set of templates, and a settings object. Since we want to determine the coverage of the primers along the full template sequence, we will set the allowed ratio of off-coverage events to 100% by modifying the constraint settings. We then call `check_constraints()` in order to determine all constraints defined in `settings`:
+
+```{r check_constraints, message = FALSE, warning = FALSE}
+# Allow off-target coverage
+conOptions(settings)$allowed_other_binding_ratio <- c("max" = 1.0)
+# Evaluate all constraints found in 'settings'
+constraint.df <- check_constraints(primer.df, template.df, 
+                 settings, active.constraints = names(constraints(settings)))
+```
+
+Note that we could have also computed only a subset of the constraints specified via `settings`, if we had passed the `active.constraints` argument to `check_constraints()`. The `constraint.df` variable provides a `Primers` data frame containing the results from  evaluating all constraints provided via `settings` (e.g. primer coverage, GC ratio, melting temperature). We can retrieve the values of individual constraints by accessing the corresponding columns in `constraint.df`. In the following, we will explore the coverage of templates in more detail.
+
+### Primer coverage
+
+The number of templates that are covered by each primer is annotated in the `primer_coverage` column:
+
+```{r view_primer_coverage, message = FALSE, warning = FALSE}
+constraint.df$primer_coverage
+```
+
+To identify the primers that cover individual templates, we can annotate the coverage information in the template data frame using `update_template_cvg()`:
+
+```{r update_template_cvg, message = FALSE, warning = FALSE}
+template.df <- update_template_cvg(template.df, constraint.df)
+```
+
+Now, the `primer_coverage` column is also available in `template.df` such that we can identify the number of primers that cover the first five templates in the set:
+
+```{r template_coverage, message = FALSE, warning = FALSE}
+template.df$primer_coverage[1:5]
+```
+
+The overall ratio of covered template sequences can be retrieved via `get_cvg_ratio()`:
+
+```{r cvg_ratio, message = FALSE, warning = FALSE}
+as.numeric(get_cvg_ratio(constraint.df, template.df))
+```
+
+The output indicates that the primer set is expected to amplify `r paste(round(get_cvg_ratio(constraint.df, template.df), 4) * 100, "%", sep = "")` of templates according to the currently specified conditions for primer coverage (at most 3 mismatches). We can learn more about the coverage by computing further statistics. For example, we may be interested in identifying which groups of templates are expected to be amplified and which are not. For this purpose, we can use `get_cvg_stats()`, which provides information on the number of covered template sequences according to their group annotation:
+
+```{r cvg_stats, message = FALSE, warning = FALSE}
+cvg.stats <- get_cvg_stats(constraint.df, template.df, for.viewing = TRUE)
+```
+
+```{r cvg_table, echo=FALSE, results='asis'}
+knitr::kable(cvg.stats[, !(grepl("_fw", colnames(cvg.stats)) | grepl("_rev", colnames(cvg.stats)))], row.names = FALSE)
+```
+
+In this case, we see that all but a single template of IGHV3 does not seem to be covered by the primer set. A visualization of the coverage can be obtained via
+
+```{r template_cvg_plot, fig.show='hold', fig.width=5, fig.height=5}
+plot_template_cvg(constraint.df, template.df)
+```
+
+This plot shows three bars:
+
+* **Identity Coverage:** The ratio of templates that are covered by primers that are perfectly complementary to the templates
+* **Expected Coverage:** The expected ratio of covered templates under the current conditions for computing the coverage
+* **Available Templates:** The number of available template sequences per group of templates
+
+For the loaded set of primers, the identity coverage is nearly as high as the expected coverage, which indicates that the analyzed primer set should have a high amplification fidelity. Note that for IGHV5, the identity coverage is 0%, while the expected coverage is 100%. This just shows that there is no primer that is fully complementary to any of the IGHV5 templates, however, according to the coverage conditions there are primers that are expected to cover all of the IGHV5 templates via mismatch binding.
+
+#### Optimal primer subsets
+Typically one wants to avoid large primer sets for reasons of cost and priming efficiency. We provide a method for reducing the size of an existing primer set by 
+computing optimal subsets with respect to the coverage of templates. Using this approach, it is possible to limit the size of a primer set without sacrificing any coverage.
+We can compute all optimal subsets of a primer set for which the coverage has already been annotated using `subset_primer_set()`:
+
+```{r primer_subsets, message = FALSE, warning = FALSE}
+primer.subsets <- subset_primer_set(constraint.df, template.df)
+```
+
+`primer.subsets` is a list whose *i*-th entry contains the primer set of size *i*. For example, the optimal subset of size 3 could be accessed via `primer.subsets[[3]]`. We can easily determine the most suitable subset by plotting the coverage of all optimal subsets:
+
+```{r cvg_subsets, fig.show='hold', fig.width=5, fig.height=5}
+plot_primer_subsets(primer.subsets, template.df)
+```
+
+The plot visualizes two types of information. The line graph shows the total percentage of covered templates, while the stacked bars indicate the coverage of individual primers. Since some of the primers in the set cover the same templates, the cumulative coverage of the stacked bars exceeds 100% for subsets of size 3 or larger, although the total coverage already seems to be saturated for the subset of size 3. It seems that subsets with more than 3 primers offer only additional redundant coverage of the templates. Hence, we might decide to select the primer subset of size 3 as it seems to achieve the same coverage as the full primer set:
+
+```{r optimal_subsets, message = FALSE, warning = FALSE}
+my.primer.subset <- primer.subsets[[3]]
+```
+
+We can verify that the coverages of the full primer set and the subset of size 3 seem to match using `get_cvg_ratio()`:
+
+```{r verify_optimal_subset, message = FALSE, warning = FALSE}
+original.cvg <- as.character(get_cvg_ratio(constraint.df, template.df, as.char = TRUE))
+subset.cvg <- as.character(get_cvg_ratio(my.primer.subset, template.df, as.char = TRUE))
+print(paste0("Coverage (n=", nrow(constraint.df), "): ", original.cvg, "; Subset Coverage (n=", nrow(my.primer.subset), "): ", subset.cvg))
+```
+
+#### Binding regions
+The binding regions of the primers in the templates can be visualized with `plot_primer_binding_regions()`:
+
+```{r binding_regions, message = FALSE, warning = FALSE, fig.show='hold', fig.width=5, fig.height=5}
+plot_primer_binding_regions(constraint.df, template.df)
+```
+
+The x-axis of the plot shows the binding positions of the primers relative to the target binding regions. Position `-1` indicates the end of the target binding region and we can see that all primers bind beyond the target region. Since we have specified the leader of the immunoglobulins as the target region, this just means that all primers bind at the beginning of the exon, which ensures that the full antibody sequence is recovered by the primers. Typical primer sets for amplifying immunoglobulins will target the exon, that is, the region directly following the leader.
+To investigate the individual positions of primer binding for individual templates, we can use `plot_primer()`. In this case, we just provide the first primer and the first ten templates to the plotting function in order to restrict the dimension of the plot:
+
+```{r cvg_primer_view, message = FALSE, warning = FALSE, fig.show='hold', fig.width=8, fig.height=8}
+plot_primer(constraint.df[1,], template.df[1:10,])
+```
+
+The plot shows primers that cover a template as arrows above the corresponding templates. If a template is covered it is shown as a black line and otherwise it is shown in grey.
+
+### Constraint evaluation
+
+We can determine which primers passed the physicochemical constraints that were supplied to the `check_constraints` function through visual inspection via `plot_constraints()`:
+
+```{r plot_constraints, fig.show='hold', fig.width=7, fig.height=7, message = FALSE, warning = FALSE}
+plot_constraint_fulfillment(constraint.df, settings)
+```
+
+The plot shows which constraints are passed (blue) and which constraints are failed (red) for every primer. For example, looking at the column indicating the GC clamp constraint, we see that only `r paste(constraint.df$ID[!constraint.df$EVAL_gc_clamp], collapse = " and ")` did not fulfill our requirements for the GC clamp. This is because both primers have no GC clamp, although we required a GC clamp with a length between `r constraints(settings)$gc_clamp[1]` and `r constraints(settings)$gc_clamp[2]` in the settings:
+
+```{r constraint_eval_gc, message = FALSE, warning = FALSE}
+# View the number of terminal GCs for primers failing the GC constraint
+constraint.df$gc_clamp_fw[!constraint.df$EVAL_gc_clamp]
+# View the desired number of terminal GCs:
+constraints(settings)$gc_clamp
+```
+
+If you are wondering why the specificity of all evaluated primer seems so low, this can be explained by the binding regions of the primers. As we have seen earlier, all primers bind outside the target binding region. Therefore, the specificity of every primer is 0% and the constraint on the specificity of the primers is never fulfilled.
+
+We can not only can visualize whether a primer passed a specific constraint, but also view the distribution of values corresponding to a specific property. For example, let us take a look at the number of terminal GCs in the primers by creating a histogram:
+
+```{r plot_constraint_qualitative, fig.show='hold', fig.width=5, fig.height=5, message = FALSE, warning = FALSE}
+plot_constraint(constraint.df, settings, "gc_clamp")
+```
+
+The y-axis shows the number of primers exhibiting a certain number of GCs at their 3' ends. The dashed lines indicate the desired extent of the GC clamp according to the settings object that we passed to `plot_constraint()`.
+
+### Filtering primers
+
+All our previous evaluations were performed without requiring the primers to actually fulfill any of the constraints we postulated. We can filter primers according to a set of biochemical constraints
+such that only primers fulfilling all requirements are retained. For example, if we want to select only primers fulfilling the requirements for GC clamp and melting temperature range, we could obtain the 
+filtered data set in the following way:
+
+```{r primer_filtering, message = FALSE, warning = FALSE}
+filtered.df <- filter_primers(constraint.df, template.df, settings,
+               active.constraints = c("gc_clamp", "gc_ratio"))
+```
+
+Now, we could perform further analyses on this data set. For example, using `get_cvg_ratio()`, we could determine that the percentage of templates that are covered by the filtered primer set is only `r paste(round(get_cvg_ratio(filtered.df, template.df), 4) * 100, "%", sep = "")` since only `r nrow(filtered.df)` primer remains after filtering.
+
+## Report generation
+
+We can create a PDF report that summarizes the analysis of a set of primers by passing an analyzed primer set with its corresponding templates and settings to `create_report()`:
+
+```{r eval_report, message = FALSE, warning = FALSE, eval = FALSE}
+# Define the path to the output file
+my.file <- tempfile(fileext = ".pdf")
+# Store a PDF report for 'constraint.df' in 'my.file'
+create_report(constraint.df, template.df, my.file, 
+              settings, sample.name = "My analysis")
+```
+
+Note that this function requires <code>pandoc</code> as well as <code>LaTeX</code> such that <code>rmarkdown</code> can create the PDF report.
+
+# Comparing primer sets
+
+To compare existing primer sets, it is necessary to precompute all constraints of interest for each of the primer sets, which can be done with `check_constraints()` as we have demonstrated earlier. Instead of evaluating multiple primer sets, we will simply load pre-evaluated sets of primers and template sets that were stored as [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) files. For example, we could have stored our previous evaluation results in the following way in order to load these data later:
+
+```{r writing_comparison_data, message = FALSE, warning = FALSE}
+primer.xml <- tempfile("my_primers", fileext =".csv")
+write_primers(constraint.df, primer.xml, "CSV")
+template.xml <- tempfile("my_templates", fileext = ".csv")
+write_templates(constraint.df, template.xml, "CSV")
+```
+
+For the following example, we will simply load primers and templates that are shipped with the openPrimeR package:
+
+```{r loading_comparison_data, message = FALSE, warning = FALSE}
+# Define the primer sets we want to load
+sel.sets <- c("Glas1999", "Rubinstein1998", "Cardona1995", "Persson1991", "Ippolito2012", "Scheid2011")
+# List all available IGH primer sets
+primer.files <- list.files(path = system.file("extdata", "IMGT_data", "comparison", 
+                           "primer_sets", "IGH", package = "openPrimeR"),
+                pattern = "*\\.csv", full.names = TRUE)
+# Load all available primer sets
+primer.data <- read_primers(primer.files)
+# Select only the sets defined via 'sel.sets'
+sel.idx <- which(names(primer.data) %in% sel.sets)
+primer.data <- primer.data[sel.idx]
+# Provide a set of templates for every primer set
+template.files <- rep(system.file("extdata", "IMGT_data", "comparison", "templates", 
+                              "IGH_templates.csv", package = "openPrimeR"), 
+                              length(primer.data))
+template.data <- read_templates(template.files)
+```
+
+Both, `primer.data` and `template.data` are lists containing primer and template data frames, respectively. Note that these lists should always have the same lengths, that is, every primer set should have an associated template set and vice versa. Having loaded the primer and template data sets, we can plot an overview of the constraints that are fulfilled by the primers in each set:
+
+```{r comparison_plots_overview, fig.show='hold', fig.width=7, fig.height=7, message = FALSE}
+plot_constraint_fulfillment(primer.data, settings, plot.p.vals = FALSE)
+```
+
+In this plot, each facet corresponds to a primer set and each physicochemical constraint is shown as a colored bar whose height indicates the percentage of primers fulfilling the constraint. An intuitive interpretation of the plot is that sets with high-quality primers should have many high bars. For example, we can quickly see that the primers from Persson et al. (1991) do not have any primers fulfilling our requirements for the ratio of GC, which should be between `r constraints(settings)$gc_clamp["min"]` and `r constraints(settings)$gc_clamp["max"]` according to the loaded settings in order to ensure similar binding behaviors of the primers.
+
+The distribution of each evaluated constraint can be investigated in more detail. For example, to investigate the influence of the GC ratios on the melting temperatures of the primers in each set, we can create the following boxplot:
+
+```{r comparison_plots_details, fig.show='hold', fig.width=7, fig.height=7, message = FALSE}
+plot_constraint(primer.data, settings, active.constraints = c("gc_ratio", "melting_temp_range"))
+```
+
+In the boxplot, each dot corresponds to a single primer and the boxes show the 1st, 2nd, and 3rd quartiles, from bottom to top. Since we have provided the current constraint settings to the plotting function, the desired ranges for GC ratios and melting temperatures are indicated as horizontal dashed lines in the plot. The plot shows that the GC ratios from the primers in the set from Cardona et al. (1995) are all in the desired range and have a small spread, while the GC ratios of other primer sets have much larger spreads, for example those from the set of Glas et al. (1999). The visualization reveals the association between GC ratios and melting temperatures. The primer sets from Cardona, Persson, and Rubinstein all have small deviations in their GC ratios effecting small deviations in their melting temperatures, while the other primer sets exhibit high variances for both properties.
+
+Remember that the plot we generated using `plot_constraint_fulfillment()` revealed that most of the loaded primer sets failed the specificity constraint. By plotting the binding regions for each of the primer sets through `plot_primer_binding_regions()` we can find out why this is the case: 
+
+```{r comparison_primer_binding, fig.show='hold', fig.width=7, fig.height=7, message = FALSE}
+plot_primer_binding_regions(primer.data, template.data)
+```
+
+The plot reveals that only the primers from Scheid et al. mostly bind in the target region, while the other primer sets all bind outside the target region. Moreover, since we have evaluated the primers allowing for off-target binding, we find that the forward primers from Glas et al. do not seem to target the 5' region of the templates but are rather spread along the length of the templates, a property that would be detrimental when trying to amplify complete antibody cDNA.
+
+# Want to learn more?
+
+For brevity's sake, we did not provide explanations and examples for all possible uses of the package. If you would like to learn more about how you can use openPrimeR, please consider using our interactive tutorial. The tutorial is provided as a Shiny app and can be started via `runTutorial()`.

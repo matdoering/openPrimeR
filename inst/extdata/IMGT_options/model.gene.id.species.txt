@@ -1,0 +1,26 @@
+any
+Bos taurus
+Camelus dromedarius
+Canis lupus familiaris
+Cercocebus atys
+Danio rerio
+Homo sapiens
+Macaca fascicularis
+Macaca mulatta
+Macaca nemestrina
+Mus
+Mus cookii
+Mus minutoides
+Mus musculus
+Mus pahari
+Mus saxicola
+Mus spretus
+Oncorhynchus mykiss
+Ornithorhynchus anatinus
+Oryctolagus cuniculus
+Ovis aries
+Papio anubis anubis
+Rattus norvegicus
+Rattus rattus
+Sus scrofa
+Vicugna pacos

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<meta name="progressive" content="true" />
+<meta name="allow-skip" content="true" />
+
+<title>openPrimeR Tutorial</title>
+
+
+<!-- highlightjs -->
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+</head>
+
+<body>
+
+
+
+<div class="pageContent band">
+<div class="bandContent page">
+
+<div class="topics">
+
+<div id="section-primer-coverage" class="section level2">
+<h2>Primer coverage</h2>
+<div class="tutorial-exercise-support" data-label="cvg_setup1" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>xml.file &lt;- system.file(&quot;extdata&quot;, &quot;settings&quot;, &quot;B_Taq_PCR_evaluate.xml&quot;,
+              package = &quot;openPrimeR&quot;)
+settings &lt;- read_settings(xml.file)
+constraints(settings) &lt;- constraints(settings)[names(constraints(settings)) != &quot;gc_clamp&quot;]
+constraints(settings)$primer_coverage &lt;- c(&quot;min&quot; = 5)
+conOptions(settings)$allowed_mismatches &lt;- 0
+conOptions(settings)$allowed_other_binding_ratio &lt;- 0
+conOptions(settings)$allowed_region_definition &lt;- &quot;any&quot;
+
+fasta.file &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;templates&quot;, 
+        &quot;Homo_sapiens_IGH_functional_exon.fasta&quot;, package = &quot;openPrimeR&quot;)
+hdr.structure &lt;- c(&quot;ACCESSION&quot;, &quot;GROUP&quot;, &quot;SPECIES&quot;, &quot;FUNCTION&quot;)
+delim &lt;- &quot;|&quot;
+template.df &lt;- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                                delim = &quot;|&quot;)
+leader.fasta &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;templates&quot;, 
+        &quot;Homo_sapiens_IGH_functional_leader.fasta&quot;, package = &quot;openPrimeR&quot;)
+template.df &lt;- assign_binding_regions(template.df, fw = leader.fasta, rev = NULL)
+template.df &lt;- openPrimeR:::update.individual.binding.regions(template.df, 
+        c(-max(template.df$Allowed_End_fw), 0), NULL)
+
+fasta.file &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;primers&quot;, 
+        &quot;IGHV&quot;, &quot;Tiller2008_1st.fasta&quot;, package = &quot;openPrimeR&quot;)
+primer.df &lt;- read_primers(fasta.file)</code></pre>
+</div>
+<p>To learn more about the properties of the primers, we can use <code>check_constraints()</code>. As a first analysis, let’s compute the primer coverage:</p>
+<div class="tutorial-exercise" data-label="check1" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>constraint.df &lt;- check_constraints(primer.df, template.df, settings, active.constraints = &quot;primer_coverage&quot;)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":false,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup1","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="cvg_setup2" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>xml.file &lt;- system.file(&quot;extdata&quot;, &quot;settings&quot;, &quot;B_Taq_PCR_evaluate.xml&quot;,
+              package = &quot;openPrimeR&quot;)
+settings &lt;- read_settings(xml.file)
+constraints(settings) &lt;- constraints(settings)[names(constraints(settings)) != &quot;gc_clamp&quot;]
+constraints(settings)$primer_coverage &lt;- c(&quot;min&quot; = 5)
+conOptions(settings)$allowed_mismatches &lt;- 0
+conOptions(settings)$allowed_other_binding_ratio &lt;- 0
+conOptions(settings)$allowed_region_definition &lt;- &quot;any&quot;
+
+fasta.file &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;templates&quot;, 
+        &quot;Homo_sapiens_IGH_functional_exon.fasta&quot;, package = &quot;openPrimeR&quot;)
+hdr.structure &lt;- c(&quot;ACCESSION&quot;, &quot;GROUP&quot;, &quot;SPECIES&quot;, &quot;FUNCTION&quot;)
+delim &lt;- &quot;|&quot;
+template.df &lt;- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                                delim = &quot;|&quot;)
+leader.fasta &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;templates&quot;, 
+        &quot;Homo_sapiens_IGH_functional_leader.fasta&quot;, package = &quot;openPrimeR&quot;)
+template.df &lt;- assign_binding_regions(template.df, fw = leader.fasta, rev = NULL)
+template.df &lt;- openPrimeR:::update.individual.binding.regions(template.df, 
+        c(-max(template.df$Allowed_End_fw), 0), NULL)
+
+fasta.file &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;primers&quot;, 
+        &quot;IGHV&quot;, &quot;Tiller2008_1st.fasta&quot;, package = &quot;openPrimeR&quot;)
+primer.df &lt;- read_primers(fasta.file)
+constraint.df &lt;- check_constraints(primer.df, template.df, settings, active.constraints = &quot;primer_coverage&quot;)</code></pre>
+</div>
+<p>Please investigate the structure of <code>constraint.df</code> and then try to find the primer with the highest coverage as well as the template sequences that are covered by the primer:</p>
+<div class="tutorial-exercise" data-label="highest_cvg" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>colnames(constraint.df)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup2","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="highest_cvg-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>max.idx &lt;- which.max(constraint.df$primer_coverage)
+max.ID &lt;- primer.df$ID[max.idx]
+covered.templates &lt;- strsplit(constraint.df$Covered_Seqs[max.idx], split = &quot;&quot;)[[1]]</code></pre>
+</div>
+<p>Great! Let’s visualize which templates are covered by the primers using <code>plot_template_cvg()</code>.</p>
+<div class="tutorial-exercise" data-label="template_cvg_plot" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>plot_template_cvg(constraint.df, template.df)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup2","exercise.checker":"NULL"}</script>
+</div>
+<p>In the plot, <code>Identity Coverage</code> indicates the coverage when requiring full complementarity, while <code>Expected Coverage</code> provides the coverage when applying the coverage constraints. Since we didn’t allow for any mismatches, both coverage values are nearly identical. <code>Available Templates</code> provides the number of template sequences per group. From the plot we can see that, when we don’t allow for any mismatches, about 47% of the templates are covered by the primers and that IGHV3, IGHV4, IGHV5, and IGHV7 are (partially) covered. To find out which primer amplifies which template groups, we can use <code>plot_primer_cvg</code>:</p>
+<div class="tutorial-exercise" data-label="primer_cvg_plot" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code># Plot the primer coverage</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup2","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="primer_cvg_plot-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>plot_primer_cvg(constraint.df, template.df)</code></pre>
+</div>
+<p>This plot reveals that each primer binds with 100% complementarity only to individual groups of templates; note that the primer <code>VH_1|1</code> targets only IGHV7, which consists of a single template sequence. However, our analysis was extremely conservative, since we didn’t consider mismatch binding events at all. To more accurately estimate the coverage of the primers, we will now ramp up the number of considered mismatches per possible template-primer binding event to 7:</p>
+<div class="tutorial-exercise" data-label="mod_settings_cvg" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>conOptions(settings)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="mod_settings_cvg-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>conOptions(settings)$allowed_mismatches &lt;- 7</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="cvg_setup3" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>xml.file &lt;- system.file(&quot;extdata&quot;, &quot;settings&quot;, &quot;B_Taq_PCR_evaluate.xml&quot;,
+              package = &quot;openPrimeR&quot;)
+settings &lt;- read_settings(xml.file)
+constraints(settings) &lt;- constraints(settings)[names(constraints(settings)) != &quot;gc_clamp&quot;]
+constraints(settings)$primer_coverage &lt;- c(&quot;min&quot; = 5)
+conOptions(settings)$allowed_mismatches &lt;- 7
+conOptions(settings)$allowed_other_binding_ratio &lt;- 0
+conOptions(settings)$allowed_region_definition &lt;- &quot;any&quot;
+
+fasta.file &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;templates&quot;, 
+        &quot;Homo_sapiens_IGH_functional_exon.fasta&quot;, package = &quot;openPrimeR&quot;)
+hdr.structure &lt;- c(&quot;ACCESSION&quot;, &quot;GROUP&quot;, &quot;SPECIES&quot;, &quot;FUNCTION&quot;)
+delim &lt;- &quot;|&quot;
+template.df &lt;- read_templates(fasta.file, hdr.structure = hdr.structure, 
+                                delim = &quot;|&quot;)
+leader.fasta &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;templates&quot;, 
+        &quot;Homo_sapiens_IGH_functional_leader.fasta&quot;, package = &quot;openPrimeR&quot;)
+template.df &lt;- assign_binding_regions(template.df, fw = leader.fasta, rev = NULL)
+template.df &lt;- openPrimeR:::update.individual.binding.regions(template.df, 
+        c(-max(template.df$Allowed_End_fw), 0), NULL)
+
+fasta.file &lt;- system.file(&quot;extdata&quot;, &quot;IMGT_data&quot;, &quot;primers&quot;, 
+        &quot;IGHV&quot;, &quot;Tiller2008_1st.fasta&quot;, package = &quot;openPrimeR&quot;)
+primer.df &lt;- read_primers(fasta.file)
+constraint.df &lt;- check_constraints(primer.df, template.df, settings, active.constraints = &quot;primer_coverage&quot;)</code></pre>
+</div>
+<p>Let’s re-analyze the coverage with the changed settings using <code>check_constraints()</code>:</p>
+<div class="tutorial-exercise" data-label="cvg2" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code># Compute the coverage again</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup3","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="cvg2-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>constraint.df &lt;- check_constraints(primer.df, template.df, settings, active.constraints = &quot;primer_coverage&quot;)</code></pre>
+</div>
+<p>We can visualize template and primer coverage to find out what has changed:</p>
+<div class="tutorial-exercise" data-label="cvg_plots2" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code># Plot the template coverage and the primer coverage</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":60,"exercise.setup":"cvg_setup3","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="cvg_plots2-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-lines="0">
+<pre class="text"><code>plot_template_cvg(constraint.df, template.df)
+plot_primer_cvg(constraint.df, template.df)</code></pre>
+</div>
+<p>The new results are impressively different to the previous ones. When we allow for more mismatches, quite a large percentage of templates are estimated to be covered and even the <code>VH_1|1</code> primer is revealed to cover multiple template groups at the same time. We can take a closer look at the distribution of coverage events occuring for different numbers of mismatches between primers and templates by supplying the boolean <code>per.mismatch</code> argument to the two plotting functions:</p>
+<p>These plots reveal that allowing for only 1 mismatch already provides more than 50% coverage and that most coverage events of <code>VH_1|1</code> occur with at least 6 mismatches.</p>
+<p>Note that the estimated coverage takes into account only the properties of the primers that are directly associated with binding to a template (e.g. free energy and mismatches). However, there are many more properties that can influence whether a PCR is successful or not; for example, if a primer forms a complex with another primer in a multiplex reaction, this may greatly reduce product yields. Therefore, the estimated coverage should be used as an indicator that shows how much coverage can be achieved if the other properties of the primers are reasonable. To determine if this is the case, we will move on to analyzing these properties now.</p>
+
+<script type="application/shiny-prerendered" data-context="server-start">
+library(learnr)
+library(openPrimeR)
+tutorial_options(exercise.timelimit = 60)
+# global variables don't work for some reason?
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::register_http_handlers(session, metadata = NULL)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-check1-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-check1-code-editor`)), session)
+output$`tutorial-exercise-check1-output` <- renderUI({
+  `tutorial-exercise-check1-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-highest_cvg-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-highest_cvg-code-editor`)), session)
+output$`tutorial-exercise-highest_cvg-output` <- renderUI({
+  `tutorial-exercise-highest_cvg-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-template_cvg_plot-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-template_cvg_plot-code-editor`)), session)
+output$`tutorial-exercise-template_cvg_plot-output` <- renderUI({
+  `tutorial-exercise-template_cvg_plot-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-primer_cvg_plot-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-primer_cvg_plot-code-editor`)), session)
+output$`tutorial-exercise-primer_cvg_plot-output` <- renderUI({
+  `tutorial-exercise-primer_cvg_plot-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-mod_settings_cvg-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-mod_settings_cvg-code-editor`)), session)
+output$`tutorial-exercise-mod_settings_cvg-output` <- renderUI({
+  `tutorial-exercise-mod_settings_cvg-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-cvg2-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-cvg2-code-editor`)), session)
+output$`tutorial-exercise-cvg2-output` <- renderUI({
+  `tutorial-exercise-cvg2-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-cvg_plots2-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-cvg_plots2-code-editor`)), session)
+output$`tutorial-exercise-cvg_plots2-output` <- renderUI({
+  `tutorial-exercise-cvg_plots2-result`()
+})
+</script>
+ <!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="dependencies">
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery-1.11.3"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootstrap"]},{"type":"character","attributes":{},"value":["3.3.5"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/bootstrap-3.3.5"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["viewport"]}},"value":[{"type":"character","attributes":{},"value":["width=device-width, initial-scale=1"]}]},{"type":"character","attributes":{},"value":["js/bootstrap.min.js","shim/html5shiv.min.js","shim/respond.min.js"]},{"type":"character","attributes":{},"value":["css/cerulean.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["pagedtable"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pagedtable-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/pagedtable.js"]},{"type":"character","attributes":{},"value":["css/pagedtable.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["highlightjs"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/highlightjs-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["highlight.js"]},{"type":"character","attributes":{},"value":["textmate.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-autocompletion"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-autocompletion.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-diagnostics"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-diagnostics.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-format"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmarkdown/templates/tutorial/resources"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-format.js"]},{"type":"character","attributes":{},"value":["tutorial-format.css","rstudio-theme.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery-1.11.3"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["4.5.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/font-awesome-4.5.0"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/font-awesome.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootbox"]},{"type":"character","attributes":{},"value":["4.4.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/bootbox"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["bootbox.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["localforage"]},{"type":"character","attributes":{},"value":["1.4.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/localforage"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["localforage.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-autocompletion"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-autocompletion.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-diagnostics"]},{"type":"character","attributes":{},"value":["0.8"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-diagnostics.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]}]}
+</script>
+<!--/html_preserve-->
+</div>
+
+</div> <!-- topics -->
+
+<div class="topicsContainer">
+<div class="topicsPositioner">
+<div class="band">
+<div class="bandContent topicsListContainer">
+
+<!-- begin doc-metadata -->
+<div id="doc-metadata">
+<h2 class="title toc-ignore" style="display:none;">openPrimeR Tutorial</h2>
+</div>
+<!-- end doc-metadata -->
+
+</div> <!-- bandContent.topicsListContainer -->
+</div> <!-- band -->
+</div> <!-- topicsPositioner -->
+</div> <!-- topicsContainer -->
+
+
+</div> <!-- bandContent page -->
+</div> <!-- pageContent band -->
+
+
+
+
+<script>
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+
+</html>
