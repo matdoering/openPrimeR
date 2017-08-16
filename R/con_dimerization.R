@@ -301,7 +301,10 @@ compute.all.cross.dimers <- function(primer.df, primer_conc, na_salt_conc, mg_sa
     # replaced plyr call with dplyr call for speed for large matrices ..
     #result <- ddply(results, c("Idx1", "Idx2"), function(x) arrange(x, substitute(DeltaG))[1, ])
     #result <- results %>% dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% dplyr::summarise(DeltaG = min(DeltaG))
-    result <- as.data.frame(results %>% dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% dplyr::slice(which.min(DeltaG)))
+    result <- as.data.frame(results %>% 
+                            dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% 
+                            dplyr::slice(which.min(substitute(DeltaG)))
+                            )
     if (for.shiny) {
         result <- view.dimer.df(result, "Cross")
     }

@@ -426,11 +426,11 @@ build.comparison.table <- function(primers, templates) {
     if (length(templates) != length(primers)) {
         templates <- replicate(length(primers), templates[1])
     }
-    cvg.data <- openPrimeR:::comparison.cvg(primers, templates)
+    cvg.data <- comparison.cvg(primers, templates)
     my.ids <- seq_along(primers)
     if (length(cvg.data) != 0) {
         # match out to cvg.data -> sorted
-        m <- match(as.character(out$PrimerSet), as.character(cvg.data$Run)) # TODO: assume that IDs are unique!!!
+        m <- match(as.character(out$PrimerSet), as.character(cvg.data$Run)) # assumes that IDs are unique!!!
         add.df <- cvg.data[m,]
         out <- cbind(out, Coverage = add.df$Coverage, Info = add.df$Info)
         # sort by highest coverage

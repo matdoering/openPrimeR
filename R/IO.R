@@ -115,9 +115,12 @@ render_report <- function(params, report_template, out.file) {
     if (rmarkdown::pandoc_available()) {
         dir.create(dirname(out.file), showWarnings = FALSE, recursive = TRUE)
         out.file <- file.path(normalizePath(dirname(out.file)), basename(out.file))
-        rmarkdown::render(tempReport, output_file = out.file, 
+        res <- try(rmarkdown::render(tempReport, output_file = out.file, 
             params = params, envir = new.env(parent = globalenv()),
-            quiet = TRUE)
+            quiet = TRUE))
+        if (class(res) == "try-error") {
+            warning("No PDF file was produced, please check the console output and whether all Latex dependencies are installed (Texlive available?).")
+        }
     } else {
         msg <- paste0("Pandoc for rmarkdown is not available on your system.", 
                 "Please install it first to generate a report.")
