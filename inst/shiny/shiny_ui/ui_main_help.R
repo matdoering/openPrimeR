@@ -9,7 +9,8 @@ tabPanel("Help",value="help",
         tabPanel("FAQ", value="FAQ", 
             # FAQ entries
             icon = icon("question-sign", lib = "glyphicon"),
-            includeHTML(file.path(FAQ.folder, "screencast.html")),
+            # TODO: add screencast when it's done
+            #includeHTML(file.path(FAQ.folder, "screencast.html")),
             includeHTML(file.path(FAQ.folder, "tools.html")),
             includeHTML(file.path(FAQ.folder, "ambiguities.html")),
             includeHTML(file.path(FAQ.folder, "design.html"))
