@@ -113,7 +113,7 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
 #' @export
 #' @examples
 #' data(Comparison)
-#' plot_deviation_vs_set_size(primer.data, settings)
+#' plot_penalty_vs_set_size(primer.data, settings)
 plot_penalty_vs_set_size <- function(primer.data, settings, 
         active.constraints = names(constraints(settings)), alpha = 0) {
     if (length(primer.data) == 0) {
