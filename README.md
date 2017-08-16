@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/matdoering/openPrimeR.svg?branch=master)](https://travis-ci.org/matdoering/openPrimeR)
+
 # openPrimeR
 
 ## Synopsis
