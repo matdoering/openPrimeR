@@ -73,7 +73,7 @@ SystemRequirements: MAFFT (>= 7.305),
     ViennaRNA (>= 2.2.4),
     MELTING (>= 5.1.1),
     Pandoc (>= 1.12.3)
-biocViews: Software, BiologicalQuestion, Coverage
+biocViews: Software, Technology, PCR
 VignetteBuilder: knitr
 Collate: 
     'Comparison.R'
