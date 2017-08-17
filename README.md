@@ -16,10 +16,3 @@ provides a comprehensive and intuitive user interface for the core functionalite
 
 ## More information
 For more information on how to install openPrimeR, we refer to the corresponding [user-space repository](https://github.com/matdoering/openPrimeR-User), which provides several installation routines.
-## License
-
-See the [LICENSE](LICENSE.txt) file for license rights and limitations (GNU General Public License, Version 2.0).
-
-## Changelog
-
-Take a look at the [CHANGELOG](CHANGELOG.md) to view recent changes to the project.
