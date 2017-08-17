@@ -778,7 +778,7 @@ setMethod("plot_constraint_fulfillment",
 #' plot_cvg_constraints(primer.df, settings)
 #' # Plot coverage constraints for mulitple primer sets
 #' data(Comparison)
-#' plot_cvg_constraints(primer.data, settings)
+#' plot_cvg_constraints(primer.data[1:2], settings)
 setGeneric("plot_cvg_constraints", 
     function(primers, settings, active.constraints = names(cvg_constraints(settings)), ...) {
         if (!is(settings, "DesignSettings")) {
