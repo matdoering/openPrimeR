@@ -99,7 +99,7 @@ setMethod("initialize", "Templates",
     }
 ) 
 setMethod("show", "Templates", function(object) {
-    # overwrite the 'print' function using data.table's show
+    # overwrite the 'print' function
     my_show_df(asS3(object))
 })
 #' @name Templates

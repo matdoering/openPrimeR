@@ -8,15 +8,16 @@ cache: packages
 
 r: bioc-devel
 
-r_packages:
-    - covr
+#r_packages:
+    #- covr
 
-after_script:
-    - FILE=$(ls -1t *.tar.gz | head -n 1)
-    - Rscript -e "library(BiocCheck); BiocCheck(\"${FILE}\")"
-
-after_success:
-    - Rscript -e 'library(covr); codecov()'
+# not enough time (50 min cutoff) for this:
+#after_script:
+    #- FILE=$(ls -1t *.tar.gz | head -n 1)
+    #- Rscript -e "library(BiocCheck); BiocCheck(\"${FILE}\")"
+#
+#after_success:
+    #- Rscript -e 'library(covr); codecov()'
 
 notifications:
   email:

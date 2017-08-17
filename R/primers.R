@@ -864,7 +864,7 @@ Primers <- function(...) new("Primers", ...)
 
 my_format_df <- function (x) {
     if (is.atomic(x) && !is.null(x)) {
-        stop("Internal structure doesn't seem to be a list. Possibly corrupt data.table.")
+        stop("Internal structure doesn't seem to be a list. Possibly corrupt data.frame.")
     }
     classes <- unlist(lapply(x, class))
     factor.idx <- which(classes == "factor")
@@ -929,7 +929,7 @@ my_show_df <- function(x, topn = 3,
     invisible()
 }
 setMethod("show", "Primers", function(object) {
-    # overwrite the 'print' function using data.table's show
+    # overwrite the 'print' function in order to limit the output
     my_show_df(asS3(object))
 })
 setMethod("summary", "Primers", function(object) {

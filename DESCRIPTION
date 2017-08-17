@@ -24,7 +24,6 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Imports:
-    iterators (>= 1.0.8),
     Biostrings (>= 2.38.4),
     XML (>= 3.98-1.4),
     scales (>= 0.4.0),
@@ -68,8 +67,7 @@ Suggests:
     devtools (>= 1.12.0),
     doParallel (>= 1.0.10),
     pander (>= 0.6.0),
-    learnr (>= 0.9),
-    data.table (>= 1.10.4)
+    learnr (>= 0.9)
 SystemRequirements: MAFFT (>= 7.305),
     OligoArrayAux (>= 3.8),
     ViennaRNA (>= 2.2.4),

@@ -767,10 +767,11 @@ compute.basic.details <- function(binding, mode = c("on_target", "off_target"), 
         rev.bindings[[x]] <- cur.bindings[["rev"]]
     }
     # define iteration vars
+    # fw.binding/rev.binding are used in the iteration such that the full object is not needed in the loop -> saves memory!
     fw.binding <- NULL
     rev.binding <- NULL
     x <- NULL
-    cvg.df <- foreach(fw.binding = fw.bindings, rev.binding = rev.bindings, x = iterators::icount(nrow(primers)), .combine = "rbind") %dopar% {
+    cvg.df <- foreach(fw.binding = fw.bindings, rev.binding = rev.bindings, x = seq_len(nrow(primers)), .combine = "rbind") %dopar% {
         if (is.function(updateProgress)) {
             detail <- ""
             updateProgress(x/nrow(primers), detail, "set")
@@ -953,7 +954,7 @@ compute.basic.details <- function(binding, mode = c("on_target", "off_target"), 
         }
         p.result$Mismatch_pos_rev <- mm.info
         p.result$Covered_Seqs <- paste(covered.seqs, collapse = ",")
-        #message(paste0(x, "/", nrow(primers))) # iteration status
+        # message(paste0(x, "/", nrow(primers))) # iteration status
         p.result
     }
     return(cvg.df)
