@@ -51,5 +51,5 @@ data(Ippolito)
 cvg.stats <- get_cvg_stats(primer.df, template.df)
 # Coverage statistics for multiple primer sets
 data(Comparison)
-cvg.stats.comp <- get_cvg_stats(primer.data, template.data)
+cvg.stats.comp <- get_cvg_stats(primer.data[1:2], template.data[1:2])
 }

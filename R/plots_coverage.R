@@ -537,6 +537,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
 #' @examples
 #' data(Ippolito)
 #' primer.subsets <- subset_primer_set(primer.df, template.df)
+#' # Plot the coverage of optimal primer subsets
 #' plot_primer_subsets(primer.subsets, template.df)
 plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
                             
@@ -1486,7 +1487,7 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
 #' cvg.stats <- get_cvg_stats(primer.df, template.df)
 #' # Coverage statistics for multiple primer sets
 #' data(Comparison)
-#' cvg.stats.comp <- get_cvg_stats(primer.data, template.data)
+#' cvg.stats.comp <- get_cvg_stats(primer.data[1:2], template.data[1:2])
 setGeneric("get_cvg_stats", 
     function(primers, templates, for.viewing = FALSE, total.percentages = FALSE, 
             allowed.mismatches = Inf, cvg.definition = c("constrained", "basic")) {

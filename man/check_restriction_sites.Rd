@@ -49,7 +49,8 @@ restriction site can be found in a sequence.
 }
 \examples{
 data(Ippolito)
-site.df <- check_restriction_sites(primer.df, template.df)
+# Check the first primer for restriction sites:
+site.df <- check_restriction_sites(primer.df[1,], template.df)
 }
 \references{
 Roberts, R.J., Vincze, T., Posfai, J., Macelis, D. (2010) REBASE–a database for DNA restriction

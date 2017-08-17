@@ -51,10 +51,10 @@ settings <- read_settings(setting.xml)
 data(Ippolito)
 out.file.single <- tempfile("evaluation_report", fileext = ".pdf")
 create_report(primer.df, template.df, out.file.single, settings)
-# Creation of a report for multiple primer sets.
+# Creation of a report for multiple primer sets
 data(Comparison)
 out.file.comp <- tempfile("comparison_report", fileext = ".pdf")
-create_report(primer.data[1:3], template.data[1:3], out.file.comp, settings)
+create_report(primer.data[1:2], template.data[1:2], out.file.comp, settings)
 }
 \seealso{
 Other primer functions: \code{\link{Primers-class}},

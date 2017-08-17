@@ -134,13 +134,7 @@ the greedy solution may yield larger primer sets than the ILP solution.
 data(Ippolito)
 constraints(settings)$primer_length <- c("min" = 18, "max" = 18)
 # Design only forward primers using a greedy algorithm
-optimal.primers.greedy <- design_primers(template.df[1:2,], "fw", settings, init.algo = "naive")
-# Design forward and reverse primers using an ILP and store 
-# the results in 'out.dir'
-out.dir <- tempdir()
-optimal.primers.ILP <- design_primers(template.df[1:2,], "both", settings,
-                         init.algo = "naive", opti.algo = "ILP",
-                         cur.results.loc = out.dir)
+optimal.primers.greedy <- design_primers(template.df[1:2,], "both", settings, init.algo = "naive")
 # Usage of the tree-based initialization strategy (requires MAFFT)
 \dontrun{
 optimal.primers.tree <- design_primers(template.df[1:2,], "both", settings,

@@ -74,8 +74,8 @@ data(Ippolito)
 settings.xml <- system.file("extdata", "settings", 
                  "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
 settings <- read_settings(settings.xml)
-# Check all constraints found in 'settings':
-constraint.df <- check_constraints(primer.df, template.df, 
+# Check all constraints in 'settings' for the first two primers:
+constraint.df <- check_constraints(primer.df[1:2,], template.df, 
                      settings, active.constraints = names(constraints(settings)))
 # Summarize the evaluation results
 summary(constraint.df)

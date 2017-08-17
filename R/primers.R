@@ -146,8 +146,8 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 #' @examples
 #' data(Ippolito)
 #' design.estimate <- classify_design_problem(template.df)
-#' # Estimate the number of required primers
-#' design.estimate.nbr <- classify_design_problem(template.df, mode.directionality = "fw",
+#' # Estimate the number of required primers to amplify the first 10 templates
+#' design.estimate.nbr <- classify_design_problem(template.df[1:10,], mode.directionality = "fw",
 #'                          primer.length = 20, primer.estimate = TRUE)
 classify_design_problem <- function(template.df, 
                                     mode.directionality = c("both", "fw", "rev"),
@@ -327,7 +327,8 @@ validate_primers <-  function(object) {
 #' @family primer functions
 #' @examples
 #' data(Ippolito)
-#' site.df <- check_restriction_sites(primer.df, template.df)
+#' # Check the first primer for restriction sites:
+#' site.df <- check_restriction_sites(primer.df[1,], template.df)
 check_restriction_sites <- function(primer.df, template.df, 
                             adapter.action = c("warn", "rm"), 
                             selected = NULL, only.confident.calls = TRUE,

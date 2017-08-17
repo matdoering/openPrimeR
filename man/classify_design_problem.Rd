@@ -71,7 +71,7 @@ primers that would actually be required is typically less.
 \examples{
 data(Ippolito)
 design.estimate <- classify_design_problem(template.df)
-# Estimate the number of required primers
-design.estimate.nbr <- classify_design_problem(template.df, mode.directionality = "fw",
+# Estimate the number of required primers to amplify the first 10 templates
+design.estimate.nbr <- classify_design_problem(template.df[1:10,], mode.directionality = "fw",
                          primer.length = 20, primer.estimate = TRUE)
 }

@@ -35,6 +35,6 @@ coverage condition is annotated for each cell.
 \examples{
 data(Ippolito)
 filename <- tempfile("cvg_overview", fileext = ".xls")
-# store coverage xls file to disk
-create_coverage_xls(primer.df, template.df, filename, settings)
+# Store coverage of the first 2 primers as an XLS file
+create_coverage_xls(primer.df[1:2,], template.df, filename, settings)
 }

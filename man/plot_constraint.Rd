@@ -32,10 +32,10 @@ The current constraint settings are indicated with dashed lines in the plot.
 \examples{
 # Plot histogram of constraints for a single primer set
 data(Ippolito)
-plot_constraint(primer.df, settings)
+plot_constraint(primer.df, settings, active.constraints = c("gc_clamp", "gc_ratio"))
 # Compare constraints across multiple primer sets
 data(Comparison)
-plot_constraint(primer.data, settings)
+plot_constraint(primer.data[1:3], settings, active.constraints = c("gc_clamp", "gc_ratio"))
 }
 \seealso{
 Other constraint visualizations: \code{\link{plot_constraint_deviation}},
