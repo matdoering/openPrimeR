@@ -1,7 +1,19 @@
 language: r
+
 cache: packages
+
 r: bioc-devel
+
 r_packages:
-  - covr
+    - covr
+
+after_script:
+    - FILE=$(ls -1t *.tar.gz | head -n 1)
+    - Rscript -e "library(BiocCheck); BiocCheck(\"${FILE}\")"
+
 after_success:
-  - Rscript -e 'library(covr); codecov()'
+    - Rscript -e 'library(covr); codecov()'
+
+notifications:
+  email:
+      on_failure: mdoering@mpi-inf.mpg.de
