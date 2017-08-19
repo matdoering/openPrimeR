@@ -687,7 +687,8 @@ setMethod("plot_constraint_fulfillment",
     xlab <- "Constraint"
     ylab <- "Primer"
     nbr.constraints <- length(unique(eval.m$Constraint))
-    levels(eval.m$ID) <- abbreviate(levels(eval.m$ID), getOption("openPrimeR.plot_abbrev"))
+    eval.m$ID <- factor(unique(eval.m$ID))
+    levels(eval.m$ID) = abbreviate(levels(eval.m$ID), getOption("openPrimeR.plot_abbrev"))
     p <- ggplot(eval.m, aes_string(x = "Constraint", y = "ID")) + geom_tile(aes_string(fill = "Outcome"), 
         colour = "black") + scale_fill_manual(values = colors) + 
         theme(axis.text.x = element_text(angle = 60, 
