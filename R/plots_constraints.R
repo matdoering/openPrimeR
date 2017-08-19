@@ -49,8 +49,6 @@ get_constraint_deviation_data <- function(constraint.df, constraint.settings) {
         stop("Please input a valid primer data frame.")
     }
     constraints <- names(constraint.settings)
-    # remove efficiency constraint
-    constraints <- constraints[constraints != "primer_efficiency"]
     if (length(constraints) == 0) {
         return(NULL)
     }
@@ -78,7 +76,7 @@ get_constraint_deviation_data <- function(constraint.df, constraint.settings) {
     # convert to percentage deviations
     myfun <- function(value, con.name, constraint.settings) {
         con.name <- as.character(con.name)
-        setting <- constraint.settings[[con.name]]
+        setting <- constraint.settings[[unique(con.name)]]
         if ("min" %in% names(setting) && value < setting["min"]) {
             return((value - setting["min"]) / abs(setting["min"]))
         } else if ("max" %in% names(setting) && value > setting["max"]) {
@@ -404,7 +402,7 @@ string.to.IQR <- function(string.values) {
 #' @return A plot of dimerization free energies.
 #' @keywords internal
 plot.dimer.dist <- function(dimer.data, deltaG.cutoff) {
-    if (length(dimer.data) == 0) {
+    if (length(dimer.data) == 0 || nrow(dimer.data) == 0) {
         return(NULL)
     }
     dimer.df <- dimer.data

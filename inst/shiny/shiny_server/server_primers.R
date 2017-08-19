@@ -442,6 +442,7 @@ problem.difficulty <- eventReactive(input$evaluate_difficulty, {
                         input$required_opti_cvg 
                         ))
     # check for warnings:
+    # n.b.: creates a 'dbeta' NaN warning: from fitdistr, not my fault!
     for (i in seq_along(design.diff$warnings)) {
         warning <- design.diff$warnings[[i]]
         if (inherits(warning, "ProblemEstimationProblem")) {

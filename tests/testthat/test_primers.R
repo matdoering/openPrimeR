@@ -28,5 +28,15 @@ test_that("Primer Set Significance", {
     expect_warning(primer_significance(constraint.df, active.constraints = "gc_ratio"))
     p <- primer_significance(primer.df) # should be significant
     expect_lt(as.numeric(p), 1e-3)
+})
 
+test_that("Primer fw+rev", {
+    # check that primer sets with pairs of primers and mixed directions is analyzed correctly
+    data(Ippolito)
+    primer.location <- system.file("extdata", "IMGT_data", "primers", "Test", 
+                        "test_both.fasta", package = "openPrimeR")
+    primers <- read_primers(primer.location, "_fw", "_rev")
+    constraint.df <- check_constraints(primers, template.df, settings)
+    temp.file <- tempfile(fileext = ".pdf")
+    create_report(constraint.df, template.df, temp.file, settings)
 })

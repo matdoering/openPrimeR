@@ -267,8 +267,6 @@ view.primers <- function(primer.df, template.df) {
     out.df <- view.cvg.primers(primer.df, template.df, 
                             mode.directionality, view.cvg.individual = "inactive", 
                             for.shiny = FALSE)
-    # select a column subset:
-    out.df <- out.df # not here ...
     # format relative binding range: select the majority binding region
     range.cols <- c("Relative Binding Range", "Relative Binding Range (fw)", "Relative Binding Range (rev)")
     for (i in seq_along(range.cols)) {
@@ -333,14 +331,13 @@ view.primers.report <- function(primer.df, template.df) {
     }
     col.names <- colnames(out.df) 
     # change mismatch representation to IQR representation:
-    # TODO error for rev primers ...
     mm.values <- sapply(seq_len(nrow(primer.df)), function(x) paste0(primer.df[x, "Nbr_of_mismatches_fw"], 
                                                                 primer.df[x, "Nbr_of_mismatches_rev"], collapse = ","))
     #print(mm.values)
     #print("MM values:")
     mm.rep <- string.to.IQR(mm.values)
     # TODO: integrate value columns when merging primers in 'view.primers()'
-    if (length(mm.rep) == nrow(out.df)) {
+    if ("Sequence" %in% colnames(out.df)) {
         # TODO: for both, the size of the primer data frame is reduced
         # and we haven't defined the values of the merged columns!!!
         # -> number of mismatches is NA at the moment, also, we don't show more than 4 columns in the report anyway.

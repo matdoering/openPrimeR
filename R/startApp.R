@@ -68,7 +68,7 @@ runTutorial <- function(dev = FALSE) {
     # n.b.: need to manually call to create html files to be included in pkg
     if (dev) {
         # development
-        rmarkdown::run("src/openPrimeR/inst/tutorials/introduction/introduction.Rmd")
+        rmarkdown::run(system.file("inst", "tutorials", "introduction", "introduction.Rmd", package = "openPrimeR"))
     } else {
         # release
         learnr::run_tutorial("introduction", package = "openPrimeR")

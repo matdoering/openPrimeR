@@ -232,7 +232,6 @@ classify_design_problem <- function(template.df,
                    "Uncertain" = uncertain.class,
                    "Nbr_primers_fw" = nbr.fw.primers,
                    "Nbr_primers_rev" = nbr.rev.primers)
-
     return(result)
 }
 greedy.primers <- function(binding.df, template.df, required.cvg = 1) {
@@ -899,9 +898,9 @@ my_show_df <- function(x, topn = 3,
     topn = max(as.integer(topn),1L)
     if (nrow(x) == 0L) {
         if (length(x)==0L)
-           cat("Empty object of class ", class(x), ".\n")
+           cat(paste0("Empty object of class '", class(x), "'.\n"))
         else
-           cat("Object of class ", class(x), " without any rows.")
+           cat(paste0("Object of class '", class(x), "' without any rows.\n"))
         return(invisible())
     }
     if (topn*2<nrow(x) && (nrow(x)>nrows || !topnmiss)) {
@@ -1819,9 +1818,9 @@ pair_primers <- function(primer.df, template.df) {
     if (!"primer_coverage" %in% colnames(primer.df)) {
         stop("pair_primers requires primer coverage.")
     }
-    # don't need to pair already paired primers ...
+    # store already paired primers in 'both.df' for later output
     both.df <- primer.df[primer.df$Direction == "both",]
-    # try to pair all single forward primers
+    # try to pair all single forward/reverse primers
     fw.s.idx <- which(primer.df$Direction == "fw")
     rev.s.idx <- which(primer.df$Direction == "rev")
     # combinations of fw and rev primers
@@ -1833,6 +1832,7 @@ pair_primers <- function(primer.df, template.df) {
     )
     cvg.shared <- sapply(cvd.shared, length)
     combis$Coverage <- cvg.shared
+    # exclude pairs that don't share any coverage
     sel.combis <- which(combis$Coverage != 0)
     combis <- combis[sel.combis,]
     # construct a new primer data frame using the pairs
@@ -1841,13 +1841,19 @@ pair_primers <- function(primer.df, template.df) {
     pair.df$primer_coverage <- combis$Coverage
     pair.df$Coverage_Ratio <- pair.df$primer_coverage / nrow(template.df)
     pair.df$Covered_Seqs <- unlist(lapply(cvd.shared[sel.combis], function(x) paste(template.df$Identifier[x], collapse = ",")))
-    pair.df$Direction <- "both"
-    pair.df$ID <- factor(paste0(abbreviate(primer.df$Identifier[combis[,1]], 5), "+", abbreviate(primer.df$Identifier[combis[,2]], 5)))
+    pair.df$Direction <- rep("both", nrow(combis))
+    if (nrow(combis) != 0) {
+        pair.df$ID <- factor(paste0(abbreviate(primer.df$Identifier[combis[,1]], 5), "+", abbreviate(primer.df$Identifier[combis[,2]], 5)))
+    }
+    # select non-redundant pairs of primers:
     cvg.matrix <- get.coverage.matrix(pair.df, template.df)
     sel.cols <- remove.redundant.cols(seq_len(nrow(pair.df)), cvg.matrix)
     pair.df <- pair.df[sel.cols,]
     # output the already paired primers as well as the new pairs
     out.df <- my_rbind(both.df, pair.df)
+    # check whether some primers couldn't be paired
+    missing.idx <- which(unlist(lapply(seq_len(nrow(primer.df)), function(x) all(!grepl(primer.df$ID[x], out.df$ID)))))
+    out.df <- my_rbind(primer.df[missing.idx, ], out.df)
     return(out.df)
 }
 

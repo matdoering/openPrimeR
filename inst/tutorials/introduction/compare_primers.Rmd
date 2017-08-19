@@ -1,0 +1,138 @@
+## Comparing primer sets
+
+At its core, comparing primer sets is based on the same functions as for analyzing individual primer sets. Therefore, we will now simply load several pre-evaluated sets of primers and their corresponding templates:
+
+```{r load_comparison_data, exercise = TRUE}
+sel.sets <- c("Glas", "Rubinstein", "Persson", "Ippolito", "Scheid")
+primer.files <- list.files(path = system.file("extdata", "IMGT_data", "comparison", 
+                           "primer_sets", "IGH", package = "openPrimeR"),
+                pattern = "*\\.csv", full.names = TRUE)
+primer.data <- read_primers(primer.files)
+sel.idx <- unlist(lapply(sel.sets, function(x) grep(x, names(primer.data))[1]))
+primer.data <- primer.data[sel.idx]
+template.files <- rep(system.file("extdata", "IMGT_data", "comparison", "templates", 
+                              "IGH_templates.csv", package = "openPrimeR"), 
+                              length(primer.data))
+template.data <- read_templates(template.files)
+```
+
+### Comparing the coverage
+
+To compare the coverage of the templates that is afforded by each primer set, we can use `plot_template_cvg()`:
+
+```{r comparison_setup}
+sel.sets <- c("Glas", "Rubinstein", "Persson", "Ippolito", "Scheid")
+primer.files <- list.files(path = system.file("extdata", "IMGT_data", "comparison", 
+                           "primer_sets", "IGH", package = "openPrimeR"),
+                pattern = "*\\.csv", full.names = TRUE)
+primer.data <- read_primers(primer.files)
+sel.idx <- unlist(lapply(sel.sets, function(x) grep(x, names(primer.data))[1]))
+primer.data <- primer.data[sel.idx]
+template.files <- rep(system.file("extdata", "IMGT_data", "comparison", "templates", 
+                              "IGH_templates.csv", package = "openPrimeR"), 
+                              length(primer.data))
+template.data <- read_templates(template.files)
+```
+
+```{r comparison_cvg, exercise = TRUE, exercise.setup = "comparison_setup"}
+# Plot the template coverage
+```
+
+```{r comparison_cvg-solution}
+plot_template_cvg(primer.data, template.data)
+```
+
+The plot shows that the primer sets from *Glas* and *Ippolito* outperform the other sets with respect to coverage. The sets from *Person*, *Rubinstein*, and *Scheid* seem to lack coverage of IGHV2. To gain a better understanding of the qualities of the individual primer sets, let's analyze the distribution of coverage events with regard to mismatches:
+
+```{r comparison_cvg_mm, exercise = TRUE, exercise.setup = "comparison_setup"}
+# Plot the template coverage with mismatches
+```
+
+```{r comparison_cvg_mm-solution}
+plot_template_cvg(primer.data, template.data, per.mismatch = TRUE)
+```
+
+From the distribution of binding events with regard to mismatches, we see that the *Ippolito* has a favorable performance for few mismatches since the set guarantees high coverages already without introducing many mutations into the sequences. While the sets from *Scheid* and *Glas* perform similarly well for few mismatches, the sets from *Persson* and *Rubinstein* achieve high coverages only with many mismatches. 
+
+Apart from the coverage, the number of primers may be of concern since unnecessarily large sets may increase costs and be subject to primer-primer interactions. We can analyze the relationship between the percentage of covered templates and the size of the primer sets through `plot_cvg_vs_set_size()`:
+
+```{r comparison_size, exercise = TRUE, exercise.setup = "comparison_setup"}
+# Plot coverage vs size of primer set
+```
+
+```{r comparison_size-solution}
+plot_cvg_vs_set_size(primer.data, template.data)
+```
+
+The plot reveals that the primer sets from *Persson*, *Rubinstein*, and *Ippolito* have acceptable sizes and that the sets from *Scheid* and *Glas* may be prohibitively large. The plot also reveals to which degree the sets fulfill the constraints as the radii of the points indicate the degree of constraint fulfillment. Since the radii of the sets are quite similar there doesn't seem to be a big difference between the sets with respect to constraint fulfillment.
+
+### Comparing primer properties
+
+We'll now investigate which constraints are unsatisfied by using `plot_constraint_fulfillment()` and determine the extent to which the constraints are broken using `plot_constraint_deviation()`:
+
+```{r comparison_setup2}
+library(openPrimeR)
+xml.file <- system.file("extdata", "settings", "B_Taq_PCR_evaluate.xml",
+              package = "openPrimeR")
+settings <- read_settings(xml.file)
+# don't consider specificity: we don't want to interpret this here ..
+constraints(settings) <- constraints(settings)[names(constraints(settings)) != "primer_specificity"]
+sel.sets <- c("Glas", "Rubinstein", "Persson", "Ippolito", "Scheid")
+primer.files <- list.files(path = system.file("extdata", "IMGT_data", "comparison", 
+                           "primer_sets", "IGH", package = "openPrimeR"),
+                pattern = "*\\.csv", full.names = TRUE)
+primer.data <- read_primers(primer.files)
+sel.idx <- unlist(lapply(sel.sets, function(x) grep(x, names(primer.data))[1]))
+primer.data <- primer.data[sel.idx]
+template.files <- rep(system.file("extdata", "IMGT_data", "comparison", "templates", 
+                              "IGH_templates.csv", package = "openPrimeR"), 
+                              length(primer.data))
+template.data <- read_templates(template.files)
+```
+
+
+```{r comparison_deviation, exercise = TRUE, exercise.setup = "comparison_setup2"}
+# Plot the constraint fulfillment and deviation 
+```
+
+```{r comparison_deviation-solution}
+plot_constraint_fulfillment(primer.data, settings)
+plot_constraint_deviation(primer.data, settings)
+```
+
+Looking at the results, we can make the following findings:
+
+* Although the extent of the deviation from the cross dimerization constraint is small, all sets exhibit some cross dimerization, which may cause problems.
+* All primer sets except that from *Persson* have high melting temperature deviations. The melting temperature deviation for the *Ippolito* set may still be acceptable.
+* Some primers from *Glas* may form considerable secondary structures.
+
+In summary, the primers from *Persson* fulfill the constraints extremely well. The sets from *Glas*, *Rubinstein*, and *Scheid* may be problematic due to the high melting temperature deviations. 
+
+### Comparing primer binding regions
+
+Finally, let us consider the regions where the primers bind in the templates. Since we've allowed for off-target binding events it's important to verify whether the primers bind close to the target region or not using `plot_primer_binding_regions()`:
+
+```{r comparison_binding_regions, exercise = TRUE, exercise.setup = "comparison_setup2"}
+# Plot the binding positions of the primers
+```
+
+```{r comparison_binding_regions-solution}
+plot_primer_binding_regions(primer.data, template.data)
+```
+
+In this case, the blue region indicates the leader of the immunoglobulins, while the red region shows the variable exon region. Hence, the primers should start amplifying the templates at position 0 (the start of the exon) at the latest. However, this is not the case for all primer sets:
+
+* The primers from *Glas* seem to bind along the full range of the sequence, which would result in shortened amplicons
+* For the sets from *Rubinstein*, *Persson*, and *Scheid*, at least one primer seems to bind too far downstream to amplify the full exon
+* All primers from *Ippolito* bind directly at the start of the exon ensuring complete amplicons
+* The primers from *Scheid* bind to the leader, which can be favorable for amplifying highly mutated immunoglobulins
+
+### What is the best primer set?
+
+Considering all criteria, we would probably want to select the set from *Ippolito* for performing PCRs on the heavy chains of immunoglobulins due to the following reasons:
+
+* The set has one of the highest coverage of templates, also for few mismatches
+* The set is quite small
+* It fulfills the desirable constraints for primers reasonably well
+
+If you'd like to store the results of comparing the primer sets you can create a PDF report using `create_report()`. 

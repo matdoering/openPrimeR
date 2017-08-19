@@ -416,7 +416,7 @@ output$primer_cvg_stats_mismatch <- DT::renderDataTable({
 
 output$template_coverage_mismatch_ui <- renderUI({
     # important: set size of plot here to prevent overlap in the UI
-    plotOutput("template_coverage_mismatch", width = 1200, height = cvg.template.mismatch.height()) # TODO: change height!!
+    plotOutput("template_coverage_mismatch", width = 1200, height = cvg.template.mismatch.height())
 })
 cvg.template.mismatch.height <- reactive({
     # height of template coverage plot, stratified by mismatches
@@ -440,7 +440,7 @@ cvg.template.mismatch.height <- reactive({
             break
         }
     }
-    height <- openPrimeR:::get.plot.height(ceiling(max.mm + 1) / 2, 400, 600)
+    height <- openPrimeR:::get.plot.height(ceiling(max.mm + 1) / 2, 200, 600)
     return(height)
 })
 

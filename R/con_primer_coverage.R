@@ -694,8 +694,6 @@ evaluate.basic.cvg <- function(template.df, primers, mode.directionality = c("fw
     binding <- merge.binding.information(primers, fw.binding.filtered, rev.binding.filtered, mode.directionality, idx.fw, idx.rev)
     # off-target binding:
     off.binding <- merge.binding.information(primers, fw.binding.data$off_target, rev.binding.data$off_target, mode.directionality, idx.fw, idx.rev)
-    x <- NULL
-    #for (x in seq_along(primers$Identifier)) { # TODO: remove, only for debug 
     on.df <- compute.basic.details(binding, "on_target", template.df, primers, mode.directionality,
                                allowed.mismatches, allowed.other.binding.ratio, 
                                allowed.region.definition, updateProgress)
@@ -713,6 +711,25 @@ evaluate.basic.cvg <- function(template.df, primers, mode.directionality = c("fw
     specificity[is.na(specificity)] <- 0
     cvg.df$primer_specificity <- specificity
     return(cvg.df)
+}
+get.mismatch.info <- function(primers, template.df, binding, covered.seqs.idx, primer.type = c("fw", "rev")) {
+    primer.type <- match.arg(primer.type)
+    subject <- Biostrings::DNAStringSet(template.df$Sequence[covered.seqs.idx])
+    w <- Biostrings::width(subject)  # template lengths
+    # cumulative index in the concatenation of template strings
+    idx <- c(0, cumsum(head(w, length(w) - 1)))
+    s <- unlist(subject)
+    mm.info <- NULL
+    if (primer.type == "fw") {
+        f <- IRanges::Views(s, binding@start + idx, (binding@start + binding@width - 1) + idx)  
+        mm.info <- mismatch.info(primers$Forward, f) 
+    } else if (primer.type == "rev") {
+        # rev
+        f <- IRanges::Views(s, binding@start + idx, 
+                    (binding@start + binding@width - 1) + idx)
+        mm.info <- mismatch.info(primers$Reverse, Biostrings::reverseComplement(f))
+    }
+    return(mm.info)
 }
 #' Computation of Coverage Details
 #'
@@ -798,39 +815,14 @@ compute.basic.details <- function(binding, mode = c("on_target", "off_target"), 
         #######
         # A: determine covered templates
         ########
-		if (primer.type == "both") {
-            # templates should be covered by both directions
-			covered.seqs.idx <- intersect(metadata(fw.binding)$template_idx,
-			                    metadata(rev.binding)$template_idx)
-		} else if (primer.type == "fw") {
-            covered.seqs.idx <- metadata(fw.binding)$template_idx
-		} else {
-            covered.seqs.idx <- metadata(rev.binding)$template_idx
-		}
-        covered.seqs <- template.df$Identifier[covered.seqs.idx]
+        covered.seqs.idx.fw <- metadata(fw.binding)$template_idx
+        covered.seqs.idx.rev <- metadata(rev.binding)$template_idx
         ###############
         # Mismatch Info
         ################
-        fw.mm.info <- NULL
-        rev.mm.info <- NULL
-        # on-target:
-        subject <- Biostrings::DNAStringSet(template.df$Sequence[covered.seqs.idx])
-        w <- Biostrings::width(subject)  # template lengths
-        # cumulative index in the concatenation of template strings
-        idx <- c(0, cumsum(head(w, length(w) - 1)))
-        s <- unlist(subject)
-        if (primer.type == "fw" || primer.type == "both") {
-            f <- IRanges::Views(s, fw.binding@start + idx, (fw.binding@start + fw.binding@width - 1) + idx)  
-            fw.mm.info <- mismatch.info(primers$Forward[x], f) 
-        } 
-        if (primer.type == "rev" || primer.type == "both") {
-            # rev
-            f <- IRanges::Views(s, rev.binding@start + idx, 
-                        (rev.binding@start + rev.binding@width - 1) + idx)
-            rev.mm.info <- mismatch.info(primers$Reverse[x], Biostrings::reverseComplement(f))
-        }
+        fw.mm.info <- get.mismatch.info(primers[x,], template.df, fw.binding, covered.seqs.idx.fw, "fw")
+        rev.mm.info <- get.mismatch.info(primers[x,], template.df, rev.binding, covered.seqs.idx.rev, "rev")
         # select only the best binding mode in each template target region: select binding w/ smallest nbr of mismatches
-        ##########
         sel.idx.fw <- select_best_binding(fw.binding, fw.mm.info)
         sel.idx.rev <- select_best_binding(rev.binding, rev.mm.info)
         ########
@@ -1032,7 +1024,7 @@ evaluate.constrained.cvg <- function(template.df, primer.df, cvg.df, mode.direct
     out <- filter.res[, keep.cols[keep.cols %in% colnames(filter.res)]]
     return(out)
 }
-get_duplex_events <- function(fw.df, annealing.temp, ions) {
+get_duplex_events <- function(fw.df, annealing.temp, ions, primer.df) {
     if (length(fw.df) == 0 || nrow(fw.df) == 0) {
         return(NULL)
     }
@@ -1052,8 +1044,8 @@ get_duplex_events <- function(fw.df, annealing.temp, ions) {
     combi.df <- combi.df[, !colnames(combi.df) %in% c("TemplateIdentifier.y", "PrimerIdentifier.y")]
     ## restore original order for accessing the unique index:
     combi.df <- combi.df[order(combi.df$Index),]
-    #m <- match(combi.df$Template, unique.df$Template)
-    duplex.result.fw <- get.dimer.data(unique.df$Primer, unique.df$Template, annealing.temp, ions, no.structures = TRUE) 
+    # nb: it's critical that the annealing temperatures are replicated correctly here for individual primers
+    duplex.result.fw <- get.dimer.data(unique.df$Primer, unique.df$Template, annealing.temp[match(unique.df$PrimerIdentifier, primer.df$Identifier)], ions, no.structures = TRUE) 
     if (length(duplex.result.fw) != 0) {
         duplex.result.fw <- plyr::ddply(duplex.result.fw, c("Idx1"), function(x) arrange(x, substitute(DeltaG))[1, ])
         #duplex.result.fw <- data.frame(PrimerIdentifier = unique.df$PrimerIdentifier, TemplateIdentifier = unique.df$TemplateIdentifier, duplex.result.fw, stringsAsFactors = FALSE)
@@ -1082,6 +1074,8 @@ get.duplex.energies <- function(primer.df, template.df, annealing.temp, settings
     if (length(mode) == 0) {
         stop("Please provide the 'mode' argument.")
     }
+    #print("duplex energies: temperatures are:")
+    #print(annealing.temp)
     mode <- match.arg(mode)
     if (mode == "on_target") {
         # on target binding events
@@ -1108,6 +1102,7 @@ get.duplex.energies <- function(primer.df, template.df, annealing.temp, settings
     # don't parallelize: dimerization is already parallelized!
     fw.p <- vector("list", nrow(primer.df))
     fw.t <- vector("list", nrow(primer.df))
+    fw.ids <- vector("list", nrow(primer.df))
     rev.p <- vector("list", nrow(primer.df))
     rev.t <- vector("list", nrow(primer.df))
     for (i in seq_len(nrow(primer.df))) {
@@ -1144,39 +1139,36 @@ get.duplex.energies <- function(primer.df, template.df, annealing.temp, settings
         rev.t[[i]] <- rev.templates
     }
     fw.ids <- unlist(lapply(seq_along(fw.p), function(x) rep(as.character(primer.df$Identifier[x]), length(fw.p[[x]]))))
-    t.ids <- as.character(template.df$Identifier[unlist(all.covered.seq.idx)])
-    if (length(fw.ids) != 0) {
-        fw.t.ids <- t.ids
-    } else {
-        fw.t.ids <- NULL
-    }
+    fw.t.ids <- unlist(all.covered.seq.idx[match(unique(fw.ids), primer.df$Identifier)])
     fw.df <- data.frame(PrimerIdentifier = fw.ids, TemplateIdentifier = fw.t.ids, Primer = unlist(fw.p), Template = unlist(fw.t), stringsAsFactors = FALSE)
-    duplex.data.fw <- get_duplex_events(fw.df, annealing.temp[i], ions)
+    # get the free energies for fw primers
+    duplex.data.fw <- get_duplex_events(fw.df, annealing.temp, ions, primer.df)
     rev.ids <- unlist(lapply(seq_along(rev.p), function(x) rep(as.character(primer.df$Identifier[x]), length(rev.p[[x]]))))
-    if (length(rev.ids) != 0) {
-        rev.t.ids <- t.ids
-    } else {
-        rev.t.ids <- NULL
-    }
+    rev.t.ids <- unlist(all.covered.seq.idx[match(unique(rev.ids), primer.df$Identifier)])    
     rev.df <- data.frame(PrimerIdentifier = rev.ids, TemplateIdentifier = rev.t.ids, Primer = unlist(rev.p), Template = unlist(rev.t), stringsAsFactors = FALSE)
-    duplex.data.rev <- get_duplex_events(rev.df, annealing.temp[i], ions)
+    # get the free energies for rev primers
+    duplex.data.rev <- get_duplex_events(rev.df, annealing.temp, ions, primer.df)
+    # unify fw/rev data
     out <- vector("list", nrow(primer.df))
     for (i in seq_len(nrow(primer.df))) {
+        # nb: 'nrow' is important, otherwise length of data.frame is defined by its number of columns when the data frame is empty
         if (length(duplex.data.fw) != 0) {
             cur.fw.data <- duplex.data.fw[duplex.data.fw$PrimerIdentifier == primer.df$Identifier[i], ]
         } else {
-            cur.fw.data <- NULL
+            cur.fw.data <- data.frame()
         }
         if (length(duplex.data.rev) != 0) {
             cur.rev.data <- duplex.data.rev[duplex.data.rev$PrimerIdentifier == primer.df$Identifier[i], ]
         } else {
-            cur.rev.data <- NULL
+            cur.rev.data <- data.frame()
         }
-        if (length(cur.fw.data) != 0 && length(cur.rev.data) != 0) {
+        if (nrow(cur.fw.data) != 0 && nrow(cur.rev.data) != 0) {
             out[[i]] <- sapply(seq_len(nrow(cur.fw.data)), function(x) min(cur.fw.data$DeltaG[x], cur.rev.data$DeltaG))
-        } else if (length(cur.fw.data) != 0) {
+            #print(i)
+            #print(out[[i]])
+        } else if (nrow(cur.fw.data) != 0) {
             out[[i]] <- cur.fw.data$DeltaG
-        } else if (length(cur.rev.data) != 0) {
+        } else if (nrow(cur.rev.data) != 0) {
             out[[i]] <- cur.rev.data$DeltaG
         }
     }
@@ -1298,8 +1290,9 @@ predict_coverage <- function(primer.df, template.df, settings, mode = c("on_targ
     }
     mode.directionality <- get.analysis.mode(primer.df)
     # compute annealingDeltaG:
-    cvg_constraints(settings)$annealing_DeltaG <- c("max" = 0)
+    cvg_constraints(settings) <- list("annealing_DeltaG" = c("max" = Inf))
     if (mode == "on_target") {
+        # TODO: check different annealing_DeltaG values
         p.df <- compute.constraints(primer.df, mode.directionality, 
                     template.df, settings, 
                     active.constraints = "annealing_DeltaG")
@@ -1318,6 +1311,11 @@ predict_coverage <- function(primer.df, template.df, settings, mode = c("on_targ
     }
     if (class(pred) == "try-error") {
         stop("Could not predict coverage using the logistic model. Maybe some columns are missing in the data frame? Provided columns were: ", colnames(pred.matrix), ". Dimension of matrix:", dim(pred.matrix))
+    }
+    # check whether predictions are available for all primer coverage events
+    if (any(is.na(pred))) {
+        idx <- which(is.na(pred))
+        warning("No prediction available for: ", paste(pred.matrix$Primer[idx], collapse = ","))
     }
     #print(pred)
     # transform coverage probabilities to FPR

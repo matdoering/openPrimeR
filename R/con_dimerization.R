@@ -22,6 +22,9 @@ get.self.dimers <- function(primers.1, primers.2, ions, annealing.temp,
     idx <- which(primers.1 != "" & primers.2 != "")
     dimer.data <- get.dimer.data(primers.1[idx], primers.2[idx],
                                   annealing.temp, ions, no.structures = no.structures)
+    # return the correct indices:
+    dimer.data$Idx1 <- idx[dimer.data$Idx1]
+    dimer.data$Idx2 <- idx[dimer.data$Idx2]
     return(dimer.data)
 }
 
@@ -300,11 +303,18 @@ compute.all.cross.dimers <- function(primer.df, primer_conc, na_salt_conc, mg_sa
     # filter out duplicate conformations for the same primer pair
     # replaced plyr call with dplyr call for speed for large matrices ..
     #result <- ddply(results, c("Idx1", "Idx2"), function(x) arrange(x, substitute(DeltaG))[1, ])
-    #result <- results %>% dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% dplyr::summarise(DeltaG = min(DeltaG))
+    ######
+    # slicing info:
+    # https://github.com/tidyverse/dplyr/issues/3034
+    #########
+    # alternative
+    # result <- as.data.frame(results %>% 
+    #                         dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% 
+    #                         dplyr::arrange_("DeltaG") %>%
+    #                         dplyr::slice(1))
     result <- as.data.frame(results %>% 
                             dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% 
-                            dplyr::slice(which.min(substitute(DeltaG)))
-                            )
+                            dplyr::slice(which.min(!! quote(DeltaG)))) # !! is inline operator to 'unquote' an expression
     if (for.shiny) {
         result <- view.dimer.df(result, "Cross")
     }
@@ -675,6 +685,9 @@ batchify.simple <- function(tasks) {
 #' @keywords internal
 batchify.temp <- function(tasks, annealing.temp) {
     # range of sampled annealing temperatures for batchification
+    if (length(annealing.temp) != length(tasks)) {
+        stop("Need matching length of annealing temperatures and tasks for batchification! Number of provided annealing temperatures: ", length(annealing.temp), "; Number of tasks: ", length(tasks))
+    }
     temps <- seq(min(annealing.temp), max(annealing.temp), 2)
     # assign every task to a temp
     temp.idx <- sapply(annealing.temp, function(x) which.min(abs(x - temps)))
@@ -721,6 +734,8 @@ batchify <- function(tasks, annealing.temps = NULL) {
 get.dimer.data <- function(s1, s2, annealing.temp, ions, no.structures) {
     #print("preparing dimer seqs")
     seq.data <- prepare.dimer.seqs(s1, s2)
+    # update annealing temps to match 'seq.data'
+    annealing.temp <- annealing.temp[match(seq.data$combis$Idx1, seq_along(annealing.temp))]
     #print("preparation done")
     s1 <- seq.data$Seqs1
     s2 <- seq.data$Seqs2
