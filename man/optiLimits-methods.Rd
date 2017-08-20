@@ -13,6 +13,9 @@ optiLimits(x)
 \arguments{
 \item{x}{A \code{DesignSettings} object.}
 }
+\value{
+Gets the optimization constraint limits.
+}
 \description{
 Gets the limits for the constraints
 that are applied just before the optimization procedure

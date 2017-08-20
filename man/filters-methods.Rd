@@ -13,6 +13,9 @@ filters(x)
 \arguments{
 \item{x}{A \code{DesignSettings} object.}
 }
+\value{
+Gets the list of filtering constraints.
+}
 \description{
 Gets the constraints on the physicochemical properties
 that are used for the filtering procedure when designing primers

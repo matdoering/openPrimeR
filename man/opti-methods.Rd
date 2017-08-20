@@ -13,6 +13,9 @@ opti(x)
 \arguments{
 \item{x}{A \code{DesignSettings} object.}
 }
+\value{
+Gets the list of optimization constraints.
+}
 \description{
 Gets the constraints on the physicochemical properties
 that are applied just before the optimization procedure

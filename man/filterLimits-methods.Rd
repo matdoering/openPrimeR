@@ -13,6 +13,9 @@ filterLimits(x)
 \arguments{
 \item{x}{A \code{DesignSettings} object.}
 }
+\value{
+Gets the list of filtering limits.
+}
 \description{
 Gets the limits on the constraints
 that are used for the filtering procedure when designing primers

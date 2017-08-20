@@ -33,6 +33,11 @@ should have a permissible name and consist of at most two
 values providing the minimal and/or maximal allowed values, which
 have to be denominated via \code{min} and \code{max}.}
 }
+\value{
+Gets the list of constraints.
+
+Sets the list of constraints.
+}
 \description{
 Gets the active constraints of the provided
 \code{DesignSettings} object \code{x}.

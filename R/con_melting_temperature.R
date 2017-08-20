@@ -97,9 +97,9 @@ compute.empiric.melting.temp <- function(primer.df) {
         A <- sapply(x, function(y) length(which(y == "a")))
         C <- sapply(x, function(y) length(which(y == "c")))
         G <- sapply(x, function(y) length(which(y == "g")))
-        T <- sapply(x, function(y) length(which(y == "t")))
+        T.count <- sapply(x, function(y) length(which(y == "t")))
         # return the smallest reuired melting temperature
-        Tm <- 64.9 + 41 * (G + C - 16.4) / (A + T + G + C) 
+        Tm <- 64.9 + 41 * (G + C - 16.4) / (A + T.count + G + C) 
         return(min(Tm))
     }
     Tm.fw <- sapply(fw.seqs, Tm)

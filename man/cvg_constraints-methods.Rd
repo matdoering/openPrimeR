@@ -28,6 +28,11 @@ are to be indicated via \code{min} and \code{max}.
 The permissible contraint identifiers are documented in the
 \code{\link{CoverageConstraints}} class.}
 }
+\value{
+Gets the list of coverage constraints.
+
+Sets the list of coverage constraints.
+}
 \description{
 Gets the coverage constraints of the provided
 \code{DesignSettings} object \code{x}.

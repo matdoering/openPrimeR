@@ -24,6 +24,11 @@ are to be modified.}
 \item{value}{A list with constraint boundaries. The permissible fields 
 of the list are provided in \code{\link{ConstraintSettings}}.}
 }
+\value{
+Gets the list of constraint limits.
+
+Sets the list of constraint limits.
+}
 \description{
 Gets the constraint limits that are defined in the provided 
 \code{DesignSettings} object \code{x}.

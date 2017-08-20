@@ -456,6 +456,7 @@ check_settings_validity <- function(object) {
 #' @name constraints
 #' @rdname constraints-methods
 #' @exportMethod constraints
+#' @return Gets the list of constraints.
 #' @keywords Settings
 #' @family settings functions
 setGeneric("constraints", function(x) standardGeneric("constraints"))
@@ -483,6 +484,7 @@ setMethod("constraints", c("AbstractConstraintSettings"),
 #' \code{DesignSettings} object \code{x}.
 #' @name cvg_constraints
 #' @exportMethod cvg_constraints
+#' @return Gets the list of coverage constraints.
 #' @rdname cvg_constraints-methods
 #' @keywords Settings
 #' @family settings functions
@@ -502,7 +504,7 @@ setMethod("cvg_constraints", "DesignSettings", function(x) {
 #' that are used for the filtering procedure when designing primers
 #' using the \code{Input_Constraints} slot of the provided
 #' \code{DesignSettings} object \code{x}.
-#'
+#' @return Gets the list of filtering constraints.
 #' @name filters
 #' @keywords internal
 #' @rdname filters-methods
@@ -524,7 +526,7 @@ setMethod("filters", "DesignSettings", function(x) {
 #' that are used for the filtering procedure when designing primers
 #' using the \code{Input_Constraint_Boundaries} slot of the provided
 #' \code{DesignSettings} object \code{x}.
-#'
+#' @return Gets the list of filtering limits.
 #' @name filterLimits
 #' @rdname filterLimits-methods
 #' @keywords internal
@@ -545,7 +547,7 @@ setMethod("filterLimits", "DesignSettings", function(x) {
 #' that are applied just before the optimization procedure
 #' using the \code{Input_Constraints} slot of the provided
 #' \code{DesignSettings} object \code{x}.
-#'
+#' @return Gets the list of optimization constraints.
 #' @name opti
 #' @rdname opti-methods
 #' @keywords internal
@@ -568,7 +570,7 @@ setMethod("opti", "DesignSettings", function(x) {
 #' that are applied just before the optimization procedure
 #' using the \code{Input_Constraint_Boundaries} slot of the provided
 #' \code{DesignSettings} object \code{x}.
-#'
+#' @return Gets the optimization constraint limits.
 #' @name optiLimits
 #' @rdname optiLimits-methods
 #' @keywords internal
@@ -591,6 +593,7 @@ setMethod("optiLimits", "DesignSettings", function(x) {
 #'
 #' @name PCR
 #' @rdname PCR-methods
+#' @return Gets the list of PCR conditions.
 #' @exportMethod PCR
 #' @family settings functions
 #' @keywords Settings
@@ -610,6 +613,7 @@ setMethod("PCR", "DesignSettings", function(x) {
 #' @name conOptions
 #' @rdname conOptions-methods
 #' @exportMethod conOptions
+#' @return Gets the constraint options list.
 #' @keywords Settings
 #' @family settings functions
 setGeneric("conOptions", function(x) standardGeneric("conOptions"))
@@ -630,6 +634,7 @@ setMethod("conOptions", "DesignSettings",
 #' @name constraintLimits
 #' @rdname constraintLimits-methods
 #' @keywords Settings
+#' @return Gets the list of constraint limits.
 #' @exportMethod constraintLimits
 #' @family settings functions
 setGeneric("constraintLimits", function(x) standardGeneric("constraintLimits"))
@@ -663,6 +668,7 @@ setMethod("constraintLimits", "DesignSettings",
 #' should have a permissible name and consist of at most two
 #' values providing the minimal and/or maximal allowed values, which
 #' have to be denominated via \code{min} and \code{max}. 
+#' @return Sets the list of constraints.
 #' @examples
 #' # Load some settings
 #' data(Ippolito)
@@ -735,6 +741,7 @@ setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
 #' are to be indicated via \code{min} and \code{max}.
 #' The permissible contraint identifiers are documented in the
 #' \code{\link{CoverageConstraints}} class.
+#' @return Sets the list of coverage constraints.
 #' @examples
 #' # Load some settings
 #' data(Ippolito)
@@ -766,6 +773,7 @@ setReplaceMethod("cvg_constraints", "DesignSettings",
 #' are to be modified.
 #' @param value A list with constraint boundaries. The permissible fields 
 #' of the list are provided in \code{\link{ConstraintSettings}}.
+#' @return Sets the list of constraint limits.
 #' @examples
 #' # Load some settings
 #' data(Ippolito)
@@ -806,6 +814,7 @@ setReplaceMethod("constraintLimits", "DesignSettings",
 #' @param value A named list providing PCR conditions 
 #' The permissible fields of the list and their types
 #' are documented in the \code{\link{PCR_Conditions}} class.
+#' @return Sets the list of PCR conditions.
 #' @examples
 #' # Load some settings
 #' data(Ippolito)
@@ -815,7 +824,6 @@ setReplaceMethod("constraintLimits", "DesignSettings",
 #' PCR(settings)$annealing_temperature <- 50 # celsius
 #' # View available PCR conditions
 #' settings
-
 setGeneric("PCR<-", function(x, value) standardGeneric("PCR<-"))
 
 #' @rdname PCR-methods
@@ -840,6 +848,7 @@ setReplaceMethod("PCR", "DesignSettings",
 #' @param value A list with constraint options. The permissible
 #' fields of the list and their types are documented in the 
 #' \code{\link{ConstraintOptions}} class.
+#' @return Sets the specified list of constraint options.
 #' @examples
 #' # Load some settings
 #' data(Ippolito)

@@ -24,6 +24,11 @@ conOptions(x) <- value
 fields of the list and their types are documented in the 
 \code{\link{ConstraintOptions}} class.}
 }
+\value{
+Gets the constraint options list.
+
+Sets the specified list of constraint options.
+}
 \description{
 Gets the constraint settings of the provided 
 \code{DesignSettings} object \code{x}.

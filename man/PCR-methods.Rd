@@ -24,6 +24,11 @@ PCR(x) <- value
 The permissible fields of the list and their types
 are documented in the \code{\link{PCR_Conditions}} class.}
 }
+\value{
+Gets the list of PCR conditions.
+
+Sets the list of PCR conditions.
+}
 \description{
 Gets the PCR conditions that are defined in the provided
 \code{DesignSettings} object \code{x}.
