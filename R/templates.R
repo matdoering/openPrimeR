@@ -783,9 +783,6 @@ update_template_cvg <- function(template.df, primer.df,
             template.df$primer_coverage_rev <- sapply(primer.IDs.rev, length)
         }
     } 
-    # don't order by cvg -> is bad for all indecing steps that depend on uniform order
-    #o <- order(template.df$primer_coverage, decreasing = TRUE)
-    #template.df <- template.df[o, ]
     return(template.df)
 }
 

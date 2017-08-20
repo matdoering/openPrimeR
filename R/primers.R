@@ -1084,25 +1084,40 @@ update_primer_cvg <- function(primer.df, template.df, allowed.mismatches, cvg.de
         # nothing to update ..
         return(primer.df)
     }
+    mode.directionality <- get.analysis.mode(primer.df)
     cvg.definition <- match.arg(cvg.definition)
     mm.info <- prepare_mm_plot(primer.df, template.df)
     # select events according to selected cvg.definition and number of mismatches only
     df <- mm.info[mm.info$Coverage_Type == cvg.definition & mm.info$Number_of_mismatches <= allowed.mismatches, ]
-    # select one event per primer-template pair (worst-case terminal mismatch)
-    ddf <- plyr::ddply(df, c("Primer", "Template"), plyr::summarize,
-                        Position = unique(substitute(Position_3terminus)), 
-                        Number_of_mismatches = unique(substitute(Number_of_mismatches)))
-    #if (length(ddf) == 0 || nrow(ddf) == 0) {
-        ## no coverage events to update available ..
-        ## TODO: if no coverage events are found we have to set everything to 0...
-        #return(primer.df)
-    #}
-    cvd <- plyr::ddply(ddf, "Primer", plyr::summarize, Covered_Seqs = paste(substitute(Template), collapse = ","))
-	#print(cvd) -> Primer is 1,2,3,4 ... instead of its character rep in windows
+    ##################
+    # just move from mismatch rep to coverage rep
+    ddf <-  plyr::ddply(df, c("Primer", "Direction", "Template", "Group"), plyr::summarize,
+                            Position = unique(substitute(Position_3terminus)), 
+                            Number_of_mismatches = unique(substitute(Number_of_mismatches)))
+    #####
+    if (mode.directionality == "both") {
+        # remove individual binding events
+        # for pairs of primers: presence of any other other direction is fine for cvg
+        dir.count.both <- plyr::ddply(ddf, c("Template", "Group"), plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
+        rm.idx <- which(dir.count.both$DirectionCount <= 1)
+        if (length(rm.idx) != 0) {
+            m <- match(dir.count.both$Template[rm.idx], ddf$Template)
+            ddf <- ddf[-m,]
+        }
+    }
+    # for primers of both directions: they were replicated (fw+both) earlier, need to select events were pairs are present and then select the individual primer once again
+    both.sel <- which(primer.df$Direction[match(ddf$Primer, primer.df$ID)] == "both")
+    dff.both <- plyr::ddply(ddf[both.sel,], c("Primer", "Template"),
+        plyr::summarize, 
+        Group = unique(substitute(Group)))
+    dff.single <- ddf[setdiff(seq_len(nrow(ddf)), both.sel), c("Primer", "Template", "Group")]
+    dff <- rbind(dff.both, dff.single)
+    ##########
+    cvd <- plyr::ddply(dff, "Primer", plyr::summarize, Covered_Seqs = paste(substitute(Template), collapse = ","))
     m <- match(cvd$Primer, primer.df$ID)
     new.df <- data.frame(ID = primer.df$ID, Covered_Seqs = "", primer_coverage = 0,
                          stringsAsFactors = FALSE)
-    if (length(m) != 0) { # we found coverage events found for selection
+    if (length(m) != 0) { # we found coverage events for our selection
         # set corresponding entries in new.df to updated values
         cvd.identifier <- unlist(lapply(strsplit(cvd$Covered_Seqs, split = ","), function(x) paste(template.df$Identifier[match(x, template.df$ID)], collapse = ",")))
         new.df[m, 'Covered_Seqs'] <- cvd.identifier
@@ -1995,17 +2010,15 @@ get_cvg_ratio <- function(primers, template.df, allowed.mismatches = NULL,
         # use the vanilla coverage definition: faster and doesn't require mismatch information
         cvd <- get_covered.vanilla(primers, template.df, mode.directionality)
     } else {
-        primer.df <- get_template_cvg_data(primers, template.df)
+        cvg.data <- get_template_cvg_data(primers, template.df)
         # select only coverage events from the selected cvg definition
-        primer.df <- primer.df[primer.df$Status == cvg.definition, ]
-        # get only the unique events for every template (for both: fw & primer are found here)
-        primer.df <- plyr::ddply(primer.df, c("Template", "Status"), function(x) plyr::arrange(x, substitute(Number_of_mismatches))[1,])
+        cvg.data <- cvg.data[cvg.data$Status == cvg.definition, ]
         # retrieve only the allowed coverage events
         if (length(allowed.mismatches) != 0) {
             # select only events with less or equal the allowed number of mismatches
-            primer.df <- primer.df[primer.df$Number_of_mismatches <= allowed.mismatches,]
+            cvg.data <- cvg.data[cvg.data$Number_of_mismatches <= allowed.mismatches,]
         } 
-        cvd <- unique(primer.df$Template)
+        cvd <- unique(cvg.data$Template)
     }
     max.cvg <- length(cvd) / nrow(template.df)  # maximum theoretical coverage
     if (as.char) {

@@ -320,6 +320,7 @@ prepare_mm_plot <- function(primer.df, template.df,
         rev.idx <- which(primer.df$Direction == "rev")
         both.idx <- which(primer.df$Direction == "both")
         # for primer pairs: consider for every coverage event the fw/rev primer with the higher nbr of mismatches
+        # new idea: for 'both' primers: add both entries
         both.sel <- lapply(seq_along(both.idx), function(x) {
                         fw.mm.pos <- abs.mm.pos.fw[[both.idx[x]]]
                         rev.mm.pos <- abs.mm.pos.rev[[both.idx[x]]]
@@ -334,28 +335,60 @@ prepare_mm_plot <- function(primer.df, template.df,
         abs.mm.pos <- rep(NA, nrow(primer.df))
         abs.mm.pos[fw.idx] <- abs.mm.pos.fw[fw.idx]
         abs.mm.pos[rev.idx] <- abs.mm.pos.rev[rev.idx]
-        abs.mm.pos[both.idx] <- lapply(seq_along(both.idx), function(x) sapply(seq_along(both.sel[[x]]), 
-                                    function(y) ifelse(both.sel[[x]][y] == "fw", abs.mm.pos.fw[[x]][y], abs.mm.pos.rev[[x]][y])))
+        abs.mm.pos[both.idx] <- lapply(seq_along(both.idx), function(x) c(abs.mm.pos.fw[both.idx[x]], abs.mm.pos.rev[both.idx[x]]))
+        #abs.mm.pos[both.idx] <- lapply(seq_along(both.idx), function(x) sapply(seq_along(both.sel[[x]]), 
+                                    #function(y) ifelse(both.sel[[x]][y] == "fw", abs.mm.pos.fw[[x]][y], abs.mm.pos.rev[[x]][y])))
         pos.3prime <- rep(NA, length(abs.mm.pos))
         pos.3prime[fw.idx] <- lapply(seq_along(fw.idx), function(x) lapply(abs.mm.pos[[fw.idx[x]]], function(y) nchar(primer.df$Forward[x]) - y + 1))
         pos.3prime[rev.idx] <- lapply(seq_along(rev.idx), function(x) lapply(abs.mm.pos[[rev.idx[x]]], function(y) nchar(primer.df$Reverse[x]) - y + 1))
-        pos.3prime[both.idx] <- lapply(seq_along(both.idx), function(x) lapply(seq_along(both.sel[[x]]), 
-                                    function(y) {
-                                        if(both.sel[[x]][y] == "fw") {
-                                            nchar(primer.df$Forward[x]) - abs.mm.pos[[both.idx[x]]][[y]] + 1
-                                        } else {
-                                            nchar(primer.df$Reverse[x]) - abs.mm.pos[[both.idx[x]]][[y]] + 1
-                                        }
-                                   }))
+        pos.3prime[both.idx] <- lapply(seq_along(both.idx), function(x) unlist(lapply(seq_along(abs.mm.pos[[x]]), function(y) lapply(seq_along(abs.mm.pos[[x]][[y]]),
+            function(z) {
+                if (y == 1) { # fw primers
+                    nchar(primer.df$Forward[x]) - abs.mm.pos[[x]][[y]][[z]] + 1
+                } else {
+                    nchar(primer.df$Reverse[x]) - abs.mm.pos[[x]][[y]][[z]] + 1
+                }
+            }
+         )), recursive = FALSE))
+        #pos.3prime[both.idx] <- lapply(seq_along(both.idx), function(x) lapply(seq_along(both.sel[[x]]), 
+                                    #function(y) {
+                                        #if(both.sel[[x]][y] == "fw") {
+                                            #nchar(primer.df$Forward[x]) - abs.mm.pos[[both.idx[x]]][[y]] + 1
+                                        #} else {
+                                            #nchar(primer.df$Reverse[x]) - abs.mm.pos[[both.idx[x]]][[y]] + 1
+                                        #}
+                                   #}))
         pos.worst <- lapply(seq_along(abs.mm.pos), function(x) lapply(pos.3prime[[x]], function(y) rep(min(y), length(y))))
         primer.ids <- lapply(seq_along(pos.3prime), function(x) rep(as.character(primer.df$ID[x]), length(unlist(pos.3prime[[x]]))))
-        directions <- lapply(seq_along(pos.3prime), function(x) rep(primer.df$Direction[x], length(unlist(pos.3prime[[x]]))))
+        directions <- lapply(seq_len(nrow(primer.df)), function(x) {
+            dir <- primer.df$Direction[x]
+            rep(dir, primer.df$primer_coverage[x])
+
+            if (dir == "both") {
+                c(rep("fw",  length(unlist(abs.mm.pos[[x]][[1]]))), 
+                  rep("rev", length(unlist(abs.mm.pos[[x]][[2]]))))
+            } else {
+                rep(dir, length(unlist(abs.mm.pos[[x]])))
+            }
+         })
         cvd.idx <- covered.seqs.to.idx(primer.df[, cvg.cols], template.df)
         if (length(unlist(cvd.idx)) == 0) {
             #warning("Nothing covered")
             next
         }
-        template.ids <- lapply(seq_along(pos.3prime), function(x) lapply(seq_along(pos.3prime[[x]]), function(y) rep(template.df$ID[cvd.idx[[x]][y]], length(unlist(pos.3prime[[x]][y])))))
+        #template.ids <- lapply(seq_along(pos.3prime), function(x) lapply(seq_along(pos.3prime[[x]]), function(y) rep(template.df$ID[cvd.idx[[x]][y]], length(unlist(pos.3prime[[x]][y])))))
+        template.ids <- lapply(seq_len(nrow(primer.df)), function(x) {
+            dir <- primer.df$Direction[x]
+            if (dir == "both") {
+                # fw and rev
+                id1 <- unlist(lapply(seq_along(abs.mm.pos[[x]][[1]]), function(y) rep(template.df$ID[cvd.idx[[x]]][y], length(abs.mm.pos[[x]][[1]][[y]]))))
+                id2 <- unlist(lapply(seq_along(abs.mm.pos[[x]][[2]]), function(y) rep(template.df$ID[cvd.idx[[x]]][y], length(abs.mm.pos[[x]][[2]][[y]]))))
+                ids <- c(id1, id2)
+            } else {
+                ids <- unlist(lapply(seq_along(abs.mm.pos[[x]]), function(y) rep(template.df$ID[cvd.idx[[x]]][y], length(abs.mm.pos[[x]][[y]]))))
+            }
+            return(ids)
+         })
         # count number of mismatches per primer-template pair
         nbr.mismatches <- lapply(seq_along(pos.3prime), function(x) lapply(pos.3prime[[x]], function(y) rep(length(which(!is.na(y))), length(y))))
         # annotate with group of templates
@@ -376,7 +409,16 @@ prepare_mm_plot <- function(primer.df, template.df,
             crit <- cvg.criteria[z]
             if (crit %in% colnames(primer.df)) {
                 val <- lapply(strsplit(primer.df[, crit], split = ","), as.numeric)
-                val <- lapply(seq_along(pos.3prime), function(x) lapply(seq_along(pos.3prime[[x]]), function(y) rep(val[[x]][y], length(pos.3prime[[x]][[y]]))))
+                val <- lapply(seq_along(pos.3prime), function(x)  {
+                    dir <- primer.df$Direction[x]
+                    if (dir == "both") {
+                        val1 <- unlist(lapply(seq_along(abs.mm.pos[[x]][[1]]), function(y) rep(val[[x]][y], length(abs.mm.pos[[x]][[1]][[y]]))), recursive = FALSE)
+                        val2 <- unlist(lapply(seq_along(abs.mm.pos[[x]][[2]]), function(y) rep(val[[x]][y], length(abs.mm.pos[[x]][[2]][[y]]))), recursive = FALSE)
+                        c(val1, val2)
+                    } else {
+                        lapply(seq_along(pos.3prime[[x]]), function(y) rep(val[[x]][y], length(pos.3prime[[x]][[y]])))
+                    }
+                })
                 df[, crit] <- unlist(val)
             }
         }
@@ -399,6 +441,34 @@ prepare_mm_plot <- function(primer.df, template.df,
     }
     return(df)
 }
+prepare_template_cvg_data <- function(df, mode.directionality) {
+    # df: coverage for one coverage type
+    # select individual binding mode per primer-template pair instead of the representation per individual mismatch
+    ddf <-  plyr::ddply(df, c("Primer", "Direction", "Template", "Group"), plyr::summarize,
+                            Position = unique(substitute(Position_3terminus)), 
+                            Number_of_mismatches = unique(substitute(Number_of_mismatches)))
+
+   # if mode.directionality is "both" -> retain only templates where we have coverage from a fw & rev primer
+    if (mode.directionality == "both") {
+        # for individual primers, require coverage by fw & rev primers:
+        dir.count <- plyr::ddply(ddf, "Template", plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
+        # remove events where we only have either fw or rev
+        rm.template.id <- setdiff(dir.count$Template[dir.count$DirectionCount <= 1], ddf$Template[ddf$Direction == "both"])
+        m <- match(rm.template.id, ddf$Template)
+        if (length(m) != 0) {
+            ddf <- ddf[-m,]
+        }
+    }
+    ##########################
+    # take the minium number of mismatches binding mode per direction 
+    dff <- plyr::ddply(ddf, c("Template", "Direction"), function(x) plyr::arrange(x, 
+                                        substitute(Number_of_mismatches))[1, ])
+    # take the maximum number of mismatches per template over all directions
+    # result is: max(min(fw), min(rev))
+    dff <- plyr::ddply(dff, c("Template"), function(x) plyr::arrange(x, 
+                                        -substitute(Number_of_mismatches))[1, ])
+    return(dff)
+}
 #' Retrieval of Template Coverage Data.
 #'
 #' Determines the coverage of the templates for individual
@@ -417,30 +487,12 @@ get_template_cvg_data <- function(primer.df, template.df) {
     plot.data <- vector("list", length(unique.cvg.types))
     for (z in seq_along(unique.cvg.types)) {
         df <- full.df[full.df$Coverage_Type == unique.cvg.types[z],]    
-        # convert from individual mismatch positions to individual binding events by selecting individual conformations:
-        ddf <- plyr::ddply(df, c("Primer", "Direction", "Template", "Group"), plyr::summarize,
-                            Position = unique(substitute(Position_3terminus)), 
-                            Number_of_mismatches = unique(substitute(Number_of_mismatches)))
-       # if mode.directionality is "both" -> retain only templates where we have coverage from a fw & rev primer (fw+rev or fw+both etc)
-        if (mode.directionality == "both") {
-            # for individual primers, require coverage by fw & rev primers:
-            dir.count <- plyr::ddply(ddf, "Template", plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
-            # remove events where we only have either fw or rev
-            rm.template.id <- setdiff(dir.count$Template[dir.count$DirectionCount <= 1], ddf$Template[ddf$Direction == "both"])
-            m <- match(rm.template.id, ddf$Template)
-            if (length(m) != 0) {
-                ddf <- ddf[-m,]
-            }
-        }
-        # TODO: select worst-case or best-case binding for analysis
-        # select best-case binding mode for each template (lowest number of positions, mismatch furthest from 3 prime)
-        # TODO: should we include the direction here -> multiple events per Direction possible ...
-        dff <- plyr::ddply(ddf, c("Direction", "Template"), function(x) plyr::arrange(x, 
-                                            substitute(Number_of_mismatches), -substitute(Position))[1, ])
+        # select representative binding events for every template
+        ddf <- prepare_template_cvg_data(df, mode.directionality)
          # if there's no mismatches, plot these primers with mismatch position @ position 0
-        dff[is.na(dff$Position), "Position"] <- 0
-        dff$Status <- unique.cvg.types[z]
-        plot.data[[z]] <- dff
+        ddf[is.na(ddf$Position), "Position"] <- 0
+        ddf$Status <- unique.cvg.types[z]
+        plot.data[[z]] <- ddf
     }
     plot.df <- do.call(rbind, plot.data)
     return(plot.df)
@@ -1156,18 +1208,6 @@ plot_template_cvg_unstratified <- function(primers, templates, groups = NULL) {
 prepare_template_cvg_mm_data <- function(primer.df, template.df, allowed.mismatches = NULL) {
     plot.df <- get_template_cvg_data(primer.df, template.df)
     #########################
-    # TODO: Think about how to annotate coverage events: worst-case may make more sense for 'both' directions?!
-    #####################
-    # get only the unique events for every template (for both: fw & primer are found here)
-    # TODO: in case of mode 'both', coverage is not well-defined. selecting the 'best' binding mode means
-    # that when we ramp up the number of allowed mismatches, we may have a primer binding with few mismatches
-    # that may amplify everything now but before it couldn't because it was dependent on a primer that only binds with a higher number of 
-    # mismatches. we would need to encode this dependency structure:
-    # for primers of different directions covering the same template, select the coverage event that had the largest number of mismatches
-    # -> but then this may be the worst-case one ... hmmm
-    # select the primer-coverage events with the smallest number of mismatches:
-    #####################
-    plot.df <- plyr::ddply(plot.df, c("Template", "Status"), function(x) plyr::arrange(x, substitute(Number_of_mismatches))[1,])
     # get data for available templates for every mismatch category:
     t.df <- data.frame("Template" = unique(template.df$ID), 
                        "Group" = NA, "Position" = NA, "Number_of_mismatches" = NA)
@@ -1194,7 +1234,6 @@ prepare_template_cvg_mm_data <- function(primer.df, template.df, allowed.mismatc
     # do not consider the exact nbr of mismatches, but the cumulative number (cvg with >= x mismatches rather than cvg with == x mismatches)
     cum.data <- p.df[p.df$Status == "Available Templates", ] # start from available data
     cum.data$Maximal_mismatches <- cum.data$Number_of_mismatches
-    #p.df$Number_of_mismatches[p.df$Status == "Basic Coverage"]
     for (i in seq_along(mm.settings)) {
         mm <- mm.settings[i]
         for (j in seq_along(cvg.groups)) {
