@@ -181,6 +181,7 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
 #' optimal.primers.greedy <- design_primers(template.df[1:2,], "both", settings, init.algo = "naive")
 #' # Usage of the tree-based initialization strategy (requires MAFFT)
 #' \dontrun{
+#' out.dir <- tempdir()
 #' optimal.primers.tree <- design_primers(template.df[1:2,], "both", settings,
 #'                          init.algo = "tree", opti.algo = "ILP",
 #'                          max.degen = 16,

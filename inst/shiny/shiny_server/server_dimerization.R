@@ -143,6 +143,7 @@ self.dimer.data <- reactive({
         "all" = primer.data(), 
         "filtered" = current.filtered.primers(), 
         "optimized" = optimal.primers())
+    # TODO: isolate() here is necessary such that this doesn't reload when Ta is changed .. however, this means that self dimerization/cross dimerization don't update ever after Ta change -> maybe remove compute.all.self.dimers() and just use check_constraints() ...
     annealing.temp <- isolate(annealing.temperature())
     data <- openPrimeR:::compute.all.self.dimers.frontend(primer.data, primer.concentration(), Na.concentration(), 
         Mg.concentration(), K.concentration(), Tris.concentration(), annealing.temp, for.shiny = TRUE)

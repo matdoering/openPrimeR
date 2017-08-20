@@ -1866,9 +1866,12 @@ pair_primers <- function(primer.df, template.df) {
     pair.df <- pair.df[sel.cols,]
     # output the already paired primers as well as the new pairs
     out.df <- my_rbind(both.df, pair.df)
+    ################
+    # when pairing, we exclude primers that weren't paired such that only paired primers remained. otherwise we have problems with the subset coverage!!
     # check whether some primers couldn't be paired
-    missing.idx <- which(unlist(lapply(seq_len(nrow(primer.df)), function(x) all(!grepl(primer.df$ID[x], out.df$ID)))))
-    out.df <- my_rbind(primer.df[missing.idx, ], out.df)
+    #missing.idx <- which(unlist(lapply(seq_len(nrow(primer.df)), function(x) all(!grepl(primer.df$ID[x], out.df$ID)))))
+    #out.df <- my_rbind(primer.df[missing.idx, ], out.df)
+    #################
     return(out.df)
 }
 

@@ -394,10 +394,10 @@ comparison.stats.raw <- function(primer.data, template.data) {
     run.names <- get.run.names(primer.data)
     N <- unlist(lapply(primer.data, function(x) nrow(x)))
     N.templates <- unlist(lapply(template.data, function(x) nrow(x)))
-    nbr.covered <- unlist(lapply(seq_along(primer.data), function(x) length(unique(unlist(covered.seqs.to.idx(primer.data[[x]]$Covered_Seqs, 
-        template.data[[x]]))))))
-    cvg <- unlist(lapply(seq_along(primer.data), function(x) get_cvg_ratio(primer.data[[x]], 
-        template.data[[x]])))
+    cvg.info <-  cvg <- lapply(seq_along(primer.data), function(x) get_cvg_ratio(primer.data[[x]], 
+        template.data[[x]]))
+    nbr.covered <- unlist(lapply(cvg.info, function(x) attr(x, "no_covered")))
+    cvg <- unlist(lapply(cvg.info, function(x) as.numeric(x)))
     o <- order(cvg, decreasing = TRUE)
     if (length(cvg) == length(run.names)) {
         # if we have enough data (primers available for each set)

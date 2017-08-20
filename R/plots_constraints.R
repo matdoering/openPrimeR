@@ -320,11 +320,10 @@ primer.set.parameter.stats <- function(primer.df, mode.directionality, lex.seq) 
     entry.df <- do.call(cbind, as.list(entries))
     colnames(entry.df) <- names(sel.cols)
     if (length(lex.seq) != 0) {
-        cvg <- paste(round(get_cvg_ratio(primer.df, lex.seq), 4) * 
-            100, "%", sep = "")
+        cvg.info <- get_cvg_ratio(primer.df, lex.seq)
+        cvg <- paste0(round(cvg.info, 4) * 100, "%")
         nbr.total <- nrow(lex.seq)
-        nbr.covered <- length(unique(unlist(covered.seqs.to.idx(primer.df$Covered_Seqs, 
-            lex.seq))))
+        nbr.covered <- attr(cvg.info, "no_covered")
         cvg <- paste(nbr.covered, " of ", nbr.total, " (", cvg, ")", sep = "")
     } else {
         cvg <- NA
@@ -342,8 +341,8 @@ primer.set.parameter.stats <- function(primer.df, mode.directionality, lex.seq) 
         binding.pos.fw <- NA
     }
     if (any(primer.df$Relative_Reverse_Binding_Position_Start_rev != "")) {
-        binding.pos.rev <- quantile(as.numeric(unlist(strsplit(primer.df$Relative_Reverse_Binding_Position_End_rev, split = ","))), 
-                         as.numeric(unlist(strsplit(primer.df$Relative_Reverse_Binding_Position_Start_rev, split = ","))))
+        binding.pos.rev <- quantile(c(as.numeric(unlist(strsplit(primer.df$Relative_Reverse_Binding_Position_End_rev, split = ","))), 
+                         as.numeric(unlist(strsplit(primer.df$Relative_Reverse_Binding_Position_Start_rev, split = ",")))))
         binding.pos.rev <- c(binding.pos.rev[2], binding.pos.rev[4]) # IQR
         binding.pos.rev <- paste0("[", paste0(ifelse(binding.pos.rev <= 0, as.character(binding.pos.rev), paste0("+", binding.pos.rev)), collapse = ","), "]")
     } else {

@@ -20,7 +20,6 @@
 #' @param sodium.eq.concentration The sodium-equivalent concentration of ions.
 #' @param mode.directionality Primer directionality.
 #' @param seqs Template sequence strings.
-#' @param eff.only Compute only 3' terminal efficiencies (no thermodynamic model).
 #' @return The efficiencies of primer binding events.
 #' @keywords internal
 #' @references Wright, Erik S., et al. 
@@ -31,8 +30,7 @@
 compute.efficiency <- function(fw.primers, fw.start, fw.end, covered, 
                                taqEfficiency, annealing.temp, primer_conc, 
                                sodium.eq.concentration, 
-                               mode.directionality = c("fw", "rev"), seqs, 
-                               eff.only = FALSE) {
+                               mode.directionality = c("fw", "rev"), seqs) {
     if (length(mode.directionality) == 0) {
         stop("Please supply the 'mode.directionality' argument.")
     }
@@ -73,30 +71,17 @@ compute.efficiency <- function(fw.primers, fw.start, fw.end, covered,
             cur.eff <- 0 # primer has 0 efficiency
         } else if (mode.directionality == "fw") {
             # reverse complement the binding sequence
-            if (eff.only) {
-                cur.eff <- .Call("terminalMismatch", cur.data$Primers[idx], rev.comp.sequence(cur.data$Templates[idx]), maxDistance = 1, 
-                    maxGaps = 0, processors = 1, # set processors to 1 due to our external foreach loop!
-                    PACKAGE = "openPrimeR")
-            } else {
-                cur.eff <- DECIPHER::CalculateEfficiencyPCR(DNAStringSet(cur.data$Primers[idx]), 
-                        Biostrings::reverseComplement(
-                            DNAStringSet(cur.data$Templates[idx])
-                        ), Ta, primer_conc, 
-                        sodium.eq.concentration, 
-                        taqEfficiency = taqEfficiency, processors = 1)
-            }
+            cur.eff <- DECIPHER::CalculateEfficiencyPCR(DNAStringSet(cur.data$Primers[idx]), 
+                    Biostrings::reverseComplement(
+                        DNAStringSet(cur.data$Templates[idx])
+                    ), Ta, primer_conc, 
+                    sodium.eq.concentration, 
+                    taqEfficiency = taqEfficiency, processors = 1)
         } else if (mode.directionality == "rev") {
-            if (eff.only) {
-                cur.eff <- .Call("terminalMismatch", cur.data$Primers[idx], cur.data$Templates[idx], maxDistance = 1, 
-                    maxGaps = 0, processors = 1,
-                    PACKAGE = "openPrimeR")
-            } else {
-                # no reverse complement is necessary
-                cur.eff <- DECIPHER::CalculateEfficiencyPCR(DNAStringSet(cur.data$Primers[idx]), 
-                            DNAStringSet(cur.data$Templates[idx]), Ta, 
-                            primer_conc, sodium.eq.concentration, 
-                            taqEfficiency = taqEfficiency, processors = 1)
-           }
+            cur.eff <- DECIPHER::CalculateEfficiencyPCR(DNAStringSet(cur.data$Primers[idx]), 
+                        DNAStringSet(cur.data$Templates[idx]), Ta, 
+                        primer_conc, sodium.eq.concentration, 
+                        taqEfficiency = taqEfficiency, processors = 1)
         }
         eff <- rep(NA, nrow(cur.data))
         eff <- cur.eff[m]
@@ -124,7 +109,6 @@ compute.efficiency <- function(fw.primers, fw.start, fw.end, covered,
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
 #' @param tris_salt_conc Tris ion concentration.
-#' @param eff.only Compute only 3' terminal efficiencies (no thermodynamic model).
 #' @param mode Compute efficiencies for on-target coverage events (\code{on_target})
 #' or off-target coverage events (\code{off_target}).
 #' @return A list with the efficiency of every primer binding event.
@@ -140,7 +124,7 @@ compute.efficiency <- function(fw.primers, fw.start, fw.end, covered,
 #' } 
 compute.primer.efficiencies <- function(primer.df, template.df, annealing.temp, 
     taqEfficiency, primer_conc, na_salt_conc, mg_salt_conc, k_salt_conc, tris_salt_conc, 
-    eff.only = FALSE, mode = c("on_target", "off_target")) {
+    mode = c("on_target", "off_target")) {
 
     if (!"primer_coverage" %in% colnames(primer.df)) {
         stop("Efficiency computations require primer coverage.")
@@ -182,10 +166,10 @@ compute.primer.efficiencies <- function(primer.df, template.df, annealing.temp,
                                mg_salt_conc, k_salt_conc, tris_salt_conc)
     fw.effs <- compute.efficiency(primer.df$Forward, fw.start, fw.end, covered, 
                                   taqEfficiency, annealing.temp, primer_conc, 
-                                  sodium.eq.concentration,"fw", seqs, eff.only = eff.only)
+                                  sodium.eq.concentration,"fw", seqs)
     rev.effs <- compute.efficiency(primer.df$Reverse, rev.start, rev.end, 
                                    covered, taqEfficiency, annealing.temp, primer_conc, 
-                                   sodium.eq.concentration, "rev", seqs, eff.only = eff.only)
+                                   sodium.eq.concentration, "rev", seqs)
     #message("Runtime: ", Sys.time() - time) 
     # combine efficiciencies from fw and rev primers if necessary
     fw.idx <- which(primer.df$Forward != "")

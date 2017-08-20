@@ -251,6 +251,8 @@ compute.constraints <- function(primer.df, mode.directionality = c("fw", "rev", 
                   template.df, na_salt_conc, mg_salt_conc, k_salt_conc, 
                   tris_salt_conc, primer_conc)
     }
+    #print("Ta is:")
+    #print(annealing.temp)
     cvg.required <- FALSE
     if ("primer_coverage" %in% active.constraints || "primer_specificity" %in% active.constraints && !"primer_specificity" %in% colnames(primer.df)) {
         # only trigger cvg computation for specificity purposes if coverage is explicitly required by constraints, otherwise use existing entries.
@@ -419,7 +421,7 @@ compute.constraints <- function(primer.df, mode.directionality = c("fw", "rev", 
                             PCR(settings)$Mg_concentration,
                             PCR(settings)$K_concentration,
                             PCR(settings)$Tris_concentration,
-                            eff.only = FALSE, mode = "on_target")
+                            mode = "on_target")
         eff.string <- string.rep(eff_taq)
         eff.mean <- sapply(eff_taq, function(x) ifelse(length(x) == 0, 0, mean(x)))
         constraint.values$primer_efficiency <- eff.string
@@ -440,7 +442,7 @@ compute.constraints <- function(primer.df, mode.directionality = c("fw", "rev", 
                             PCR(settings)$Mg_concentration,
                             PCR(settings)$K_concentration,
                             PCR(settings)$Tris_concentration,
-                            eff.only = FALSE, mode = "off_target")
+                            mode = "off_target")
         eff.string <- string.rep(eff_off)
         constraint.values$off_primer_efficiency <- eff.string
     }

@@ -6,7 +6,7 @@
 \usage{
 compute.efficiency(fw.primers, fw.start, fw.end, covered, taqEfficiency,
   annealing.temp, primer_conc, sodium.eq.concentration,
-  mode.directionality = c("fw", "rev"), seqs, eff.only = FALSE)
+  mode.directionality = c("fw", "rev"), seqs)
 }
 \arguments{
 \item{fw.primers}{Primer sequence strings.}
@@ -31,8 +31,6 @@ another polymerase than Taq.}
 \item{mode.directionality}{Primer directionality.}
 
 \item{seqs}{Template sequence strings.}
-
-\item{eff.only}{Compute only 3' terminal efficiencies (no thermodynamic model).}
 }
 \value{
 The efficiencies of primer binding events.

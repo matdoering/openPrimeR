@@ -6,7 +6,7 @@
 \usage{
 compute.primer.efficiencies(primer.df, template.df, annealing.temp,
   taqEfficiency, primer_conc, na_salt_conc, mg_salt_conc, k_salt_conc,
-  tris_salt_conc, eff.only = FALSE, mode = c("on_target", "off_target"))
+  tris_salt_conc, mode = c("on_target", "off_target"))
 }
 \arguments{
 \item{primer.df}{Primer data frame.}
@@ -29,8 +29,6 @@ another polymerase than Taq.}
 \item{k_salt_conc}{Potassium ion concentration.}
 
 \item{tris_salt_conc}{Tris ion concentration.}
-
-\item{eff.only}{Compute only 3' terminal efficiencies (no thermodynamic model).}
 
 \item{mode}{Compute efficiencies for on-target coverage events (\code{on_target})
 or off-target coverage events (\code{off_target}).}

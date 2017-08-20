@@ -700,11 +700,6 @@ subset.ILP <- function(primer.df, template.df, k) {
     set.rhs(lprec, k, 1)
     rownames(lprec)[1] <- "SetSize_Constraint"
     ####### coverage constraint: 
-    #cat(paste("Adding ", length(covered.templates), " coverage constraints. \n", 
-        #sep = ""))
-    #if (length(covered.templates) > 0) {
-        #pb <- txtProgressBar(min = 0, max = length(covered.templates), style = 3)
-    #}
     for (j in seq_along(covered.templates)) {
         # select the idx of those primers that are covering the current template
         template.lp.idx <- j + xp
@@ -828,7 +823,13 @@ subset_primer_set <- function(primer.df, template.df, k = 1, groups = NULL, iden
         ""))) {
             primer.df <- pair_primers(primer.df, template.df)
     }
-    
+     # set the same analysis mode for all subsets:
+    dirs <- unique(primer.df$Direction)
+    if (length(dirs) >= 2) {
+        mode.directionality <- "both"
+    } else {
+        mode.directionality <- dirs
+    }
     p.df <- primer.coverage.for.groups(primer.df, template.df, groups)
     out.loc <- file.path(cur.results.loc, identifier)
     if (length(out.loc) != 0) {

@@ -89,21 +89,21 @@ use.taq.polymerase <- reactive({
 })
 annealing.temperature <- reactive({
     # The currently active annealing temperature (either automatically determined or input by the user)
+     primer.data <- switch(input$set_meta_selector, 
+            "all" = primer.data(), 
+            "filtered" = current.filtered.primers(), 
+            "optimized" = optimal.primers())
     if (input$automatic_annealing_temp == "active") {
         # this should be computed 'at the right time' 
         #print("COMPUTING ANNEALING TEMPERATURE")
         # get Ta for currently active set:
-        primer.data <- switch(input$set_meta_selector, 
-            "all" = primer.data(), 
-            "filtered" = current.filtered.primers(), 
-            "optimized" = optimal.primers())
         template.data <- switch(input$set_meta_selector,
             "all" = rv_templates$cvg_all,
             "filtered" = rv_templates$cvg_filtered,
             "optimized" = rv_templates$cvg_optimized)
-        annealing.temp <- try(min(openPrimeR:::compute_annealing_temp(primer.data, run.mode(), 
+        annealing.temp <- try(openPrimeR:::compute_annealing_temp(primer.data, run.mode(), 
                                 template.data, Na.concentration(), Mg.concentration(), K.concentration(), 
-                                Tris.concentration(), primer.concentration()), na.rm=TRUE), silent = TRUE)
+                                Tris.concentration(), primer.concentration()), silent = TRUE)
         #print("ANNEALING TEMPERATURE COMPUTED")
         if (class(annealing.temp) == "try-error") { # T_a can't be computed because coverage isnt' available yet
             Ta <- NULL # Ta will be computed by the backend when it's possible & necessary
@@ -113,7 +113,11 @@ annealing.temperature <- reactive({
     } else {
         #print("USING INPUT ANNEALING TEMPERATURE")
         validate(need(is.numeric(input$annealing_temp), "Annealing temperature should be a numeric."))
-        Ta <- input$annealing_temp
+        if (length(primer.data) != 0) {
+            Ta <- rep(input$annealing_temp, nrow(primer.data))
+        } else {
+            Ta <- input$annealing_temp
+        }
     }
     #message("Ta is: ", Ta)
     return(Ta)
@@ -565,7 +569,7 @@ current.settings <- reactive({
     annealing.temp <- NULL
     if (input$automatic_annealing_temp != "active") {
         # set the input annealing temperature if provided
-        annealing.temp <- annealing.temperature()
+        annealing.temp <- unique(annealing.temperature())
     }
     PCR.settings <- openPrimeR:::get.PCR.settings(use.taq.polymerase(), annealing.temp, Na.concentration(), 
                                                   Mg.concentration(), K.concentration(), 

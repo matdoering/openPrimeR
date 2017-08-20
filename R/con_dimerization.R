@@ -51,6 +51,9 @@ get.cross.dimers <- function(primers.1, primers.2, ions,
     if (length(primers.1) == 0 || length(primers.2) == 0) {
         return(NULL)
     }
+    if (length(annealing.temp) == 1) {
+        annealing.temp <- rep(annealing.temp, length(primers.1))
+    }
     #message("Creating dimer combinations ...")
     if (mode == "symmetric") {
         # fewer options for combinations: can exclude self-dimers, as well as already
@@ -72,7 +75,11 @@ get.cross.dimers <- function(primers.1, primers.2, ions,
         return(NULL)
     }
     combis <- combis[idx, ]
-    result <- get.dimer.data(primers.1[combis[, 1]], primers.2[combis[, 2]], annealing.temp, ions, no.structures)
+    # TODO: for asymmetric, this shouldn't work .. o_O
+    # for each possible cross-dimer use the minimal annealing temp of the pairs
+    use.Ta <- unlist(lapply(seq_len(nrow(combis)), function(x)
+                    min(annealing.temp[combis[x,1]], annealing.temp[combis[x,2]])))
+    result <- get.dimer.data(primers.1[combis[, 1]], primers.2[combis[, 2]], use.Ta, ions, no.structures)
     result <- result[, c("DeltaG", "Structure", "Idx1", "Idx2")]
     # modify indices from internal index to used index
     result$Idx1 <- combis[, 1][result$Idx1]
@@ -237,25 +244,26 @@ select.min.cross.idx <- function(deltaG, primers) {
 # X <- compute.all.cross.dimers.unfiltered(p.df, primer_conc, na_salt_conc, mg_salt_conc, k_salt_conc, tris_salt_conc, annealing.temp, check.idx = NULL, for.shiny = FALSE, no.structures = FALSE)
 compute.all.cross.dimers.unfiltered <- function(primer.df, primer_conc, na_salt_conc, 
     mg_salt_conc, k_salt_conc, tris_salt_conc, annealing.temp, check.idx = NULL, for.shiny = FALSE, no.structures = FALSE) {
-     #TIME <- Sys.time() 
-     # ion computation takes some time ...
+    # computes all combinations of cross dimers: fw-fw, rev-rev, fw-rev
+    # check.idx: only compute cross-dimers for a subset of primers
      ions <- compute.sodium.equivalent.conc(na_salt_conc, mg_salt_conc, 
                                            k_salt_conc, tris_salt_conc)
-    # computes all combinations of cross dimers: fw-fw, rev-rev, fw-rev
     # message("Computing cross dimers @ ", annealing.temp)
-    # check.idx: only compute cross-dimers for a subset of primers
+    # fw-fw dimers
     fw.fw <- get.cross.dimers(primer.df$Forward, primer.df$Forward, 
-                              ions, annealing.temp, check.idx, no.structures)  # fw-fw primer dimers
+                              ions, annealing.temp, check.idx, no.structures)
     if (length(fw.fw) != 0) {
         fw.fw$Direction <- "fw-fw"
     }
+    # rev-rev dimers
     rev.rev <- get.cross.dimers(primer.df$Reverse, primer.df$Reverse, 
-                                ions, annealing.temp, check.idx, no.structures)  # rev-primer dimers
+                                ions, annealing.temp, check.idx, no.structures)
     if (length(rev.rev) != 0) {
         rev.rev$Direction <- "rev-rev"
     }
+    # fw-rev dimers
     fw.rev <- get.cross.dimers(primer.df$Forward, primer.df$Reverse, 
-                               ions, annealing.temp, check.idx, no.structures)  # fw-rev primer dimers
+                               ions, annealing.temp, check.idx, no.structures)
     if (length(fw.rev) != 0) {
         fw.rev$Direction <- "fw-rev"
     }
@@ -269,7 +277,6 @@ compute.all.cross.dimers.unfiltered <- function(primer.df, primer_conc, na_salt_
     if (for.shiny) {
         results <- view.dimer.df(results, "Cross")
     }
-    #message("Time was: ", Sys.time() - TIME)
     return(results)
 }
 #' Cross dimerization
@@ -732,11 +739,9 @@ batchify <- function(tasks, annealing.temps = NULL) {
 #' \code{DeltaG} and the dimerization structure in \code{Structure}.
 #' @keywords internal
 get.dimer.data <- function(s1, s2, annealing.temp, ions, no.structures) {
-    #print("preparing dimer seqs")
     seq.data <- prepare.dimer.seqs(s1, s2)
     # update annealing temps to match 'seq.data'
     annealing.temp <- annealing.temp[match(seq.data$combis$Idx1, seq_along(annealing.temp))]
-    #print("preparation done")
     s1 <- seq.data$Seqs1
     s2 <- seq.data$Seqs2
     combis <- seq.data$combis
@@ -759,9 +764,7 @@ get.dimer.data <- function(s1, s2, annealing.temp, ions, no.structures) {
 		annealing.temp <- as.numeric(names(batches))
     }
     i <- NULL
-    #print("TA")
     #print(annealing.temp)
-    #for (i in seq_along(batches)) {
     #print("Computing free energies ...")
     results <- foreach(i = seq_along(batches), .combine = rbind) %dopar% {
         batch <- batches[[i]]

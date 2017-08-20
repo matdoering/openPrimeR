@@ -554,6 +554,20 @@ optimized.regions.structure <- eventReactive(input$modify_binding_regions_second
     return(result)
 }, ignoreNULL = FALSE) # trigger also on NULL to return something
 
+templateScenarioObserver <- observeEvent(input$template_scenario, {
+    # ensure that for personal templates, personal primers are pre-selected
+    if (input$template_scenario == "personal") {
+        updateRadioButtons(session, "primer_upload_choice", 
+                           selected = "personal_primers")
+        updateRadioButtons(session, "primer_comparison_upload_choice", 
+                           selected = "personal_primers")
+    } else {
+        updateRadioButtons(session, "primer_upload_choice", 
+                           selected = "available_primers")
+        updateRadioButtons(session, "primer_comparison_upload_choice", 
+                           selected = "available_primers")
+    }
+})
 optimized.regions.conservation <- eventReactive(input$modify_binding_regions_conservation, {
     # modify template target region based on secondary structure
     if (input$modify_binding_regions_conservation == 0 || length(get.exon.data()) == 0) { # no target region annotation available ...

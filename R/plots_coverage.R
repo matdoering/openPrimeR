@@ -434,6 +434,10 @@ prepare_mm_plot <- function(primer.df, template.df,
         dfs[[i]] <- df
     }
     df <- do.call(rbind, dfs)
+    if (length(df) != 0) {
+        # ensure that the order of the factors doesn't change
+        df$Primer <- factor(df$Primer, levels(primer.df$ID))
+    }
     # rename off_columns for later use for cvg model
     if (length(df) != 0 && mode == "off_target") {
         # note: this may 'overwrite' the regular columns ..
@@ -444,25 +448,26 @@ prepare_mm_plot <- function(primer.df, template.df,
 prepare_template_cvg_data <- function(df, mode.directionality) {
     # df: coverage for one coverage type
     # select individual binding mode per primer-template pair instead of the representation per individual mismatch
+    #########
     ddf <-  plyr::ddply(df, c("Primer", "Direction", "Template", "Group"), plyr::summarize,
                             Position = unique(substitute(Position_3terminus)), 
                             Number_of_mismatches = unique(substitute(Number_of_mismatches)))
 
-   # if mode.directionality is "both" -> retain only templates where we have coverage from a fw & rev primer
-    if (mode.directionality == "both") {
-        # for individual primers, require coverage by fw & rev primers:
-        dir.count <- plyr::ddply(ddf, "Template", plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
-        # remove events where we only have either fw or rev
-        rm.template.id <- setdiff(dir.count$Template[dir.count$DirectionCount <= 1], ddf$Template[ddf$Direction == "both"])
-        m <- match(rm.template.id, ddf$Template)
-        if (length(m) != 0) {
-            ddf <- ddf[-m,]
-        }
-    }
     ##########################
     # take the minium number of mismatches binding mode per direction 
     dff <- plyr::ddply(ddf, c("Template", "Direction"), function(x) plyr::arrange(x, 
                                         substitute(Number_of_mismatches))[1, ])
+    # if mode.directionality is "both" -> retain only templates where we have coverage from a fw AND a rev primer
+    if (mode.directionality == "both") {
+        # for individual primers, require coverage by fw & rev primers:
+        dir.count <- plyr::ddply(dff, "Template", plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
+        # remove all template coverage events where we don't have two primers covering the template
+        rm.template.id <- setdiff(dir.count$Template[dir.count$DirectionCount <= 1], dff$Template[dff$Direction == "both"])
+        m <- which(dff$Template %in% rm.template.id)
+        if (length(m) != 0) {
+            dff <- dff[-m,]
+        }
+    }
     # take the maximum number of mismatches per template over all directions
     # result is: max(min(fw), min(rev))
     dff <- plyr::ddply(dff, c("Template"), function(x) plyr::arrange(x, 
@@ -1925,11 +1930,11 @@ plot_primer_cvg_unstratified <- function(p.df, template.df, groups = NULL) {
 get_primer_cvg_mm_plot_df <- function(primer.df, template.df) {
     full.df <- prepare_mm_plot(primer.df, template.df)
     full.df <- full.df[full.df$Coverage_Type == "constrained",]
+    # go from individual mismatches to individual coverage events
     df <- plyr::ddply(full.df, c("Primer", "Template", "Group"), plyr::summarize,
                             Position = unique(substitute(Position_3terminus)), 
                             Number_of_mismatches = unique(substitute(Number_of_mismatches)))
-    # for every primer and group, ensure that there's an entry for every number of mismatches#
-    # otherwise there would be missing data for individual facets (individual nbr of mismatches)
+    # for every primer and group, ensure that there's an entry for every number of mismatches:
     count.df <- plyr::ddply(df, c("Primer", "Group", "Number_of_mismatches"), plyr::summarize,
                             Coverage = length(unique(substitute(Template))))
     if (nrow(df) == 0) {

@@ -136,7 +136,6 @@ availablePrimerComparisonUpdater <- observeEvent(input$template_comparison_locus
     updateTextInput(session, "sample_name", 
         value = input$template_comparison_locus) 
 })
-
 comparison.table <- reactive({
     # overview of all loaded templates and primer sets for comparison
     primers <- rv_comparison.data$primers  # display all loaded primers
