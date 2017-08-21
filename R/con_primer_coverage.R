@@ -1031,25 +1031,24 @@ get_duplex_events <- function(fw.df, annealing.temp, ions, primer.df) {
     #print("get_duplex_Events:")
     #print("fw.df:")
     #print(fw.df)
-    # select only unique events
-    #print(fw.df)
-    dup <- duplicated(fw.df[, c("Primer", "Template")])
-    unique.df <- fw.df[!dup,]
-    fw.df$Index <- seq_len(nrow(fw.df))
-    unique.df$UniqueIndex <- seq_len(nrow(unique.df))
-    combi.df <- merge(unique.df, fw.df, by = c("Primer", "Template"))
-    # rename identifiers:
-    colnames(combi.df) <- gsub("TemplateIdentifier.x", "TemplateIdentifier", colnames(combi.df))
-    colnames(combi.df) <- gsub("PrimerIdentifier.x", "PrimerIdentifier", colnames(combi.df))
-    combi.df <- combi.df[, !colnames(combi.df) %in% c("TemplateIdentifier.y", "PrimerIdentifier.y")]
-    ## restore original order for accessing the unique index:
-    combi.df <- combi.df[order(combi.df$Index),]
-    # nb: it's critical that the annealing temperatures are replicated correctly here for individual primers
-    duplex.result.fw <- get.dimer.data(unique.df$Primer, unique.df$Template, annealing.temp[match(unique.df$PrimerIdentifier, primer.df$Identifier)], ions, no.structures = TRUE) 
+    combi.df <- plyr::ddply(fw.df, c("Primer", "Template"), plyr::summarize,
+                             PrimerIdentifier = paste(substitute(PrimerIdentifier), collapse = ","), TemplateIdentifier = paste(TemplateIdentifier, collapse = ","))
+    p.ids <- unlist(lapply(combi.df$PrimerIdentifier, function(x) strsplit(x, split = ",")[[1]][1]))
+    duplex.result.fw <- get.dimer.data(combi.df$Primer, combi.df$Template, annealing.temp[match(p.ids, primer.df$Identifier)], ions, no.structures = TRUE) 
     if (length(duplex.result.fw) != 0) {
+        # get lowest DeltaG for all ambiguities
         duplex.result.fw <- plyr::ddply(duplex.result.fw, c("Idx1"), function(x) arrange(x, substitute(DeltaG))[1, ])
-        #duplex.result.fw <- data.frame(PrimerIdentifier = unique.df$PrimerIdentifier, TemplateIdentifier = unique.df$TemplateIdentifier, duplex.result.fw, stringsAsFactors = FALSE)
-        duplex.result.fw <- cbind(combi.df, DeltaG = duplex.result.fw[combi.df$UniqueIndex, c("DeltaG")])
+        # restore original dimensions of dat
+        m <- lapply(seq_len(nrow(combi.df)), function(x) {
+            primer.id <- strsplit(combi.df$PrimerIdentifier[x], split = ",")[[1]]
+            template.id <- strsplit(combi.df$TemplateIdentifier[x], split = ",")[[1]]
+            mm <- unlist(lapply(seq_along(primer.id), function(y) which(fw.df$PrimerIdentifier == primer.id[y] & fw.df$TemplateIdentifier == template.id[y])))
+        })
+        deltaG <- rep(NA, nrow(fw.df))
+        for (i in seq_len(nrow(duplex.result.fw))) {
+            deltaG[m[[i]]] <- duplex.result.fw$DeltaG[i]
+        }
+        duplex.result.fw <- cbind(fw.df, DeltaG = deltaG)
     }
     return(duplex.result.fw)
 }
@@ -1291,6 +1290,7 @@ predict_coverage <- function(primer.df, template.df, settings, mode = c("on_targ
     mode.directionality <- get.analysis.mode(primer.df)
     # compute annealingDeltaG:
     cvg_constraints(settings) <- list("annealing_DeltaG" = c("max" = Inf))
+    print(paste0("mode: ", mode))
     if (mode == "on_target") {
         # TODO: check different annealing_DeltaG values
         p.df <- compute.constraints(primer.df, mode.directionality, 

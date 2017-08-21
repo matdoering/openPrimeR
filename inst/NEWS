@@ -5,6 +5,8 @@
 - Recomputed all comparison data
 - Updated all analysis scripts
 - Primer view plot: coverage status depends on directionality now
+- Added examples for virological applications
+- Added logistic model for coverage evaluation
 
 ## Version 0.97.0
 - Restructured the package

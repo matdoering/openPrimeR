@@ -1858,7 +1858,7 @@ pair_primers <- function(primer.df, template.df) {
     pair.df$Covered_Seqs <- unlist(lapply(cvd.shared[sel.combis], function(x) paste(template.df$Identifier[x], collapse = ",")))
     pair.df$Direction <- rep("both", nrow(combis))
     if (nrow(combis) != 0) {
-        pair.df$ID <- factor(paste0(abbreviate(primer.df$Identifier[combis[,1]], 5), "+", abbreviate(primer.df$Identifier[combis[,2]], 5)))
+        pair.df$ID <- factor(paste0(abbreviate(primer.df$ID[combis[,1]], 5), "+", abbreviate(primer.df$ID[combis[,2]], 5)))
     }
     # select non-redundant pairs of primers:
     cvg.matrix <- get.coverage.matrix(pair.df, template.df)

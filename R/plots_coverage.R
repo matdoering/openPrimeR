@@ -321,43 +321,22 @@ prepare_mm_plot <- function(primer.df, template.df,
         both.idx <- which(primer.df$Direction == "both")
         # for primer pairs: consider for every coverage event the fw/rev primer with the higher nbr of mismatches
         # new idea: for 'both' primers: add both entries
-        both.sel <- lapply(seq_along(both.idx), function(x) {
-                        fw.mm.pos <- abs.mm.pos.fw[[both.idx[x]]]
-                        rev.mm.pos <- abs.mm.pos.rev[[both.idx[x]]]
-                        #print("out:")
-                        #print(sapply(fw.mm.pos, length))
-                        #print(sapply(rev.mm.pos, length))
-                        sel.dirs <- unlist(lapply(seq_along(fw.mm.pos), 
-                                        function(y) ifelse(length(fw.mm.pos[[y]]) > length(rev.mm.pos[[y]]), "fw", "rev"))
-                                    )
-                        #print(sel.dirs)
-                   })
         abs.mm.pos <- rep(NA, nrow(primer.df))
         abs.mm.pos[fw.idx] <- abs.mm.pos.fw[fw.idx]
         abs.mm.pos[rev.idx] <- abs.mm.pos.rev[rev.idx]
         abs.mm.pos[both.idx] <- lapply(seq_along(both.idx), function(x) c(abs.mm.pos.fw[both.idx[x]], abs.mm.pos.rev[both.idx[x]]))
-        #abs.mm.pos[both.idx] <- lapply(seq_along(both.idx), function(x) sapply(seq_along(both.sel[[x]]), 
-                                    #function(y) ifelse(both.sel[[x]][y] == "fw", abs.mm.pos.fw[[x]][y], abs.mm.pos.rev[[x]][y])))
         pos.3prime <- rep(NA, length(abs.mm.pos))
         pos.3prime[fw.idx] <- lapply(seq_along(fw.idx), function(x) lapply(abs.mm.pos[[fw.idx[x]]], function(y) nchar(primer.df$Forward[x]) - y + 1))
         pos.3prime[rev.idx] <- lapply(seq_along(rev.idx), function(x) lapply(abs.mm.pos[[rev.idx[x]]], function(y) nchar(primer.df$Reverse[x]) - y + 1))
-        pos.3prime[both.idx] <- lapply(seq_along(both.idx), function(x) unlist(lapply(seq_along(abs.mm.pos[[x]]), function(y) lapply(seq_along(abs.mm.pos[[x]][[y]]),
+        pos.3prime[both.idx] <- lapply(both.idx, function(x) unlist(lapply(seq_along(abs.mm.pos[[x]]), function(y) lapply(seq_along(abs.mm.pos[[x]][[y]]),
             function(z) {
                 if (y == 1) { # fw primers
                     nchar(primer.df$Forward[x]) - abs.mm.pos[[x]][[y]][[z]] + 1
-                } else {
+                } else { # rev primers
                     nchar(primer.df$Reverse[x]) - abs.mm.pos[[x]][[y]][[z]] + 1
                 }
             }
          )), recursive = FALSE))
-        #pos.3prime[both.idx] <- lapply(seq_along(both.idx), function(x) lapply(seq_along(both.sel[[x]]), 
-                                    #function(y) {
-                                        #if(both.sel[[x]][y] == "fw") {
-                                            #nchar(primer.df$Forward[x]) - abs.mm.pos[[both.idx[x]]][[y]] + 1
-                                        #} else {
-                                            #nchar(primer.df$Reverse[x]) - abs.mm.pos[[both.idx[x]]][[y]] + 1
-                                        #}
-                                   #}))
         pos.worst <- lapply(seq_along(abs.mm.pos), function(x) lapply(pos.3prime[[x]], function(y) rep(min(y), length(y))))
         primer.ids <- lapply(seq_along(pos.3prime), function(x) rep(as.character(primer.df$ID[x]), length(unlist(pos.3prime[[x]]))))
         directions <- lapply(seq_len(nrow(primer.df)), function(x) {

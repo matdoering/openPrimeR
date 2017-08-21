@@ -129,14 +129,43 @@ primer.restriction.sites <- reactive({
     } 
     return(site.df)
 })
+primers.Virus.view <- reactive({
+    # Returns the names/paths of primer sets that are available when viral templates have been selected 
+    if (input$selected_supplied_templates != "virological") {
+        return(NULL)
+    }
+    if (length(input$virus_type) == 0 || input$virus_region == "") {
+        return(NULL)
+    }
+    if (input$load_eval_primers) {
+        # load pre-evaluated primers from csv
+        primer.folder <- system.file("extdata", "Vir", input$virus_type, 
+            input$virus_region, "comparison", "primers", package = "openPrimeR")
+    } else {
+        # load raw fasta seqs from fasta
+        primer.folder <- system.file("extdata", "Vir", input$virus_type, 
+                input$virus_region, "primers", package = "openPrimeR")
+    }
+    files <- list.files(primer.folder, full.names = TRUE)
+    if (length(files) == 0) {
+        return(NULL)
+    }
+    # remove .fasta extension from basename
+    names(files) <- sub("^([^.]*).*", "\\1", basename(files))
+    return(files)
+})
+
 primers.IMGT.view <- reactive({ 
     # Returns the names/paths of primer sets that are available when IMGT templates have been selected 
+    if (input$selected_supplied_templates != "immunological") {
+        return(NULL)
+    }
     if (length(input$IMGT_DB_locus) == 0) {
         return(NULL)
     }
     if (input$load_eval_primers) {
         # load pre-evaluated comparison sets
-        primer.folder <- system.file("extdata", "IMGT_data", "comparison", "primer_sets", package=  "openPrimeR")
+        primer.folder <- system.file("extdata", "IMGT_data", "comparison", "primer_sets", package = "openPrimeR")
     } else {
         # load raw fasta seqs
         primer.folder <- system.file("extdata", "IMGT_data", "primers", package=  "openPrimeR")
@@ -163,6 +192,15 @@ selected.IMGT.primers <- reactive({
     out <- list("datapath" = sel.primers, "name" = "IMGT_primers")
     return(out)
 })
+selected.Virus.primers <- reactive({
+    # Returns data for loading a supplied, viral primer set:
+    sel.primers <- input$Virus_primers
+    if (sel.primers == "") { # nothing selected
+        return(NULL)
+    }
+    out <- list("datapath" = sel.primers, "name" = "Virus_primers")
+    return(out)
+})
 IMGT_EvaluatedObserver <- observeEvent(c(input$load_eval_primers, input$primer_upload_choice), {
     # disable the iupac ambiguity action selector if we load evaluated primer sets
     if (input$load_eval_primers) {
@@ -174,13 +212,21 @@ IMGT_EvaluatedObserver <- observeEvent(c(input$load_eval_primers, input$primer_u
     }
 })
 
-availablePrimerUpdater <- observeEvent(c(input$IMGT_DB_locus, input$load_eval_primers), {
+availablePrimerUpdater <- observeEvent(c(input$selected_supplied_templates, input$IMGT_DB_locus, input$load_eval_primers), {
     # Updates the input$IMGT_primers field when the input locus changes based on the available primers determined by primers.IMGT.view()
     primer.choices <- primers.IMGT.view()
     if (is.null(primer.choices)) {
         primer.choices <- character(0) # remove all choices
     }
     updateSelectInput(session, "IMGT_primers", choices = primer.choices)
+})
+availableVirusPrimerUpdater <- observeEvent(c(input$selected_supplied_templates, input$virus_type, input$virus_region, input$load_eval_primers), {
+    # Updates the input$Virus_primers field when the template selection changes
+    primer.choices <- primers.Virus.view()
+    if (is.null(primer.choices)) {
+        primer.choices <- character(0) # remove all choices
+    }
+    updateSelectInput(session, "Virus_primers", choices = primer.choices)
 })
 
 primer.data <- reactive({
@@ -625,6 +671,15 @@ IMGT_PrimerObserver <- observeEvent(input$IMGT_primers, {
     #print(paste("IMGT primer file: ", selected.IMGT.primers()))
     rv_cur.input.data$primers <- selected.IMGT.primers()
 })
+IMGT_PrimerObserver <- observeEvent(input$Virus_primers, {
+    # update current input primer file on user selection of provided viral primers
+    if (input$Virus_primers == "") {
+        # Dont update here on empty selection 
+        return()
+    }  
+    rv_cur.input.data$primers <- selected.Virus.primers() # TODO
+})
+
 run.mode <- reactive({
     # get analysis mode for primers. either fw/rev/both, depending on the directionality of the primers.
     run.mode <- openPrimeR:::get.analysis.mode(primer.data())

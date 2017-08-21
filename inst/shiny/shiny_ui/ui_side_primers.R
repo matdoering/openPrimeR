@@ -61,15 +61,36 @@ tabPanel("Primers",
                     "Whether pre-evaluated primers (CSV) or raw primers (FASTA) shall be loaded.",
                     "right", options = list(container = "body")
         ),
+        #######################
+        # SUPPLIED PRIMERS
+        #########################
         conditionalPanel("input.primer_upload_choice == 'available_primers'",
+            ############################
             # Load Supplied IMGT primers
-            selectizeInput("IMGT_primers", 
-                tagList(icon = icon("tag", lib = "glyphicon"),
-                    "Available primers"),
-                choices = NULL, selected = NULL,
-                options = list(
-                    placeholder = 'Please select one of the available primer data sets',
-                    onInitialize = I('function() { this.setValue(""); }')
+            #######################
+            conditionalPanel("input.selected_supplied_templates == 'immunological'", 
+                selectizeInput("IMGT_primers", 
+                    tagList(icon = icon("tag", lib = "glyphicon"),
+                        "Available primers"),
+                    choices = NULL, selected = NULL,
+                    options = list(
+                        placeholder = 'Please select one of the available primer data sets',
+                        onInitialize = I('function() { this.setValue(""); }')
+                    )
+                )
+            ),
+            ##################
+            # Load supplied virological primers
+            #####################
+            conditionalPanel("input.selected_supplied_templates == 'virological'", 
+                selectizeInput("Virus_primers", 
+                    tagList(icon = icon("tag", lib = "glyphicon"),
+                        "Available primers"),
+                    choices = NULL, selected = NULL,
+                    options = list(
+                        placeholder = 'Please select one of the available primer data sets',
+                        onInitialize = I('function() { this.setValue(""); }')
+                    )
                 )
             )
         ),

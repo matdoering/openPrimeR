@@ -8,7 +8,7 @@ view.input.sequences <- function(template.df) {
         return(NULL)
     }
     template.df <- asS3(template.df) # modifying columns -> type can't be preserved
-    excl.col <- c("Header", "Group", "Identifier", "Sequence_Length", "Allowed_Start_fw", 
+    excl.col <- c("Header", "Identifier", "Sequence_Length", "Allowed_Start_fw", 
         "Allowed_End_fw", "Allowed_Start_rev", "Allowed_End_rev", 
         "Run", "Allowed_Start_fw_initial", "Allowed_End_fw_initial", 
         "Allowed_Start_rev_initial", "Allowed_End_rev_initial", "InputSequence")
@@ -545,5 +545,12 @@ myHeaderPanel <- function (title, windowTitle = title, style = NULL)
     tagList(tags$head(tags$title(windowTitle)), 
         div(style = NULL, id = "headerPanel", class = "col-sm-12", title)
     )
+}
+
+get.available.viruses <- function() {
+    # determine for which viruses there are available template sequences
+    virus.folder <- system.file("extdata", "Vir", package = "openPrimeR")
+    virs <- basename(list.dirs(virus.folder, recursive = FALSE))
+    return(virs)
 }
 

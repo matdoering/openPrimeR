@@ -30,7 +30,8 @@ tabPanel("Templates",
     conditionalPanel("input.template_scenario == 'supplied'",
          selectizeInput("selected_supplied_templates", 
                         "Template type", 
-                        c("Immunological" = "immunological"),
+                        c("Immunology" = "immunological",
+                          "Virology" = "virological"),
                         selected = "immunological"
          )
     ),
@@ -168,6 +169,34 @@ tabPanel("Templates",
                     disabled = TRUE)
             )
             ), # conditional panel for IMGT template ends
+            ########## CONDITIONAL PANEL FOR VIROLOGICAL TEMPLATES
+             conditionalPanel("input.template_scenario == 'supplied' && input.selected_supplied_templates == 'virological'", 
+        # Template upload: other analysis than comparison and IMGT data are used
+            div(class = "one", 
+                p("Specify the virological template sequences to be analyzed.")
+            ),
+            # species to retrieve data for
+            selectInput("virus_type", 
+                "Virus", 
+                get.available.viruses(),
+                selected = "HIV-1"),
+            # locus to retrieve data for
+            selectInput("virus_region", 
+                "Region", 
+                NULL,
+            ),
+            # template retrieve button for virusees
+            actionButton("Virus_template_button",
+                "Retrieve templates",
+                icon = icon("database"), 
+                class="actionStyle btn-primary"
+            ),
+            bsTooltip("Virus_template_button", 
+                      "Retrieve selected viral templates.",
+                      "right", options = list(container = "body")
+            )
+            ),
+            ################
             ###############
             # PERSONAL TEMPLATES
             #############

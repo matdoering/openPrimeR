@@ -337,7 +337,7 @@ cvg.group.plot.dim <- reactive({
         template.df <- template.df[idx,]
     }
     nbr.groups <- length(unique(template.df$Group))
-    width <- openPrimeR:::get.plot.height(nbr.groups, 25, 500) # nbr of gruops
+    width <- openPrimeR:::get.plot.height(nbr.groups, 50, 500) # based on nbr of groups
     max.nbr.templates.per.group <- max(table(template.df$Group))
     height <- openPrimeR:::get.plot.height(max.nbr.templates.per.group, 1, 500)
     out <- list("width" = width, "height" = height)

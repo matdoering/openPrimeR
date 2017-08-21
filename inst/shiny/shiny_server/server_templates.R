@@ -11,7 +11,8 @@ rv_templates <- reactiveValues("SeqTab" = NULL, # displayed sequences
                               "cvg_optimized" = NULL, # annotated template cvg for optimized primers
                               "raw_seqs" = NULL, # all seqs without any changes (no view)
                               "load_IMGT_templates" = FALSE, # boolean to indicate whether IMGT templates are to be loaded.
-                              "cur_cvg_regions" = NULL # the allowed binding regions for which cvg has been computed for 'all'primers
+                              "cur_cvg_regions" = NULL, # the allowed binding regions for which cvg has been computed for 'all'primers
+                              "supplied_hdr_info" = NULL # args for loading supplied templates (header structure, delimiter, etc.)
 )
 
 InputDataObserverTemplates <- observeEvent(input$sequence_file, {
@@ -51,19 +52,11 @@ seq.data.input <- reactive({
     if (is.null(seqFile)) {
       return(NULL)
     }
-    is.IMGT.data <- isolate(rv_templates$load_IMGT_templates)
-    rm.keywords <- NULL
     rm.duplicated <- FALSE
-    if (is.IMGT.data) {
-        # overwrite header structure and id column for imgt input
-        hdr.structure <- c("ACCESSION", "GROUP", 
-                           "SPECIES", "FUNCTION")
-        delim <- "|"
-        hdr.structure <- list(header = hdr.structure, delim = delim)    
-        id.col <- "GROUP" # use group to identify templates
-        if (isolate(input$remove_partial_seqs)) {
-            rm.keywords <- c("partial")
-        }
+    if (input$template_scenario == "supplied") {
+        hdr.info <- isolate(rv_templates$supplied_hdr_info)
+        hdr.structure <- list("header" = hdr.info$header, "delim" = hdr.info$delim)
+        id.col <- hdr.info$id_col
     } else {
         # use defined header structure and id column
         # don't use the remove_partial_seqs indicator for other sequences
@@ -71,6 +64,17 @@ seq.data.input <- reactive({
         id.col <- isolate({input$template_header_ID_column})
         rm.duplicated <- isolate(input$remove_duplicated_seqs)
     }
+    is.IMGT.data <- isolate(rv_templates$load_IMGT_templates)
+    rm.keywords <- NULL
+    if (is.IMGT.data) {
+        # overwrite header structure and id column for imgt input
+         if (isolate(input$remove_partial_seqs)) {
+            rm.keywords <- c("partial")
+        }
+    }
+    #print("Using the following header structure:")
+    #print(hdr.structure)
+    #print(id.col)
     out <- withWarnings(openPrimeR:::read_templates(seqFile$datapath, 
             hdr.structure = hdr.structure$header, 
             delim = hdr.structure$delim, id.column = id.col, 
@@ -374,6 +378,11 @@ IMGT_TemplateDataObserver <- observeEvent(input$IMGT_template_button, {
     # update of partial seqs makes some problems (can only update once)
 
     # reset current data: necessary to reload data even if filename doesn't change!
+    # set header structure in reactive value list
+    hdr.info <- list("header" = c("ACCESSION", "GROUP", "SPECIES", "FUNCTION"),
+                     "delim" = "|",
+                     "id_col" = "GROUP")
+    rv_templates$supplied_hdr_info <- hdr.info
     rv_cur.input.data$templates_exon <- NULL
     rv_cur.input.data$templates_leader <- NULL
     rv_cur.input.data$templates_leader_rev <- NULL
@@ -521,9 +530,12 @@ output$header_structure <- renderUI({
 # Displays the available template header fields to the user in the frontend for selection.
   fields <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
   ## using selectizeInput with drag_drop and DT
-  selectizeInput("template_header_structure", tagList(icon("list-alt", lib = "glyphicon"), "FASTA header fields"), choices  = fields,
-   selected = "ACCESSION", multiple = TRUE,
-   options = list(plugins = list('remove_button', 'drag_drop')))
+  selected <- "ACCESSION"
+  selectizeInput("template_header_structure", 
+    tagList(icon("list-alt", lib = "glyphicon"), 
+        "FASTA header fields"), choices  = fields,
+    selected = selected, multiple = TRUE,
+    options = list(plugins = list('remove_button', 'drag_drop')))
 })
 output$template_conservation_plot <- renderPlot({
     validate(need(attr(current.seqs(), "entropies"), "Conservation is not available yet."))
@@ -584,3 +596,49 @@ optimized.regions.conservation <- eventReactive(input$modify_binding_regions_con
     updateTabsetPanel(session, "main", selected = "template_view_panel") 
     return(result)
 }, ignoreNULL = FALSE) # trigger also on NULL to return something
+
+VirusRegionObserver <- observeEvent(input$virus_type, {
+    # determine for which viruses there are available template sequences
+    virus.folder <- file.path(system.file("extdata", "Vir", 
+                    package = "openPrimeR"), input$virus_type)
+    regions <- basename(list.dirs(virus.folder, recursive = FALSE))
+    updateSelectInput(session, "virus_region", choices = regions)
+    return(regions)
+})
+
+Virus_TemplateDataObserver <- observeEvent(input$Virus_template_button, {
+    # retrieve supplied viral templates
+    # set header structure
+    hdr.info <- list("header" = c("SPECIES", "ACCESSION", "GROUP"),
+                     "delim" = "|",
+                     "id_col" = "ACCESSION")
+    rv_templates$supplied_hdr_info <- hdr.info
+    rv_cur.input.data$templates_exon <- NULL
+    rv_cur.input.data$templates_leader <- NULL
+    rv_cur.input.data$templates_leader_rev <- NULL
+    vir.folder <- system.file("extdata", "Vir", input$virus_type, 
+                    input$virus_region, "templates", package = "openPrimeR")
+    fnames <- list.files(vir.folder, full.names = TRUE)[1] # select 1 only..
+    #############################
+    # INFO: hiv viral template reference sets can be extracted from
+    # https://www.hiv.lanl.gov/content/sequence/NEWALIGN/
+    # -> select subtype reference alignemnts and the region of interest 
+    ###########################
+    if (length(fnames) != 0) {
+        # return fasta filename of exon and leader file in vector
+        seqFile <- list("datapath" = fnames[1],  # exon file
+                            "name" = basename(fnames[1]))
+        rv_cur.input.data$templates_exon <- seqFile
+        #leaderFile.fw <- list("datapath" = fnames[2],  # leader file
+                            #"name" = basename(fnames[2]))
+        #rv_cur.input.data$templates_leader <- leaderFile.fw
+        # activate 'confirm templates' button
+        #shinyjs::enable("IMGT_template_confirm_button")
+    } else {
+        # disable confirm templates button
+        #shinyjs::disable("IMGT_template_confirm_button")
+        # throw warning:
+        #session$sendCustomMessage(type='jsCode', list(value = "$('#NotifyIMGT_ConnectionError').modal('show')"))
+    }
+})
+
