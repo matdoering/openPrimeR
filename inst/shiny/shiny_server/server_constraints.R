@@ -42,16 +42,11 @@ output$constraint_plots_no_mismatches <- renderPlot({
 
 eval.plot.width <- reactive({
     # width for evaluation plot
-    primers <- switch(input$set_meta_selector, 
-                      all = rv_primers$evaluated_primers, 
-                      filtered = current.filtered.primers(), 
-                      optimized = optimal.primers())
-    if (length(primers) == 0) {
-        return(1200)
+    if (length(current.settings()) == 0) {
+        return(NULL)
     }
-    idx <- grep("^EVAL_", colnames(primers))
-    nbr.con <- length(idx)
-    width <- openPrimeR:::get.plot.height(nbr.con, 40, 300)
+    nbr.con <- length(constraints()$active_settings)
+    width <- openPrimeR:::get.plot.height(nbr.con, 50, 400)
     return(width)
 })
 
@@ -83,6 +78,14 @@ output$constraint_fulfillment_plot <- renderPlot({
             plot.p.vals = TRUE)
     return(p)
 })
+constraint_deviations_height <- reactive({
+    return(800)
+})
+output$constraint_deviations_ui <- renderUI({
+    plotOutput("constraint_deviations", 
+        width = paste0(eval.plot.width(), "px"),
+        height = paste0(constraint_deviations_height(), "px"))
+})
 output$constraint_deviations <- renderPlot({
     # plot of deviations from target constraints
     constraint.df <- switch(input$set_meta_selector, 
@@ -92,7 +95,13 @@ output$constraint_deviations <- renderPlot({
     validate(need(constraint.df, "Please evaluate the primers first."))
     openPrimeR:::plot_constraint_deviation(constraint.df, current.settings())
 })
+output$constraint_stats_ui <- renderUI({
+    # renderUI necessary to have two plots with specific sizes on one page
+    plotOutput("constraint_stats", 
+        width = paste0(eval.plot.width(), "px"),
+        height = paste0(eval.plot.height(), "px"))
 
+})
 output$constraint_stats <- renderPlot({
     # plot overview of fulfilled/failed constraints
     constraint.df <- switch(input$set_meta_selector, 
@@ -102,5 +111,5 @@ output$constraint_stats <- renderPlot({
     validate(need(constraint.df, "Please evaluate the primers first."))
     constraint.settings <- NULL
     openPrimeR:::plot_constraint_fulfillment(constraint.df, current.settings())
-})#, width = eval.plot.width, height = eval.plot.height)
+})
 

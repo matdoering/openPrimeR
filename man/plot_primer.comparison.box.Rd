@@ -5,7 +5,8 @@
 \title{Boxplot for Primer Comparison}
 \usage{
 plot_primer.comparison.box(primer.data, con.identifier, con.cols, boundaries,
-  y.limits = NULL, show.points = TRUE, highlight.set = NULL)
+  y.limits = NULL, show.points = TRUE, highlight.set = NULL,
+  nfacets = NULL)
 }
 \arguments{
 \item{primer.data}{List with primer data frames.}
@@ -22,6 +23,10 @@ plot_primer.comparison.box(primer.data, con.identifier, con.cols, boundaries,
 are visualized in the boxplot, otherwise they are not shown.}
 
 \item{highlight.set}{The identifier of a primer set to highlight in the plot.}
+
+\item{nfacets}{A numeric providing the number of facet columns to show.
+By default \code{nfacets} is \code{NULL} such that the number of 
+facet columns is chosen automatically.}
 }
 \value{
 A boxplot for primer comparison.

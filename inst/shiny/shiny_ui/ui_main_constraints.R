@@ -65,9 +65,9 @@ tabPanel("Constraints",
             column(12, uiOutput("ConstraintsTotal")),
             br(),
             # fulfillment matrix:
-            column(12, plotOutput("constraint_stats"), align="center"),
+            column(12, uiOutput("constraint_stats_ui"), align="center"),
             # deviation of constraints:
-            column(12, plotOutput("constraint_deviations"), align = "center")
+            column(12, uiOutput("constraint_deviations_ui"), align = "center")
         )
     ),
     ########

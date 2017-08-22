@@ -1377,8 +1377,8 @@ setMethod("plot_primer_binding_regions",
             colour = "#3d3835", 
             size = 0.3, show.legend = FALSE)
     if (length(unique(plot.df$Run)) > 1) {
-        # don't show facets and don't show individual primer legend
-        p <- p + facet_wrap(~Run, ncol = 3) +
+        # show facets and don't show individual primer legend
+        p <- p + facet_wrap(~Run, ncol = 2) +
             guides(fill = FALSE)
     } else {
         # only show rectangle text for single plot

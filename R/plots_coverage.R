@@ -548,25 +548,28 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     }
     mm.stats <- data.frame(mm.stats)
     colnames(mm.stats) <- mm.range
+    mm.stats <- cbind("Primer" = primer.df$ID, mm.stats)
     ########
-    # enrich table with other information
+    # determine number of templates covered from each group
     ########
-    # what is the main group of covered templates per primer?
     count.df <- plyr::ddply(df, c("Primer", "Group"), plyr::summarize,
-                            Coverage = length(unique(substitute(Template))))
-    # order by largest number of coverage events per group
-    count.df <- count.df[order(count.df$Coverage, decreasing = TRUE),]
-    count.df$Group_Coverage <- sapply(seq_len(nrow(count.df)), function(x) count.df$Coverage[x] / length(which(template.df$Group == count.df$Group[x])))
-    group.cvg <- unlist(lapply(primer.df$ID, function(x) {
-                        idx <- which(as.character(count.df$Primer) == as.character(x))
-                        strings <- sapply(idx, function(y) paste0(count.df[y, "Group"], " (",
-                                                       paste0(round(count.df[y, "Group_Coverage"], 3) * 100, "%", 
-                                                       ")", sep = "")))
-                        res <- paste0(strings, collapse = ",")
-                        }))
-    #mm.stats <- cbind("Primer" = rownames(mm.stats), "Forward" = primer.df$Forward, "Reverse" = primer.df$Reverse, "Group_Coverage" = group.cvg, mm.stats)
-    mm.stats <- cbind("Primer" = primer.df$ID, "Group_Coverage" = group.cvg, mm.stats)
-    return(mm.stats)
+                            Coverage = length(unique(substitute(Template))),
+                            CoverageRatio = length(unique(substitute(Template)))/ length(which(template.df$Group == unique(substitute(Group)))))
+    # create table entry: value + percentage
+    count.df$TabEntry <- paste0(count.df$Coverage, " (", 
+                            paste0(round(count.df$CoverageRatio * 100, 1), "%"), ")")
+    # add percentages
+    # order by factorlevels to ensure group order when using 'reshape'
+    #print(count.df)
+    cols <- c("Primer", "Group", "TabEntry")
+    count.df <- count.df[order(count.df$Group), cols]
+    # to wide format
+    group.df <- stats::reshape(count.df, idvar = "Primer", timevar = "Group", direction = "wide")
+    colnames(group.df) <- gsub("TabEntry.", "", colnames(group.df), fixed = TRUE)
+    # replace NA with 0
+    group.df[is.na(group.df)] <- "0 (0%)"
+    out <- list("cvg_per_nbr_mismatches" = mm.stats, "cvg_per_group" = group.df)
+    return(out)
 }
 #' Plot of Primer Subset Coverage.
 #'
@@ -1115,9 +1118,9 @@ setMethod("plot_template_cvg",
     }
     if (per.mismatch) {
         # stratify by mismatches
-        p <- plot_template_cvg_mismatches(primers, templates)
+        p <- plot_template_cvg_mismatches(primers, templates, groups)
     } else {
-        p <- plot_template_cvg_unstratified(primers, templates)
+        p <- plot_template_cvg_unstratified(primers, templates, groups)
     }
     return(p)
 })
@@ -1258,9 +1261,19 @@ prepare_template_cvg_mm_data <- function(primer.df, template.df, allowed.mismatc
 #'
 #' @param primer.df A \code{Primers} object.
 #' @param template.df A \code{Templates} object.
+#' @param groups Identifiers of template groups for which plot should be created. By default, \code{groups} is set to \code{NULL} such that all 
+#' templates are considered.
+#' @param nfacets The number of facets columns to plot. By default,
+#' \code{nfacets} is set to 2.
 #' @return A plot showing the number of covered template sequences.
 #' @keywords internal
-plot_template_cvg_mismatches <- function(primer.df, template.df) {
+plot_template_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
+                                        nfacets = 2) {
+    if (!is.null(groups) && !"all" %in% groups) {
+        # select a template subset
+        idx <- which(template.df$Group %in% groups)
+        template.df <- template.df[idx,]
+    }
     plot.df <- prepare_template_cvg_mm_data(primer.df, template.df)
     # compute cvg ratio per mismatch setting to show in facet labels:
     cvg.per.mm <- plyr::ddply(plot.df, c("Maximal_mismatches", "Status"), plyr::here(plyr::summarise),
@@ -1284,7 +1297,7 @@ plot_template_cvg_mismatches <- function(primer.df, template.df) {
                 angle = 90, 
                 hjust = 1, vjust = 0.5)) +
         scale_fill_manual(values = colors) + 
-        facet_wrap(~Maximal_mismatches, ncol = 2,
+        facet_wrap(~Maximal_mismatches, ncol = nfacets,
         labeller = label_bquote("Mismatches"<=.(substitute(Maximal_mismatches))))
     return(p)
 }
@@ -1816,10 +1829,10 @@ plot_primer_cvg_unstratified <- function(p.df, template.df, groups = NULL) {
     # Select only the selected groups of templates:
      if (!is.null(groups) && !"all" %in% groups) { # select subset
         idx <- which(template.df$Group %in% groups)
+        # set excluded seqs for updating the coverage
+        excluded.seqs <- setdiff(template.df$Identifier[seq_len(nrow(template.df))], template.df$Identifier[idx])
         # select relevant templates
         template.df <- template.df[idx,]
-        # set excluded seqs
-        excluded.seqs <- setdiff(template.df$Identifier[seq_len(nrow(template.df))], template.df$Identifier[idx])
         # re-evalaute coverage with the new templates
         p.df <- evaluate.diff.primer.cvg(p.df, excluded.seqs, template.df)
     }
@@ -1950,9 +1963,20 @@ get_primer_cvg_mm_plot_df <- function(primer.df, template.df) {
 #'
 #' @param primer.df A \code{Primers} object.
 #' @param template.df A \code{Templates} object.
+#' @param groups Optional identifiers of template groups to be considered.
+#' If not provided, all template groups are considered.
+#' @param nfacets A numeric providing the number of facet columns to use. 
+#' By default, \code{nfacets} is set to \code{NULL} such that a
+#' suitable number of columns is chosen automatically.
 #' @return A bar plot showing the coverage of individual primers for different mismatch settings.
 #' @keywords internal
-plot_primer_cvg_mismatches <- function(primer.df, template.df) {
+plot_primer_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
+                                       nfacets = NULL) {
+    # select template group subset
+    if (!is.null(groups) && !"all" %in% groups) { # select subset
+        idx <- which(template.df$Group %in% groups)
+        template.df <- template.df[idx,]
+    }
     # retrieve cvg stats of each primer:
     count.df <- get_primer_cvg_mm_plot_df(primer.df, template.df)
     pal <- getOption("openPrimeR.plot_colors")["Group"] # the RColorBrewer palette to use
@@ -1968,7 +1992,7 @@ plot_primer_cvg_mismatches <- function(primer.df, template.df) {
                 angle = 90,  # angle @ 90 to prevent overplotting when facetting
                 hjust = 1)) +
         scale_fill_manual(values = group.colors) + 
-        facet_wrap(~Maximal_mismatches,
+        facet_wrap(~Maximal_mismatches, ncol = nfacets,
             labeller = label_bquote("Mismatches"<=.(substitute(Maximal_mismatches))))
     return(p)
 }

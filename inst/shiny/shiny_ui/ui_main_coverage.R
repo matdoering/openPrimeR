@@ -74,17 +74,20 @@ tabPanel("Coverage",
         # individual primer coverage (for defined cvg condition)
         condition = "input.selected_cvg_plot == 'individual_coverage'", 
         fluidRow(
-            column(12, plotOutput("Coverage_Primer"), align = "center")
+            column(12, uiOutput("Coverage_Primer_ui"), align = "center"),
+            # table with coverage events per group
+            column(12, DT::dataTableOutput("primer_cvg_stats"), align = "center")
+
         )
      ),
      conditionalPanel(
         # individual primer coverage (for all mismatch settings)
         condition = "input.selected_cvg_plot == 'individual_coverage_mismatches'", 
         fluidRow(
-            # coverage stats wrt mismatches:
-            column(12, DT::dataTableOutput("primer_cvg_stats_mismatch"), align = "center"),
             # primer cvg wrt mismatches:
-            column(12, plotOutput("Coverage_Primer_mismatches"), align = "center")
+            column(12, uiOutput("Coverage_Primer_mismatches_ui"), align = "center"),
+            # coverage stats wrt mismatches:
+            column(12, DT::dataTableOutput("primer_cvg_stats_mismatch"), align = "center")
         )
     ),
      conditionalPanel(

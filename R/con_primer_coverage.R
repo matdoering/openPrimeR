@@ -1290,9 +1290,8 @@ predict_coverage <- function(primer.df, template.df, settings, mode = c("on_targ
     mode.directionality <- get.analysis.mode(primer.df)
     # compute annealingDeltaG:
     cvg_constraints(settings) <- list("annealing_DeltaG" = c("max" = Inf))
-    print(paste0("mode: ", mode))
+    #print(paste0("mode: ", mode))
     if (mode == "on_target") {
-        # TODO: check different annealing_DeltaG values
         p.df <- compute.constraints(primer.df, mode.directionality, 
                     template.df, settings, 
                     active.constraints = "annealing_DeltaG")

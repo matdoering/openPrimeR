@@ -217,11 +217,14 @@ plot_primer.comparison.mismatches <- function(primer.data, template.data, allowe
 #' @param show.points If \code{TRUE} (the default), individual data points
 #' are visualized in the boxplot, otherwise they are not shown.
 #' @param highlight.set The identifier of a primer set to highlight in the plot.
+#' @param nfacets A numeric providing the number of facet columns to show.
+#' By default \code{nfacets} is \code{NULL} such that the number of 
+#' facet columns is chosen automatically.
 #' @return A boxplot for primer comparison.
 #' @keywords internal
 plot_primer.comparison.box <- function(primer.data,
     con.identifier, con.cols, boundaries, y.limits = NULL, 
-    show.points = TRUE, highlight.set = NULL) {
+    show.points = TRUE, highlight.set = NULL, nfacets = NULL) {
 
     if (length(primer.data) == 0) {
         return(NULL)
@@ -230,6 +233,8 @@ plot_primer.comparison.box <- function(primer.data,
         # no constraints to be plotted according to 'con.cols'
         return(NULL)
     }
+    #print("plot_primer.box: nbr facet cols is:")
+    #print(nfacets)
     plot.df <- rbind.primer.data(primer.data)
     if (length(plot.df) == 0) {
         return(NULL)
@@ -295,7 +300,8 @@ plot_primer.comparison.box <- function(primer.data,
     if (length(con.identifier) > 1) {
         # multiple constraints are plotted
         p <- p + facet_wrap(stats::as.formula("~Constraint"), 
-                scales = "free_y", ncol = 2, labeller = ggplot2::label_parsed)
+                scales = "free_y", ncol = nfacets, 
+                labeller = ggplot2::label_parsed)
     } else {
         # a single constraint is plotted
         p <- p + ylab(con.identifier[[1]])

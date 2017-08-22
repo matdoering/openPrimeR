@@ -4,12 +4,19 @@
 \alias{plot_template_cvg_mismatches}
 \title{Bar Plot of Template Coverage for Mismatches.}
 \usage{
-plot_template_cvg_mismatches(primer.df, template.df)
+plot_template_cvg_mismatches(primer.df, template.df, groups = NULL,
+  nfacets = 2)
 }
 \arguments{
 \item{primer.df}{A \code{Primers} object.}
 
 \item{template.df}{A \code{Templates} object.}
+
+\item{groups}{Identifiers of template groups for which plot should be created. By default, \code{groups} is set to \code{NULL} such that all 
+templates are considered.}
+
+\item{nfacets}{The number of facets columns to plot. By default,
+\code{nfacets} is set to 2.}
 }
 \value{
 A plot showing the number of covered template sequences.

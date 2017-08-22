@@ -18,7 +18,6 @@ rv_comparison.data <- reactiveValues(template_path = NULL,
     comp_primers = NULL, comp_templates = NULL) # selected all primers, selected all templates
 
 eval_comparison_con_width <- reactive({
-    # width for region comparison plot
     # nbr of facets times facet width
     openPrimeR:::get.plot.height(2, 400)
 })
@@ -35,7 +34,6 @@ eval_comparison_cvg_height <- reactive({
 })
 
 eval_comparison_width <- reactive({
-    # width for region comparison plot
     # nbr of facets times facet width
     openPrimeR:::get.plot.height(3, 600)
 })
@@ -46,11 +44,11 @@ eval_comparison_height <- reactive({
 region_comparison_width <- reactive({
     # width for region comparison plot
     # nbr of facets times facet width
-    openPrimeR:::get.plot.height(3, 200)
+    openPrimeR:::get.plot.height(2, 400)
 })
 region_comparison_height <- reactive({
     # height for region comparison plot
-    openPrimeR:::get.plot.height(length(plot.comp.primers()) / 3, 300)
+    openPrimeR:::get.plot.height(length(plot.comp.primers()) / 2, 300)
 })
 output$cvg_vs_size_plot <- renderPlot({
     
@@ -82,6 +80,12 @@ output$cvg_vs_size_plot <- renderPlot({
     #d <- plotly::event_data("plotly_relayout")
     #if (is.null(d)) "Relayout (i.e., zoom) events appear here" else d
 #})
+
+comparison_plot_cvg_width <- reactive({
+    # scale width of plot by nbr of sets
+    nbr.sets <- length(plot.comp.primers())
+    width <- openPrimeR:::get.plot.height(nbr.sets, 20, 800)
+})
 output$comparison_plot_cvg <- renderPlot({
     # comparison of primer coverage for different primer sets
     validate(need(plot.comp.primers(), "Please upload primer sets for comparison and click on the Compare button first."))
@@ -89,7 +93,8 @@ output$comparison_plot_cvg <- renderPlot({
     validate(need(length(plot.comp.templates()) == length(plot.comp.primers()), 
         "Number of uploaded template sets did not agree with the number of uploaded primer sets."))
     openPrimeR:::plot_template_cvg(plot.comp.primers(), plot.comp.templates())
-})
+}, width = comparison_plot_cvg_width)
+
 output$comparison_plot_regions <- renderPlot({
     # binding regions comparison plot
     validate(need(plot.comp.primers(), "Please upload primer sets for comparison and click on the Compare button first."))
@@ -99,8 +104,8 @@ output$comparison_plot_regions <- renderPlot({
     group <- "all"
     direction <- "both"
     relation <- input$primer_comparison_relation
-    openPrimeR:::plot_primer_binding_regions(plot.comp.primers(), plot.comp.templates(),
-        direction, group, relation)
+    openPrimeR:::plot_primer_binding_regions(plot.comp.primers(),
+        plot.comp.templates(), direction, group, relation)
 }, width = region_comparison_width, height = region_comparison_height, units = "px")
 
 comparison_primer_choices <- reactive({
@@ -358,11 +363,21 @@ output$comparison_stats <- DT::renderDataTable({
     DT::datatable(data, options = list(searching = FALSE, processing = FALSE), caption = "Coverage statistics of the loaded primer sets.")
 })
 
+comparison_plot_deviation_width <- reactive({
+    if (length(plot.comp.primers()) == 0) {
+        return(NULL)
+    }
+    nbr.sets <- length(plot.comp.primers())
+    nbr.constraints <- length(constraints()$active_settings)
+    width <- openPrimeR:::get.plot.height(nbr.sets * nbr.constraints, 20, 600)
+})
+
 output$comparison_plot_deviation <- renderPlot({
+    # constraint deviation plot
     validate(need(plot.comp.primers(), "Please upload primer sets for comparison and click on the Compare button first."))
     openPrimeR:::plot_constraint_deviation(plot.comp.primers(), current.settings())
-    # TODO: width and height -> width depends on nbr of sets?
-})
+}, width = comparison_plot_deviation_width, height = 800)
+
 output$comparison_plot_box <- renderPlot({
     # comparison plot for coverage
     validate(need(plot.comp.primers(), "Please upload primer sets for comparison and click on the Compare button first."))
@@ -371,12 +386,44 @@ output$comparison_plot_box <- renderPlot({
         "Number of uploaded template sets did not agree with the number of uploaded primer sets."))
     openPrimeR:::plot.comparison.box(plot.comp.primers(), plot.comp.templates())
 })
+comparison_plot_constraint_nfacets <- reactive({ 
+    if (length(plot.comp.primers()) == 0) {
+        return(NULL)
+    }
+    nfacets <- 2
+    if (length(plot.comp.primers()) > 10) {
+        nfacets <- 1
+    }
+    return(nfacets)
+})
+
+comparison_plot_constraint_width <- reactive({
+    if (length(plot.comp.primers()) == 0) {
+        return(NULL)
+    }
+    nbr.sets <- length(plot.comp.primers())
+    width <- openPrimeR:::get.plot.height(nbr.sets * comparison_plot_constraint_nfacets(), 50)
+    return(width)
+})
+
+comparison_plot_constraint_height <- reactive({
+    if (length(plot.comp.primers()) == 0) {
+        return(NULL)
+    }
+    nbr.constraints <- length(constraints()$active_settings)
+    facets <- comparison_plot_constraint_nfacets()
+    height <- openPrimeR:::get.plot.height(ceiling(nbr.constraints / facets), 150)
+    return(height)
+})
+
 output$comparison_plot_constraint <- renderPlot({
     validate(need(plot.comp.primers(), "Please upload primer sets for comparison and click on the Compare button first."))
     p <- openPrimeR:::plot_constraint(plot.comp.primers(),
-                        current.settings(), input$selected_other_plot)
+                        current.settings(), input$selected_other_plot,
+                        nfacets = comparison_plot_constraint_nfacets())
     return(p)
-}, width = eval_comparison_con_width, height = eval_comparison_con_height, units = "px")
+}, width = comparison_plot_constraint_width, 
+   height = comparison_plot_constraint_height, units = "px")
 
 output$comparison_plot_mismatches <- renderPlot({
     # comparison plot for the number of mismatches in primer sets
@@ -387,7 +434,8 @@ output$comparison_plot_mismatches <- renderPlot({
     p <- openPrimeR:::plot_primer.comparison.mismatches(plot.comp.primers(), plot.comp.templates(),
         allowed_nbr_of_mismatches())
     return(p)
-})
+}, width = comparison_plot_cvg_width)
+
 output$comparison_plot_evaluation_ui <- renderUI({
     # ui output of evaluation to prevent overplotting
     plotOutput("comparison_plot_evaluation",

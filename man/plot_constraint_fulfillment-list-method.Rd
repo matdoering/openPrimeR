@@ -6,7 +6,7 @@
 \title{Comparison of Evaluation Results.}
 \usage{
 \S4method{plot_constraint_fulfillment}{list}(primers, settings,
-  active.constraints, plot.p.vals = FALSE, ncol = 3, highlight.set = NULL)
+  active.constraints, plot.p.vals = FALSE, ncol = 2, highlight.set = NULL)
 }
 \arguments{
 \item{primers}{A list of \code{Primers} objects.}

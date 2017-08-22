@@ -543,16 +543,21 @@ setMethod("plot_constraint",
 #' @param active.constraints The names of the constraints to be plotted.
 #' @param constraint.settings List with settings for each constraint.
 #' @param highlight.set Identifiers of primer sets to be highlighted.
+#' @param nfacets A numeric providing the number of facet columns to show.
+#' By default \code{nfacets} is \code{NULL} such that the number of 
+#' facet columns is chosen automatically.
 #' @return Boxplot comparing the values of the properties specified 
 #' by \code{constraints}.
 #' @keywords internal
 setMethod("plot_constraint", 
     methods::signature(primers = "list"), 
     function(primers, settings, active.constraints,
-             highlight.set = NULL) {
+             highlight.set = NULL, nfacets = NULL) {
     if (length(primers) == 0 || length(active.constraints) == 0) {
         return(NULL)
     }
+    #print("nfacets plot_constraint()")
+    #print(nfacets)
     # check type of primers
     primer.classes <- sapply(primers, function(x) class(x))
     if (any(primer.classes != "Primers")) {
@@ -572,7 +577,8 @@ setMethod("plot_constraint",
     con.cols <- con.cols[!duplicated(names(con.cols))]
     constraints <- constraints_to_unit(active.constraints)
     p <- plot_primer.comparison.box(primers, constraints, 
-            con.cols, boundaries, highlight.set = highlight.set)
+            con.cols, boundaries, highlight.set = highlight.set,
+            nfacets = nfacets)
     return(p)
 })
 #' Constraint Fulfillment Plot.
@@ -715,7 +721,7 @@ setMethod("plot_constraint_fulfillment",
 setMethod("plot_constraint_fulfillment", 
     methods::signature(primers = "list"),
     function(primers, settings, active.constraints, 
-             plot.p.vals = FALSE, ncol = 3, highlight.set = NULL) {
+             plot.p.vals = FALSE, ncol = 2, highlight.set = NULL) {
 
     constraint.settings <- constraints(settings)[names(constraints(settings)) %in% active.constraints]
     new.df <- prepare.constraint.plot(primers, constraint.settings, plot.p.vals) 

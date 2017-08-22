@@ -4,12 +4,20 @@
 \alias{plot_primer_cvg_mismatches}
 \title{Plot of Individual Primer Coverage and Mismatches.}
 \usage{
-plot_primer_cvg_mismatches(primer.df, template.df)
+plot_primer_cvg_mismatches(primer.df, template.df, groups = NULL,
+  nfacets = NULL)
 }
 \arguments{
 \item{primer.df}{A \code{Primers} object.}
 
 \item{template.df}{A \code{Templates} object.}
+
+\item{groups}{Optional identifiers of template groups to be considered.
+If not provided, all template groups are considered.}
+
+\item{nfacets}{A numeric providing the number of facet columns to use. 
+By default, \code{nfacets} is set to \code{NULL} such that a
+suitable number of columns is chosen automatically.}
 }
 \value{
 A bar plot showing the coverage of individual primers for different mismatch settings.

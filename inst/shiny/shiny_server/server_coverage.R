@@ -167,7 +167,7 @@ output$cvg_stats_mismatches <- DT::renderDataTable({
     validate(need(template.data, "No templates available."))
     # select the coverage definition for template coverage table:
     allowed.mm <- input$allowed_mm_cvg_stats
-    stats <- coverage.statistics.mismatches() # TODO: this is new
+    stats <- coverage.statistics.mismatches()
     if (allowed.mm == "") {
         # nothing to select
         return(NULL)
@@ -194,7 +194,8 @@ output$CoverageTotal <- renderUI({
         return(NULL)
     }
     stats <- coverage.statistics()
-    selected.group <- input$selected_group_coverage
+    #selected.group <- input$selected_group_coverage
+    selected.group <- NULL # no dependence on selected.group -> don't want to show multiple texts, just show coverage text for all templates.
     if (length(stats) != 0) {
         cvg.stats.exp <- stats[stats$Coverage_Definition == "Expected_Coverage",]
         cvg.stats.ident <- stats[stats$Coverage_Definition == "Identity_Coverage",]
@@ -318,7 +319,7 @@ output$primer_plot <- renderPlot({
 },  width = primer_plot_width, height=primer_plot_height, units="px")
 
 cvg.group.plot.dim <- reactive({
-    # dimension of group cvg plot
+    # dimension of template coverage plot
     primer.df <- switch(input$set_meta_selector,
         "all" = rv_primers$evaluated_primers,
         "filtered" = current.filtered.primers(),
@@ -336,10 +337,41 @@ cvg.group.plot.dim <- reactive({
         idx <- which(template.df$Group %in% lex.sel)
         template.df <- template.df[idx,]
     }
+    # base width on number of groups
     nbr.groups <- length(unique(template.df$Group))
-    width <- openPrimeR:::get.plot.height(nbr.groups, 50, 500) # based on nbr of groups
+    #nbr.primers <- nrow(primer.df)
+    width <- openPrimeR:::get.plot.height(nbr.groups, 40, 500) 
+    # increase height with number of templates per group
     max.nbr.templates.per.group <- max(table(template.df$Group))
     height <- openPrimeR:::get.plot.height(max.nbr.templates.per.group, 1, 500)
+    out <- list("width" = width, "height" = height)
+    return(out)
+})
+primer.cvg.plot.dim <- reactive({
+    # dimension of template coverage plot
+    primer.df <- switch(input$set_meta_selector,
+        "all" = rv_primers$evaluated_primers,
+        "filtered" = current.filtered.primers(),
+        "optimized" = optimal.primers())
+    template.df <- switch(input$set_meta_selector,
+            "all" = rv_templates$cvg_all,
+            "filtered" = rv_templates$cvg_filtered,
+            "optimized" = rv_templates$cvg_optimized)
+    if (length(template.df) == 0 || length(primer.df) == 0)  {
+        #print("templates unknown for group plot dimension ...")
+        return(list("width" = 800, "height" = 800))
+    }
+    lex.sel <- input$selected_group_coverage
+    if (!is.null(lex.sel) && !"all" %in% lex.sel) { # select subset
+        idx <- which(template.df$Group %in% lex.sel)
+        template.df <- template.df[idx,]
+    }
+    # base width on number of groups
+    nbr.groups <- length(unique(template.df$Group))
+    nbr.primers <- nrow(primer.df)
+    width <- openPrimeR:::get.plot.height(nbr.groups*nbr.primers, 10, 500) # 2nd value is the width of each bar
+    # increase height with number of templates per group
+    height <- 500
     out <- list("width" = width, "height" = height)
     return(out)
 })
@@ -377,8 +409,25 @@ output$Coverage_Group <- renderPlot({
 
 output$coverage_primer_per_group_ui <- renderUI({
     # ui output of group coverage; prevents overplotting for multiple plot elements on one page
-    plotOutput("Coverage_Group",width = paste0(cvg.group.plot.width(), "px"), height = paste0(cvg.group.plot.height(), "px"))
+    plotOutput("Coverage_Group", width = paste0(cvg.group.plot.width(), "px"), 
+                                height = paste0(cvg.group.plot.height(), "px"))
 })
+
+cvg.stats.primer <- reactive({
+    data <- switch(input$set_meta_selector,
+            "all" = rv_primers$evaluated_primers,
+            "filtered" = current.filtered.primers(),
+            "optimized" = optimal.primers())
+    template.data <- switch(input$set_meta_selector,
+            "all" = rv_templates$cvg_all,
+            "filtered" = rv_templates$cvg_filtered,
+            "optimized" = rv_templates$cvg_optimized)
+    validate(need(data, "No primer coverage available."))
+    validate(need(template.data, "No templates available."))
+    cvg.stats <- openPrimeR:::get_cvg_stats_primer(data, template.data)$cvg_per_group
+    return(cvg.stats)
+})
+
 cvg.stats.primer.mismatches <- reactive({
     data <- switch(input$set_meta_selector,
             "all" = rv_primers$evaluated_primers,
@@ -390,9 +439,28 @@ cvg.stats.primer.mismatches <- reactive({
             "optimized" = rv_templates$cvg_optimized)
     validate(need(data, "No primer coverage available."))
     validate(need(template.data, "No templates available."))
-    cvg.stats <- openPrimeR:::get_cvg_stats_primer(data, template.data)
+    cvg.stats <- openPrimeR:::get_cvg_stats_primer(data, template.data)$cvg_per_nbr_mismatches
     return(cvg.stats)
 })
+output$primer_cvg_stats<- DT::renderDataTable({
+    # table with coverage stats for primers (covered templates by group)
+    primer.df <- switch(input$set_meta_selector,
+            "all" = rv_primers$evaluated_primers,
+            "filtered" = current.filtered.primers(),
+            "optimized" = optimal.primers())
+    template.df <- switch(input$set_meta_selector,
+            "all" = rv_templates$cvg_all,
+            "filtered" = rv_templates$cvg_filtered,
+            "optimized" = rv_templates$cvg_optimized)
+    validate(need(primer.df, "No primer coverage available."))
+    validate(need(template.df, "No templates available."))
+    return(DT::datatable(cvg.stats.primer(),
+           caption = paste("The number of covered template sequences for every primer.",
+                            "Each column indicates the number of covered templates",
+                            "per group of template sequences."),
+           rownames = FALSE, options = list(dom = "pt"))) # dom = pt -> show pages and table
+})
+
 output$primer_cvg_stats_mismatch <- DT::renderDataTable({
     # table with coverage stats wrt mismatches
     primer.df <- switch(input$set_meta_selector,
@@ -406,20 +474,39 @@ output$primer_cvg_stats_mismatch <- DT::renderDataTable({
     validate(need(primer.df, "No primer coverage available."))
     validate(need(template.df, "No templates available."))
     return(DT::datatable(cvg.stats.primer.mismatches(),
-           caption = paste("The number of covered template sequence for every primer.",
+           caption = paste("The number of covered template sequences for every primer.",
                             "Columns with numeric identifiers give the number of coverage events",
-                            "corresponding to primers binding with a certain number of mismatches.",
-                            "The group coverage indicates the percentage of covered templates",
-                            "from each group."),
+                            "that occur with the indicated number of mismatches."),
            rownames = FALSE, options = list(dom = "pt"))) # dom = pt -> show pages and table
 })
 
 output$template_coverage_mismatch_ui <- renderUI({
     # important: set size of plot here to prevent overlap in the UI
-    plotOutput("template_coverage_mismatch", width = 1200, height = cvg.template.mismatch.height())
+    plotOutput("template_coverage_mismatch", 
+               width = cvg.template.mismatch.width(), 
+               height = cvg.template.mismatch.height())
 })
+cvg.template.mismatch.nfacets <- reactive({
+    # decide on the number of facet columns to show
+    px.width <- cvg.group.plot.dim()$width # unfacetted plot
+    nfacets <- 2
+    if (px.width > 1000) {
+        # only show 1 column if plot is too wide for typical screens
+        nfacets <- 1
+    }
+    return(nfacets)
+
+})
+cvg.template.mismatch.width <- reactive({
+    # width of template coverage plot, stratified by mismatches
+    # just multiply by two (two facet columns)
+    plot.width <- cvg.group.plot.width() * cvg.template.mismatch.nfacets()
+    return(plot.width)
+})
+
 cvg.template.mismatch.height <- reactive({
-    # height of template coverage plot, stratified by mismatches
+    # height: at which nbr of mismatches do we have maxed the coverage?
+    # TODO: add Primer_mismatches cvg update depending on selection!
     primer.df <- switch(input$set_meta_selector,
         "all" = rv_primers$evaluated_primers,
         "filtered" = current.filtered.primers(),
@@ -431,6 +518,16 @@ cvg.template.mismatch.height <- reactive({
     if (length(primer.df) == 0 || length(template.df) == 0 || !"primer_coverage" %in% colnames(primer.df))  {
         return(1200)
     }
+    # select template subset
+    # TODO: store these values (selected primers/templates as react expressions ..)
+    lex.sel <- input$selected_group_coverage
+    if (!is.null(lex.sel) && !"all" %in% lex.sel) { # select subset
+        idx <- which(template.df$Group %in% lex.sel)
+        excluded.seqs <- setdiff(template.df$Identifier[seq_len(nrow(template.df))], template.df$Identifier[idx])
+        template.df <- template.df[idx,]
+        primer.df <- evaluate.diff.primer.cvg(primer.df, excluded.seqs, template.df)
+    }
+    # scale height of plot by max nbr of mismatches of any primer
     max.cvg <- openPrimeR:::get_cvg_ratio(primer.df, template.df)
     max.mm <- max(as.numeric(unlist(strsplit(c(primer.df$Nbr_of_mismatches_fw, primer.df$Nbr_of_mismatches_rev), split = ","))))
     for (i in seq(0, max.mm - 1)) {
@@ -440,7 +537,7 @@ cvg.template.mismatch.height <- reactive({
             break
         }
     }
-    height <- openPrimeR:::get.plot.height(ceiling(max.mm + 1) / 2, 200, 600)
+    height <- openPrimeR:::get.plot.height(ceiling(max.mm + 1) / cvg.template.mismatch.nfacets(), 200, 600) 
     return(height)
 })
 
@@ -457,33 +554,104 @@ output$template_coverage_mismatch <- renderPlot({
             "filtered" = rv_templates$cvg_filtered,
             "optimized" = rv_templates$cvg_optimized)
     validate(need(template.df, "The template data set is not available."))
-    lex.sel <- input$selected_group_coverage
-    if (!is.null(lex.sel) && !"all" %in% lex.sel) {
-        # select a template subset
-        idx <- which(template.df$Group %in% lex.sel)
-        template.df <- template.df[idx,]
-    }
-    openPrimeR:::plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
+    groups <- input$selected_group_coverage
+    openPrimeR:::plot_template_cvg_mismatches(primer.df, template.df, 
+                        groups = groups, 
+                        nfacets = cvg.template.mismatch.nfacets())
 })
 
 
 cvg.primer.group.width <- reactive({
     # width of individual primer plot
-     primer.df <- switch(input$set_meta_selector,
-        "all" = rv_primers$evaluated_primers,
-        "filtered" = current.filtered.primers(),
-        "optimized" = optimal.primers())
-    if (length(primer.df) == 0)  {
-        print("primers unknown for group plot dimension ...")
-        return(800)
+    if (length(primer.cvg.plot.dim()) == 0) {
+        return(NULL)
     }
-    width <- openPrimeR:::get.plot.height(nrow(primer.df), 20, 500)
+    width <- primer.cvg.plot.dim()$width
     return(width)
 })
 cvg.primer.group.height <- reactive({
     # height of individual primer plot
-    return(600)
+    if (length(primer.cvg.plot.dim()) == 0) {
+        return(NULL)
+    }
+    height <- primer.cvg.plot.dim()$height
+    return(height)
 })
+Coverage_Primer_mismatches_nfacets <- reactive({
+    # nbr of facets for the primer mismatch plot
+    primer.df <- switch(input$set_meta_selector,
+        "all" = rv_primers$evaluated_primers,
+        "filtered" = current.filtered.primers(),
+        "optimized" = optimal.primers())
+    if (length(primer.df) == 0) {
+        return(3)
+    }
+    nfacets <- 3
+    if (nrow(primer.df) > 10) {
+        nfacets <- 2
+    }
+    if (nrow(primer.df) > 30) {
+        nfacets <- 1
+    }
+    return(nfacets)
+})
+Coverage_Primer_mismatches_width <- reactive({
+    # width of primer mismatch coverage plot
+    primer.df <- switch(input$set_meta_selector,
+        "all" = rv_primers$evaluated_primers,
+        "filtered" = current.filtered.primers(),
+        "optimized" = optimal.primers())
+    if (length(primer.df) == 0) {
+        return(1200)
+    }
+    # base width on number of primers and number of facets used
+    width <- get.plot.height(nrow(primer.df) * Coverage_Primer_mismatches_nfacets(), 15, 800)
+    return(width)
+})
+Coverage_Primer_mismatches_height <- reactive({
+    # TODO: use this for individual primer mismatches plot
+    # height of template coverage plot, stratified by mismatches
+    primer.df <- switch(input$set_meta_selector,
+        "all" = rv_primers$evaluated_primers,
+        "filtered" = current.filtered.primers(),
+        "optimized" = optimal.primers())
+    template.df <- switch(input$set_meta_selector,
+            "all" = rv_templates$cvg_all,
+            "filtered" = rv_templates$cvg_filtered,
+            "optimized" = rv_templates$cvg_optimized)
+    if (length(primer.df) == 0 || length(template.df) == 0 || !"primer_coverage" %in% colnames(primer.df))  {
+        return(1200)
+    }
+    # select template subset
+    lex.sel <- input$selected_group_coverage
+    if (!is.null(lex.sel) && !"all" %in% lex.sel) { # select subset
+        idx <- which(template.df$Group %in% lex.sel)
+        excluded.seqs <- setdiff(template.df$Identifier[seq_len(nrow(template.df))], template.df$Identifier[idx])
+        template.df <- template.df[idx,]
+        primer.df <- evaluate.diff.primer.cvg(primer.df, excluded.seqs, template.df)
+    }
+    # scale height of plot by max nbr of mismatches of any primer
+    max.cvg <- openPrimeR:::get_cvg_ratio(primer.df, template.df)
+    max.mm <- max(as.numeric(unlist(strsplit(c(primer.df$Nbr_of_mismatches_fw, primer.df$Nbr_of_mismatches_rev), split = ","))))
+    for (i in seq(0, max.mm - 1)) {
+        cur.cvg <- openPrimeR:::get_cvg_ratio(primer.df, template.df, allowed.mismatches = i)
+        if (cur.cvg == max.cvg) {
+            max.mm <- i
+            break
+        }
+    }
+    height <- openPrimeR:::get.plot.height(ceiling(max.mm + 1) / Coverage_Primer_mismatches_nfacets(), 200, 600)
+    return(height)
+})
+
+output$Coverage_Primer_mismatches_ui <- renderUI({
+    # important: set size of plot here to prevent overlap in the UI
+    # TOOD: set width and height 
+    plotOutput("Coverage_Primer_mismatches", 
+        width = paste0(Coverage_Primer_mismatches_width(), "px"),
+        height = paste0(Coverage_Primer_mismatches_height(), "px"))
+})
+
 output$Coverage_Primer_mismatches <- renderPlot({
     # individual primer coverage plot: mismatches
     primer.df <- switch(input$set_meta_selector,
@@ -497,13 +665,17 @@ output$Coverage_Primer_mismatches <- renderPlot({
             "filtered" = rv_templates$cvg_filtered,
             "optimized" = rv_templates$cvg_optimized)
     validate(need(template.df, "The template data set is not available."))
-    lex.sel <- input$selected_group_coverage
-    if (!is.null(lex.sel) && !"all" %in% lex.sel) { # select subset
-        idx <- which(template.df$Group %in% lex.sel)
-        template.df <- template.df[idx,]
-    }
-    openPrimeR:::plot_primer_cvg(primer.df, template.df, per.mismatch = TRUE)
-}, width = 1200, height = 1200)
+    groups <- input$selected_group_coverage
+    openPrimeR:::plot_primer_cvg_mismatches(primer.df, template.df, 
+                    groups = groups,
+                    nfacets = Coverage_Primer_mismatches_nfacets())
+})
+
+output$Coverage_Primer_ui <- renderUI({
+    # width shall be defined by groups * primers
+    # ui output of individual primer coverage plot
+    plotOutput("Coverage_Primer", width = paste0(cvg.primer.group.width(), "px"), height = paste0(cvg.primer.group.height(), "px"))
+})
 
 output$Coverage_Primer <- renderPlot({
     # individual primer coverage plot

@@ -609,9 +609,17 @@ VirusRegionObserver <- observeEvent(input$virus_type, {
 Virus_TemplateDataObserver <- observeEvent(input$Virus_template_button, {
     # retrieve supplied viral templates
     # set header structure
-    hdr.info <- list("header" = c("SPECIES", "ACCESSION", "GROUP"),
-                     "delim" = "|",
+    #if (input$virus_region %in% c("Pol")) {
+        # old Pol file
+        #hdr.info <- list("header" = c("SPECIES", "ACCESSION", "GROUP"),
+                     #"delim" = "",
+                     #"id_col" = "ACCESSION")
+    #} else {
+        hdr.info <- list("header" = c("REF", "GROUP", "COUNTRY", "YEAR", 
+                                      "STRAIN", "ACCESSION"),
+                     "delim" = ".",
                      "id_col" = "ACCESSION")
+    #}
     rv_templates$supplied_hdr_info <- hdr.info
     rv_cur.input.data$templates_exon <- NULL
     rv_cur.input.data$templates_leader <- NULL
