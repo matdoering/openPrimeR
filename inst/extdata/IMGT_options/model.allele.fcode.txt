@@ -1,4 +1,0 @@
-any
-functional
-ORF
-pseudogene
