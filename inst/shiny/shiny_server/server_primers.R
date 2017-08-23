@@ -677,7 +677,7 @@ IMGT_PrimerObserver <- observeEvent(input$Virus_primers, {
         # Dont update here on empty selection 
         return()
     }  
-    rv_cur.input.data$primers <- selected.Virus.primers() # TODO
+    rv_cur.input.data$primers <- selected.Virus.primers()
 })
 
 run.mode <- reactive({

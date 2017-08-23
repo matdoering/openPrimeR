@@ -63,9 +63,12 @@ tabPanel("Templates",
                      "right", options = list(container = "body")
             )
         ),
-        # IMGT COMPARISON TEMPLATES
-        conditionalPanel("input.template_scenario == 'supplied' &&
-                         input.selected_supplied_templates == 'immunological'",
+        #######
+        # SUPPLIED TEMPLATES
+        #########
+        conditionalPanel("input.template_scenario == 'supplied'",
+            # SUPPLIED IMGT TEMPLATES
+            conditionalPanel("input.selected_supplied_templates == 'immunological'",
             div(class = "one", 
                 p("We supply functional template data for IGH,
                    IGK, and IGL of homo sapiens.")
@@ -81,6 +84,27 @@ tabPanel("Templates",
                             )
             )
         ),
+        # SUPPLIED VIRUS TEMPLATES
+        conditionalPanel("input.selected_supplied_templates == 'virological'",
+            #div(class = "one", 
+                #p("We supply functional template data for IGH,
+                   #IGK, and IGL of homo sapiens.")
+            #), 
+            selectInput("virus_type_comparison", 
+                "Virus", 
+                get.available.viruses(),
+                selected = "HIV-1"),
+            # locus to retrieve data for
+            selectizeInput("virus_region_comparison", 
+                "Region", 
+                choices = NULL,
+                selected = NULL,
+                options = list(
+                                placeholder = 'Please select one of the available template data sets',
+                                onInitialize = I('function() { this.setValue(""); }')
+                            )
+            )
+        ),
         #######
         # RESET BUTTON FOR COMPARISON TEMPLATES
         #######
@@ -91,7 +115,7 @@ tabPanel("Templates",
             "Reset uploaded primer and template sets for comparison.", 
             "right", options = list(container = "body")
         )
-    ),
+    )),
     ###########
     # Analysis of primers
     ############

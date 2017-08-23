@@ -279,21 +279,43 @@ tabPanel("Primers",
             #################
             # SUPPLIED COMPARISON PRIMER SETS
             ##################
-            # select primer sets for comparison
-            selectizeInput("selected_comparison_primers",
-            tagList(icon = icon("tag", lib = "glyphicon"),
-                    "Available primer sets"),
-                 choices = NULL, 
-                 selected = NULL, multiple = FALSE, 
-                    options = list(
-                    placeholder = 'Please select one or multiple of the available primer data sets',
-                    onInitialize = I('function() { this.setValue(""); }')
-                    )
+            conditionalPanel("input.selected_supplied_templates == 'immunological'", 
+                ######
+                # IMMUNO COMPARISON PRIMERS
+                ########
+                # select primer sets for comparison
+                selectizeInput("selected_comparison_primers",
+                    tagList(icon = icon("tag", lib = "glyphicon"),
+                        "Available primer sets"),
+                     choices = NULL, 
+                     selected = NULL, multiple = FALSE, 
+                        options = list(
+                        placeholder = 'Please select at least one of the available primer data sets',
+                        onInitialize = I('function() { this.setValue(""); }')
+                        )
+                ),
+                # load comparison primer button
+                # TODO: this button only works for IMGT at the moment ..
+                actionButton("load_all_comparison_sets", 
+                    "Load all available primer sets",
+                    class = "actionStyleSmall"
+                )
             ),
-            # load comparison primer button
-            actionButton("load_all_comparison_sets", 
-                "Load all available primer sets",
-                class = "actionStyleSmall"
+            conditionalPanel("input.selected_supplied_templates == 'virological'", 
+                ######
+                # IMMUNO COMPARISON PRIMERS
+                ########
+                # select primer sets for comparison
+                selectizeInput("selected_comparison_primers_virus",
+                    tagList(icon = icon("tag", lib = "glyphicon"),
+                        "Available primer sets"),
+                     choices = NULL, 
+                     selected = NULL, multiple = FALSE, 
+                        options = list(
+                        placeholder = 'Please select at least one of the available primer data sets',
+                        onInitialize = I('function() { this.setValue(""); }')
+                        )
+                )
             )
         )
     )

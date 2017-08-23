@@ -334,6 +334,21 @@ get.IMGT.settings <- function() {
     }
     return(options)
 }
+get.supplied.comparison.template.path.virus <- function(virus, region) {
+    if (length(region) == 0 || region == "") {
+        return(NULL)
+    }
+    path <- system.file("extdata", "Vir", virus, region, "comparison",
+                        "templates", package = "openPrimeR")
+    csv.file <- list.files(path, full.names = TRUE)[1]
+    if (!file.exists(csv.file)) {
+        warning(paste0("Template comparison data for ", virus, " and ", region, 
+                       ",not found!"))
+        return(NULL)
+    }
+    res <- list(datapath = csv.file, name = region)
+    return(res)
+}
 get.supplied.comparison.template.path <- function(locus) {
     # loads locally stored csv containing template analysis results
     if (length(locus) == 0 || locus == "") {

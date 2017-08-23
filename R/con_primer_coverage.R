@@ -1032,7 +1032,7 @@ get_duplex_events <- function(fw.df, annealing.temp, ions, primer.df) {
     #print("fw.df:")
     #print(fw.df)
     combi.df <- plyr::ddply(fw.df, c("Primer", "Template"), plyr::summarize,
-                             PrimerIdentifier = paste(substitute(PrimerIdentifier), collapse = ","), TemplateIdentifier = paste(TemplateIdentifier, collapse = ","))
+                             PrimerIdentifier = paste(substitute(PrimerIdentifier), collapse = ","), TemplateIdentifier = paste(substitute(TemplateIdentifier), collapse = ","))
     p.ids <- unlist(lapply(combi.df$PrimerIdentifier, function(x) strsplit(x, split = ",")[[1]][1]))
     duplex.result.fw <- get.dimer.data(combi.df$Primer, combi.df$Template, annealing.temp[match(p.ids, primer.df$Identifier)], ions, no.structures = TRUE) 
     if (length(duplex.result.fw) != 0) {

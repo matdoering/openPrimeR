@@ -129,17 +129,48 @@ output$comp_cvg_constraints <- renderPlot({
     return(p)
 }, width = eval_comparison_con_width, height = eval_comparison_cvg_height, units = "px")
 
+primers.Virus.view.comparison <- reactive({
+    # Returns the names/paths of primer sets that are available when viral templates have been selected 
+    if (length(input$virus_type_comparison) == 0 || input$virus_region_comparison == "") {
+        return(NULL)
+    }
+    # load pre-evaluated primers from csv
+    primer.folder <- system.file("extdata", "Vir", input$virus_type_comparison, 
+        input$virus_region_comparison, "comparison", "primers", package = "openPrimeR")
+    files <- list.files(primer.folder, full.names = TRUE)
+    if (length(files) == 0) {
+        return(NULL)
+    }
+    # remove .fasta extension from basename
+    names(files) <- sub("^([^.]*).*", "\\1", basename(files))
+    return(files)
+})
+
+availableVirusComparisonPrimerUpdater <- observeEvent(input$virus_region_comparison, {
+    # updates comparison primer sets for viral templates
+    reset.reactive.values(rv_comparison.data)
+    primer.choices <- primers.Virus.view.comparison()
+    #print("updating available viral primers")
+    #print(primer.choices)
+    if (is.null(primer.choices)) {
+        primer.choices <- character(0) # remove all choices
+    }
+    updateSelectInput(session, "selected_comparison_primers_virus", choices = primer.choices)
+     # update analysis identifier
+    updateTextInput(session, "sample_name", 
+        value = paste0(input$virus_type_comparison, "_", input$virus_region_comparison))
+
+})
 availablePrimerComparisonUpdater <- observeEvent(input$template_comparison_locus, 
     {
-    # update the primer set selector for comparison when selected template locus
-    # (input$template_comparison_locus) changes
+    # Updates available comparison primers for IMGT data
     # reset reactive values:
     reset.reactive.values(rv_comparison.data)
     choices <- comparison_primer_choices()
     updateSelectInput(session, "selected_comparison_primers", choices = choices)
     # update analysis identifier
     updateTextInput(session, "sample_name", 
-        value = input$template_comparison_locus) 
+        value = paste0(input$template_comparison_locus))
 })
 comparison.table <- reactive({
     # overview of all loaded templates and primer sets for comparison
@@ -173,6 +204,20 @@ ComparisonPrimerSuppliedObserver <- observeEvent(input$selected_comparison_prime
             name = NA, stringsAsFactors = FALSE)
         rv_values$comparison_primer_path <- choice.table
     })
+
+ComparisonPrimerSuppliedObserverComparison <- observeEvent(input$selected_comparison_primers_virus, 
+    {
+        # TODO: remove all the 'virus' functions and integrate such that there's only one primer comparison input field 
+        # set
+        if (length(input$selected_comparison_primers_virus) == 0 || input$selected_comparison_primers_virus == 
+            "") {
+            return(NULL)
+        }
+        choice.table <- data.frame(datapath = input$selected_comparison_primers_virus, 
+            name = NA, stringsAsFactors = FALSE)
+        rv_values$comparison_primer_path <- choice.table
+})
+
 
 read.compare.primers <- reactive({
     # loads the currently selected comparison primer sets
@@ -210,6 +255,10 @@ comparisonTemplateIMGTObserver <- observeEvent(input$template_comparison_locus, 
     # updates the path to the comparison templates when user selects a supplied
     # template set
     rv_comparison.data$comparison_template_path <- get.supplied.comparison.template.path(input$template_comparison_locus)
+})
+comparisonTemplateVirusObserver <- observeEvent(input$virus_region_comparison, {
+    # update viral template set upon user selection of region
+    rv_comparison.data$comparison_template_path <- get.supplied.comparison.template.path.virus(input$virus_type_comparison, input$virus_region_comparison)
 })
 
 read.comparison.templates <- reactive({

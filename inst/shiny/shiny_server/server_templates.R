@@ -597,12 +597,13 @@ optimized.regions.conservation <- eventReactive(input$modify_binding_regions_con
     return(result)
 }, ignoreNULL = FALSE) # trigger also on NULL to return something
 
-VirusRegionObserver <- observeEvent(input$virus_type, {
+VirusRegionObserver <- observeEvent(c(input$virus_type, input$virus_type_comparison), {
     # determine for which viruses there are available template sequences
     virus.folder <- file.path(system.file("extdata", "Vir", 
                     package = "openPrimeR"), input$virus_type)
     regions <- basename(list.dirs(virus.folder, recursive = FALSE))
     updateSelectInput(session, "virus_region", choices = regions)
+    updateSelectInput(session, "virus_region_comparison", choices = regions)
     return(regions)
 })
 
