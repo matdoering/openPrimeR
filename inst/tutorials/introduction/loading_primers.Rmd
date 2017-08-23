@@ -1,0 +1,34 @@
+## Loading primers
+
+Existing sets of primers can also be loaded from FASTA files. Why don't you try loading the following primer FASTA file using `read_primers()` into the `primer.df` variable?
+
+```{r primer_FASTA_setup}
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+```
+
+```{r primer_FASTA_1, exercise = TRUE}
+# Load the prmiers from 'fasta.file' into 'primer.df' and explore the data
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+```
+
+```{r primer_FASTA_1-solution}
+# Load the prmiers from 'fasta.file' into 'primer.df' and explore the data
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+primer.df <- read_primers(fasta.file)
+print(primer.df)
+```
+
+As we can see, the data frame only contains entries in the `Forward`, but not the `Reverse` column indicating that this is a set of forward primers only. Moreover, we obtain some basic information about the primers such as their length via `primer_length_fw` and their degeneracy via `Degeneracy_fw`. As a careful reader, you may now wonder how it was possible to annotate the primers with their directionalities without specifying any identifiers. 
+
+This was possible because the input FASTA file already provided the default keywords used by `read_primers` for identifying the directions of the primers, which you verify by finding that the tag `_fw` is shared by all entries in the `ID` column. For your own primers, it is crucial that you tag the directionality of the primers in the FASTA file correctly and then specify the respective keywords using the `fw.id` and `rev.id` arguments in case that you are deviating from the defaults, for
+example:
+
+```{r primer_FASTA_example}
+fasta.file <- system.file("extdata", "IMGT_data", "primers", 
+        "IGHV", "Tiller2008_1st.fasta", package = "openPrimeR")
+primer.df <- read_primers(fasta.file, fw.id = "_fw", rev.id = "_rev")
+```
+

@@ -1,0 +1,76 @@
+---
+output:
+  pdf_document:
+    fig_caption: yes
+    includes:
+        in_header: header.tex 
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+params:
+  sample: NA
+  primers: NA
+  templates: NA
+  direction: NA
+  settings: NA
+  used_settings: NA
+  required_cvg: NA
+
+title: "`r paste0('Report for ', params$sample)`"
+---
+
+<!-- Vignette options and disclaimer-->
+```{r child = 'disclaimer.Rmd'}
+```
+<!-- no title for first section, would create a new page ... -->
+
+```{r primer_table}
+out.df <- openPrimeR:::view.primers.report(params$primers, params$templates)
+#"$\\Delta \\text{T}_\\text{m}$")
+knitr::kable(out.df, row.names = FALSE, caption = "Overview of the analyzed primers. If forward and reverse primers are present, primers are paired such as to maximize the coverage. Ambiguous bases are shown in italics. The \\textit{Coverage} column indicates the percentage of template sequences that are covered by each primer. \\textit{Mismatches} gives the percentage of coverage events that are subject to a certain number of mismatches. \\textit{Position} indicates the major binding mode of a primer relative to the end of the target binding region. Negative values indicate binding upstream of the specified region, while positive positions indicate binding downstream of the target region.",
+            escape = TRUE, longtable = TRUE)
+```
+
+# Coverage
+
+```{r template_cvg_stats}
+cvg.stats <- openPrimeR::get_cvg_stats(params$primers, params$templates)
+```
+
+```{r cvg_table, results='asis'}
+out.stats <- openPrimeR::get_cvg_stats(params$primers, params$templates, for.viewing = TRUE)
+knitr::kable(out.stats, row.names = FALSE, caption = "Number of covered template sequences per group. In case that primers for both directions are present, the \\textit{Coverage (fw)} and \\textit{Coverage (rev)} columns refer to the individual coverage of forward and reverse primers, respectively. If primers of both directions are present, the total coverage is determined by the intersection of coverage events from primers of both directions. If, however, only primers of a single direction are present, the coverage solely depends on the primers of the given direction.", longtable = TRUE)
+```
+
+```{r template_coverage_plot, fig.width = 4.5, fig.height = 4.5, fig.show='hold', fig.cap="The number of covered and available template sequences per group of templates. \\textit{Identity Coverage} refers to the number of template sequences for which fully complementary primers exist. \\textit{Expected Coverage} indicates the expected number of covered templates, which is determined by applying the coverage constraints to the set of potential coverage events for the specified number of maximal mismatches. \\textit{Available Templates} shows the total number of available template sequences per group."}
+openPrimeR::plot_template_cvg(params$primers, params$templates)
+```
+
+```{r cvg_subsets, fig.show='hold', fig.width = 5, fig.height = 5, fig.cap = 'The coverage of optimal subsets of the input primer set. Here \\textit{optimal} refers to the fact that the subsets were selected such as to maximize the coverage. The line plot indicates the total percentage of covered template sequences, while the bars indicate the percentage of covered templates for individual primers. The cumulative coverage of the bars can exceed 100 percent because different primers may cover the same template redundantly. The target coverage ratio is indicated by the dashed horizontal line.'}
+primer.subsets <- openPrimeR::subset_primer_set(params$primers, params$templates)
+openPrimeR::plot_primer_subsets(primer.subsets, params$templates, 
+                                required.cvg = params$required_cvg)
+```
+
+```{r binding_regions_fw, fig.width = 5, fig.height = 5,fig.show='hold', fig.cap = 'The binding positions of the primers relative to the target binding region of forward primers. Here, \\textit{Binding region} indicates the region where the forward primers should bind, while \\textit{Amplification region} indicates the following region.'}
+if (params$direction == "fw" || params$direction == "both") {
+    openPrimeR::plot_primer_binding_regions(params$primers, params$templates, relation = "fw")
+}
+```
+
+# Physicochemical properties
+
+```{r plot_constraints_fulfilled_individual, fig.show='hold', fig.width = 5, fig.height = 5, fig.cap = 'Failed and passed constraints on physicochemical properties for every primer. Constraints that are failed by a primer are colored in red, while constraints that are fulfilled are shown in blue. The provided p-value is an indicator of the overall quality of the primer set: significant p-values indicate primer sets fulfilling more constraints than reference primer sets from the literature.'}
+openPrimeR::plot_constraint_fulfillment(params$primers, params$settings)
+```
+
+```{r plot_constraints_deviation, fig.show='hold', fig.width = 5, fig.height = 5, fig.cap = 'Deviation of physicochemical properties from the desired value range. Positive deviations indicate that the upper bound of a property was exceeded, while negative deviations indicate values below the lower bound. Each dot corresponds to the deviation of a primer for an individual constraint. The boxes indicate the 1st, 2nd (median), and 3rd quartiles from top to bottom.'}
+openPrimeR::plot_constraint_deviation(params$primers, params$settings)
+```
+
+<!-- Input Parameters -->
+```{r child = 'parameters.Rmd'}
+```
+
+```{r vignette_options_end, echo = FALSE}
+# reset theme to previous setting
+ggplot2::theme_set(old.theme)
+```

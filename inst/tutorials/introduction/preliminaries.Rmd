@@ -1,0 +1,14 @@
+## Preliminaries
+
+This tutorial will introduce you to the core functionalities of the openPrimeR package:
+
+* Loading primers and templates
+* Analyzing existing sets of primers
+* Designing novel primer sets
+
+If you're already accustomed with these functions, you can skip this tutorial. Otherwise, let's start with attaching the openPrimeR package:
+
+
+```{r eval = FALSE}
+library(openPrimeR)
+```

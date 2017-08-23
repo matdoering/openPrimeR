@@ -1,0 +1,38 @@
+<div class="help">
+<br>
+<p>
+The primer design procedures consists of three steps: initialization of primer candidates, filtering, and optimization of primers. In the following, each step is briefly explained.</p></div>
+<h4 class="help"> Initializing the primer set</h4>
+<div class="help">
+<p>
+Primer initialization encompasses the generation of all primers of desired length that bind within the specified binding regions. Only primers of the specified directionality are generated. Primers can be generated either for related or divergent template sequences. For related templates, degenerate primers are constructed using multiple alignments such that a single primer can cover as many templates as possible. Here, the maximal allowed degeneracy of primers should be specified (typically 16). For divergent sequences, primers are simply constructed from template substrings without aligning the sequences or introducing ambiguities.</p>
+</p>
+</div>
+<h4 class="help">Filtering the primer set</h4>
+<div class="help">
+<p>
+The initial primer set is filtered according to the selected constraint settings. If the target coverage ratio can be reached, only primers fulfilling the specified constraint settings are retained. Otherwise, a relaxation procedure slackens the specified constraints until a suitable set of candidate primers is found.</p></div>
+<h4 class="help">Optimizing the primer set</h4>
+<div class="help">
+<p>
+The optimization of a set of primers aims at determining the minimal set of primers yielding the maximal possible coverage subject to a set of constraints. Here, <i>coverage</i> refers to the number of unique template sequences that can be bound by a set of primers. Consider the following example:
+</p>
+<p class="tab">
+Given ten template sequences and four primers with the following coverages:</p>
+<ul class="tab help">
+<li><span>Primer 1: covers templates 1, 2, 3, and 4.</span></li>
+<li><span>Primer 2: covers templates 2 and 3.</span></li>
+<li><span>Primer 3: covers templates 8,9, and 10.</span></li>
+<li><span>Primer 4: covers templates 1, 5, and 8.</span></li>
+</ul>
+<p class="tab">This set of primers uniquely covers templates 1 to 5 and 8 to 10. Hence, its coverage is <i>n=8</i> (<i>80%</i>). 
+</p>
+<p>Maximizing the coverage (i.e. the number of covered sequences) is important in order to achieve the amplification of all template sequences. Often, one is interested in amplifying all variants of a set of related template sequences. For example, when performing PCR for HIV-1 env sequences from different subtypes, it is necessary to consider subtype-specific primers in order to prevent biases during amplification. Selecting the set of primers that maximizes the coverage ensures that
+as much sequence variation as possible is retained in the PCR. 
+</p>
+<p>
+Minimizing the size of the selected set of primers is important for two reasons. First, primers can have unintended interactions during multiplex PCR (e.g. due to dimerization of primers). Second, the more primers are required for a PCR, the costlier the PCR. Hence, removing redundant primers (i.e. primers which would not amplify any additional templates) saves costs.
+</p>
+<p>In openPrimeR, primer sets can be optimized using either a greedy algorithm or an integer linear program (ILP) formulation. The greedy algorithm is fast, but
+only provides an approximation, while the ILP provides an exact solution at the cost of longer worst-case runtimes.</p>
+</div>

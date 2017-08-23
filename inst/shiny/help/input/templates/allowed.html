@@ -1,0 +1,38 @@
+<h3 class="help">Specifying Template-Specific Binding Sites</h3>
+<div class="help">
+<p>The binding regions for forward and reverse primers are specified by one FASTA file for each primer direction. In the case that only a single FASTA file with binding regions is uploaded, the allowed binding sites are adjusted only for the corresponding primer directionality.</p>
+<p>The FASTA file containing the template-specific regions for primer binding should contain one entry for each template sequence for which the allowed binding region should be adjusted. To ensure that all templates can be annotated correctly, please ensure that the header of each entry in the binding region FASTA file should correspond to the headers of the template FASTA file.</p>
+<p>Consider that you would like to amplify the DNA sequence ACCTGCAAGN and have uploaded the following FASTA file:</p>
+<p class="tab">
+<i>>TargetSequence</i><br>
+<i><font color="#214f78">ATGGGCTGG</font>ACCTGCAAGN</i>
+</p>
+<p>To ensure that <i>ACCTGCAAGN</i> is amplified, we need to ensure that the primers bind upstream of the target region. Hence, we restrict the forward binding sites by supplying a FASTA containing the allowed binding regions for the forward primers such as this:</p>
+<p class="tab">
+<i>>TargetSequence</i><br>
+<i><font color="#214f78">ATGGGCTGG</font></i>
+</p>
+<p>By specifying the allowed regions in this way, we can ensure that only forward primers within/overlapping (defined in the settings) <i>ATGGGCTGG</i> are considered to cover the <i>TargetSequence</i> template. Primers binding further towards the 3' end (e.g. at CCTGCAAGN) would not be considered to cover the template.</p>
+</div>
+<figure>
+<img src="images/primer_binding.png" alt="Primer binding" height="500" width="700">
+<figcaption style="margin:auto" class="help">Figure 1: Allowed primer binding sites.</figcaption>
+</figure>
+<div class="help">
+<p>
+Figure 1 illustrates the concept of binding sites for the case that primers are required to overlap with the target binding region. The two rectangles at the bottom of the image indicate the forward (fw) and reverse (rev) strands of double-stranded DNA. In the upper part, arrows pointing towards the right-hand side indicate sense primers, while arrows pointing towards the left-hand side indicate anti-sense primers. Sense primers amplify the forward DNA strand, while anti-sense primers amplify the reverse DNA strand. The small rectangles spanning the distance between pairs of primers indicate the resulting PCR products.</p>
+<p>The blue regions in the reverse DNA indicates the allowed binding region for forward primers and the green region in the forward DNA indicates the allowed binding region for reverse primers. The red lines at the borders of these regions indicate the start and end of the target sequence, respectively. In the lowest pair of primers, both primers bind to the allowed  primer binding sites and are considered to cover the template.</p>
+<p>In the pair of primers in the middle, however, the reverse primer binds too far upstream, which would yield a PCR product that does not contain the full target sequence. Hence, this pair of primers would not be considered to cover the template. Similarly, in the uppermost pair of primers, none of the primers binds in the specified regions, hence we do not consider the primer pair to cover the template.
+</p>
+</div>
+<h3 class="help">Specifying Uniform Binding Sites</h3>
+<div class="help">
+<p>
+It is also possible to uniformly define an interval for defining the allowed primer binding regions.  This is done by entering a numeric range providing the positions in the templates where primers are allowed to bind. These positional ranges refer to the template 5' position for forward primers and to the template 3' position for reverse primers. For example, if we set the forward binding range to positions 1 to 5 and to positions 1 to 6 for reverse primers, we have the following annotation:
+</p>
+<p class="tab">
+5'-<font color="#578EBF">ACGCG</font>TCGACGCACGCCACGTGGGCCCGT<font color="74BEFF">ACGAAC</font>-3'
+</p>
+<p>Here, <font color="#578EBF">ACGCG</font> indicates the target binding region for the forward primers and <font color="74BEFF">ACGAAC</font> indicates the binding region for reverse primers.</p> 
+</div>
+

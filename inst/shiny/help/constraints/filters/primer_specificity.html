@@ -1,0 +1,10 @@
+<h3 class="help">Primer specificity</h3>
+<div class="help">
+<p>
+The specificity of a primer relates to the number of unintended template sequences that can be bound by the primer. Primers with high specificities bind mostly to the intended regions of the templates and not to other regions. openPrimeR computes the specificity of a primer by computing
+</p>
+<p class = "indent">
+Specificity = <sup>T</sup>/<sub>(T+OT)</sub>
+</p>
+<p>where <i>T</i> refers to on-target binding events and <i>OT</i> refers to the number of off-target binding events. Any coverage event that is not in the target binding region is considered as off-target. Note that the <i>T</i> and <i>OT</i> are both bounded by the number of template sequences.</p>
+</div>

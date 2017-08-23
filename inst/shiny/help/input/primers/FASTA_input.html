@@ -1,0 +1,50 @@
+<h3 class="help">Input of primers</h3>
+<div class="help">
+<p>
+To evaluate an existing set of primers, you can either select one of the sets that are shipped with openPrimeR or you can provide a FASTA or CSV file. In the following, the input parameters for FASTA files are discussed in more detail.</p>
+</div>
+<h3 class="help">Primer directionality</h3>
+<div class="help">
+<p>
+For FASTA input, the directionalities (forward/reverse) of the input primers should be annotated in the header entries of the FASTA file. For example, if the identifier of forward primers is set to <i>_fw</i>, then all forward primers should contain the keyword <i>_fw</i> in their headers. Then, a valid forward primer header entry would look like this:</p>
+<p class="tab">
+<i>>TestSeq1_fw</i>
+</p>
+</div>
+<h3 class="help">Pairing primers</h3>
+<div class="help">
+<p>In some applications, it may be desirable to consider a primer as a unit consisting of a forward and reverse primer, that is, as a <i>primer pair</i>. To identify that a pair of forward and reverse primers belongs together, it is necessary that both primers of a pair should have the same FASTA header except for the keywords indicating their directionality. For example, the primers</p>
+    <p class="tab">
+    <i>>Primer1_fw</i><br>
+    <i>>Primer1_rev</i><br>
+    </p>
+    <p>would make up a pair of primers when the direction keywords are <i>_fw</i> and <i>_rev</i> because they share the same prefix (<i>Primer1</i>) in the header. If, however, the primers had headers such as</p>
+    <p class="tab">
+    <i>>Primer1_fw</i><br>
+    <i>>Primer2_rev</i><br>
+    </p>
+    <p>then <i>Primer1</i> and <i>Primer2</i> would be considered as individual primers because their identifiers are distinct.
+    </p>
+    <p>Primer pairs are always analyzed as one unit, which impacts several analysis steps. In terms of coverage, a pair of primers covers a template sequence only if both, its forward and reverse primer, cover the template sequence. For filtering, if one primer of a pair does not pass a constraint, the whole pair of primers is excluded.
+</p>
+</div>
+<h3 class="help">Treatment of IUPAC ambiguity codes</h3>
+<div class="help">
+<p>
+When loading primers, you have the option of disambiguating or merging primers using IUPAC ambiguity codes. When the <i>Merge</i> option is selected, primers with similar sequences are automatically merged by forming consensus sequences leading to degenerate sequences. Note that, by default, the maximal degeneracy is set to 16, which means that at most four ambiguous positions are allowed in a merged primer.</p>
+<p>In the following example, the following three primers could be merged:</p>
+<ul class="help">
+<li><span>
+A<font color="#214f78">C</font>GCGCGT<font color="#214f78">C</font>GT
+</span></li>
+<li><span>
+A<font color="#214f78">C</font>GCGCGT<font color="#214f78">G</font>GT
+</span></li>
+<li><span>
+A<font color="#214f78">G</font>GCGCGT<font color="#214f78">C</font>GT
+</span></li>
+</ul>
+<p>
+yielding the primer A<font color="#214f78">S</font>GCGCGT<font color="#214f78">S</font>GT with a degeneracy of 4.</p>
+<p>The <i>Disambiguate</i> option performs the reverse action. Given a degenerate primer it generates all non-ambiguous sequences that are represented by the degenerate sequence. This means that in the example above, we would go from <i>A<font color="#214f78">S</font>GCGCGT<font color="#214f78">S</font>GT</i> to the four distinct sequences that the primer represents.
+</div>

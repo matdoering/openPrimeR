@@ -1,0 +1,57 @@
+<h3 id="help_primer_coverage" class="help">Primer coverage</h3>
+<div id="help_primer_coverage" class="help">
+<p>
+openPrimeR uses two coverage definitions: basic coverage and constrained coverage. Basic coverage refers to the results of a string matching procedure, while the constrained coverage is based on applying the extended coverage conditions to the basic coverage, thereby obtaining a coverage estimate that approximates the experimentally observed coverage. 
+The following general rules for the coverage computations apply:</p>
+
+<ul class="help">
+<li><span>
+When a primer is given as a pair consisting of a forward and reverse primer, both the forward and the reverse primer need to cover the template sequence.
+
+</span></li>
+<li><span>
+If forward and reverse primers are present,the template is considered covered if it is covered by at least one forward and one reverse primer.
+</span></li>
+</ul>
+
+<p>The basic coverage is determined by matching primers to target template regions such that the primers match with at most <i>m</i> mismatches, where <i>m</i> is defined by the user. The primer either has to overlap or intersect with the target binding region, depending on the choice of the user. Binding to off-target sites in the template is allowed only when the allowed off-target ratio is greater than 0%.</p>
+<p>Having determined the basic coverage, openPrimeR computes the constrained coverage by applying the extended coverage conditions. Only coverage events fulfilling all of the selected extended coverage conditions are retained. The free energy of annealing is one example of a coverage condition. For example, by specifying a cutoff at -5 kcal/mol only coverage events with favorable free energies (below -5 kcal/mol) are retained.</p>
+<p>
+The coverage of a primer (<i>primer coverage</i>) is defined by the number of template sequences that are covered by the primer. Since multiplex PCR aims at amplifying all template sequences, primer coverage is an important quantity to be considered. In general, the greater the number of template sequences that a single primer can bind, the better. For example, a single primer that can bind 50 different templates is preferable to a primer that can bind just 20 sequences. 
+</p>
+<p>openPrimeR allows users to specify a cutoff that determines the minimal number of templates covered by a primer. Using this option, it is possible to retain only primers hybridizing to a diverse set of templates.
+</p>
+<p>openPrimeR computes several parameters relating to coverage, which can be retrieved from the primer table in the <i>Primers</i> tab:</p>
+<ul class="help">
+<li><span>Primer coverage: the number of covered template sequences</span></li>
+<li><span>Coverage ratio: the fraction of covered template sequences </span></li>
+<li><span>Covered seqs: the identifiers/groups of the templates that are covered by the primer.</span></li>
+</ul>
+</div>
+<h4 class="help">Number of allowed mismatches</h4>
+<div class="help">
+<p>
+The number of allowed mismatches is an important parameter for determining the coverage of a primer set accurately. According to our experiences, primers can amplify templates also with a considerable number of mismatches. Hence, the number of allowed mismatches should not be set too low, if you want to determine the possible amplification for a regular gel electrophoresis. For quantitative applications, the number of allowed mismatches, however, should be low (e.g. at most 1) to ensure accurate measurements. 
+</p>
+<p>
+The following example exemplifies a primer that binds with a single internal mismatch to a template sequence (highlighted in blue). 
+</p>
+<table style="width:100%" class="tab">
+<tr>
+    <td>Primer</td>
+    <td class="verbatim">3'-AGC<font color="#214f78">T</font>GAGCTGGCGT-5'</td>
+</tr>
+<tr>
+    <td>Template</td>
+    <td class="verbatim">5'-TCG<font color="#214f78">C</font>CTCGACCGCA-3'</td>
+</tr>
+</table>
+<p>If the maximal number of mismatches is set to a value of at least 1, we are able to identify this coverage event. If, however, the maximal number of mismatches is set to 0, the illustrated coverage event cannot be detected by openPrimeR.</p>
+<p>Since the number of possible string matchings increases exponentially with increases in the number of allowed mismatches, runtime and memory usage can be a concern for high numbers of allowed mismatches.</p>
+</div>
+<h4 class="help">Allowing primers to cover off-target regions</h4>
+<div class="help">
+<p>
+When the allowed off-target ratio is greater than 0%, primers are also considered to cover templates even when they do not seem to bind to the specified target regions. This option is useful in cases when individual primers in a larger set of primers would amplify the desired amplicon only partially, but one would still like to evaluate them. If the ratio of off-target binding events exceeds the allowed ratio, openPrimeR produces a warning.
+</p>
+</div>

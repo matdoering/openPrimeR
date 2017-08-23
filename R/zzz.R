@@ -1,7 +1,7 @@
 ####
 # Actions to perform on loading/attaching the package
 ######
-#' @import ggplot2 lpSolveAPI
+#' @import ggplot2 lpSolveAPI methods
 #' @importFrom reshape2 melt dcast
 #' @importFrom plyr ddply summarize arrange .
 #' @importFrom foreach foreach %dopar%
@@ -14,7 +14,6 @@
 #' @importFrom magrittr %>%
 #' @importFrom stats na.omit qnorm quantile sd 
 #' @importFrom utils head read.csv read.delim setTxtProgressBar tail txtProgressBar write.csv write.table
-#' @importFrom methods as callNextMethod new validObject setClass setMethod setGeneric setReplaceMethod is rbind2 cbind2 slot prototype
 NULL # need to have some evaluated code here
 
 #' Determination if Selenium is installed.
