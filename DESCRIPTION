@@ -18,7 +18,7 @@ Description: An implementation of methods for designing, evaluating,
     are selected. All relevant functions are accessible through
     a user-friendly Shiny application.
 Depends:
-    R (>= 3.3.3)
+    R (>= 3.4.0)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
