@@ -1,6 +1,6 @@
 Package: openPrimeR
 Title: Multiplex PCR Primer Design and Analysis
-Version: 0.99.6
+Version: 0.99.7
 Authors@R: c(person("Matthias", "Döring", 
                     email = "mdoering@mpi-inf.mpg.de", 
                     role = c("aut", "cre")),
@@ -31,7 +31,6 @@ Imports:
     seqinr (>= 3.3-3),
     IRanges (>= 2.4.8),
     GenomicRanges (>= 1.22.4),
-    GenomeInfoDbData (>= 0.99.0),
     ggplot2 (>= 2.1.0),
     plyr (>= 1.8.4),
     dplyr (>= 0.5.0),

@@ -5,7 +5,7 @@ sudo: false
 
 matrix:
   include:
-    - os: osx
+    - os: linux
       r: bioc-release
 
 notifications:
