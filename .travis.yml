@@ -1,5 +1,3 @@
-language: r
-
 cache: packages
 
 matrix: # don't test osx + r-devel
