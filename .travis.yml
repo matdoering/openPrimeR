@@ -2,14 +2,12 @@ language: r
 
 cache: packages
 
-r: bioc-devel
-
 matrix: # don't test osx + r-devel
 include:
 - os: linux
 r: release
 - os: linux
-r: devel
+r: bioc-devel
 - os: osx
 r: release
 
