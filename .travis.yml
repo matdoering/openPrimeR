@@ -1,7 +1,7 @@
 language: r
 
 cache: packages
-
+sudo: false
 bioc_required: true
 
 matrix:
