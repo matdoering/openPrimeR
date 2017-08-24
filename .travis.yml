@@ -2,25 +2,26 @@ language: r
 
 cache: packages
 
-matrix: # don't test osx + r-devel
-    include:
+matrix:
+  include:
     - os: linux
-    r: release
+      dist: precise
+      sudo: false
+      r: 3.3.3
     - os: linux
-    r: bioc-devel
+      dist: precise
+      sudo: false
+      r: release
+    - os: linux
+      dist: precise
+      sudo: false
+      r: devel
     - os: osx
-    r: release
-
-#r_packages:
-    #- covr
-
-# not enough time (50 min cutoff) for this:
-#after_script:
-    #- FILE=$(ls -1t *.tar.gz | head -n 1)
-    #- Rscript -e "library(BiocCheck); BiocCheck(\"${FILE}\")"
-#
-#after_success:
-    #- Rscript -e 'library(covr); codecov()'
+      r: 3.3.3
+    - os: osx
+      r: release
+    - os: osx
+      r: devel
 
 notifications:
   email:
