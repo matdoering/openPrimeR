@@ -343,8 +343,25 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
                 rep(x, length(which(compatible[,x])))))
             opti.rev <- opti.rev[opti.rev.indices]
         }
+        # TODO: opti fw and rev?
+        print("Nbr of fw sets:")
+        print(length(opti.fw))
+        print("Nbr of rev sets:")
+        print(length(opti.rev))
+        print("Target temps:")
+        print(target.temps)
         fw.rev.data <- evaluate.fw.rev.combinations(opti.fw, opti.rev, template.df, target.temps)
+        print("fw/rev data stats:")
+        print(fw.rev.data$stats)
         sel.set <- select.best.primer.set(fw.rev.data$stats)
+        print("Selected set:")
+        print(sel.set)
+        print("nbr of sets: ")
+        print(length(fw.rev.data$sets))
+        print("Number of used constraints fw: ")
+        print(length(optimal.primer.data.fw$all_used_constraints))
+        print("Number of used constraints rev: ")
+        print(length(optimal.primer.data.fw$all_used_constraints))
         if (length(sel.set) == 0) {
             warning("Could not select an optimal fw-rev combination of primers.")
             optimal.primers <- NULL
@@ -354,7 +371,6 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
         # update melting temp diff and cross dimerization to account for fw/rev primers
         for (i in seq_along(fw.rev.data$sets)) {
             cur.set <- fw.rev.data$sets[[i]]
-            # TODO: update.opti.results -> Error in read.table
             cur.set <- update.opti.results(cur.set, settings, template.df)
             fw.rev.data$sets[[i]] <- cur.set
         }
@@ -450,7 +466,7 @@ evaluate.fw.rev.combinations <- function(opti.fw, opti.rev, template.df, cur.tar
     # set fw temperatures as names as temperatures of fw/rev sets should correspond:
     names(primer.sets) <- names(opti.fw)
     for (i in seq_along(opti.fw)) {
-        combi.df <- my_rbind(opti.fw[[i]], opti.rev[[i]])  # better than my_rbind
+        combi.df <- my_rbind(opti.fw[[i]], opti.rev[[i]]) 
         primer.sets[[i]] <- combi.df
         cvg <- get_cvg_ratio(combi.df, template.df)
         temp.diff <- NA
