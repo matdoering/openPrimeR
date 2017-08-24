@@ -5,7 +5,7 @@ cache: packages
 matrix:
   include:
     - os: osx
-      r: bioc-devel
+      r: bioc-release
 
 notifications:
   email:
