@@ -323,6 +323,9 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
 		message("#####\n# (BOTH) Aggregating results\n#####")
         opti.fw <- optimal.primer.data.fw$all_results # base consideration of templates on the best set from the 'fw' run
         opti.rev <- optimal.primer.data.rev$all_results
+        print("opti rev sets:")
+        print(length(opti.rev))
+        print(names(opti.rev))
         #print("FW set:")
         #print(opti.fw)
         #print("REV set:")
@@ -333,24 +336,32 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
             allowed.diff.fw <- max(sapply(optimal.primer.data.fw$all_used_constraints, function(x) constraints(x)$melting_temp_diff))
             allowed.diff.rev <- max(sapply(optimal.primer.data.fw$all_used_constraints, function(x) constraints(x)$melting_temp_diff))
             allowed.diff <- max(c(allowed.diff.fw, allowed.diff.rev))
+            print("Allowed diff:")
+            print(allowed.diff)
             fw.tm <- as.numeric(names(opti.fw))
-            rev.tm <- unlist(sapply(seq_along(optimal.primer.data.rev$all_results), function(x) mean(optimal.primer.data.rev$all_results[[x]][,"melting_temp"], na.rm= TRUE)))
+            rev.tm <- unlist(lapply(seq_along(optimal.primer.data.rev$all_results), function(x) mean(optimal.primer.data.rev$all_results[[x]][,"melting_temp"], na.rm= TRUE)))
+            print("fw tm:")
+            print(fw.tm)
+            print('rev.tm')
+            print(rev.tm)
+            # create a matrix indicating whether the i-th forward set is compatible with the j-th reverse set
             compatible <- do.call(rbind, lapply(fw.tm, function(x) abs(x - rev.tm) < allowed.diff))
-            opti.fw.indices <- unlist(lapply(seq_len(nrow(compatible)), function(x)
-                rep(x, length(which(compatible[x,])))))
-            opti.fw <- opti.fw[opti.fw.indices]
-            opti.rev.indices <- unlist(lapply(seq_len(ncol(compatible)), function(x)
-                rep(x, length(which(compatible[,x])))))
-            opti.rev <- opti.rev[opti.rev.indices]
+            print("compatible sets:")
+            print(compatible)
+            compatible.df <- data.frame(which(compatible, arr.ind = TRUE))
+            colnames(compatible.df) <- c("fw_idx", "rev_idx")
+        } else {
+            # set all pairs of fw/rev sets as compatible
+            compatible.df <- data.frame(fw_idx = seq_along(opti.fw),
+                                        rev_idx = seq_along(rev.idx))
         }
-        # TODO: opti fw and rev?
         print("Nbr of fw sets:")
         print(length(opti.fw))
         print("Nbr of rev sets:")
         print(length(opti.rev))
         print("Target temps:")
         print(target.temps)
-        fw.rev.data <- evaluate.fw.rev.combinations(opti.fw, opti.rev, template.df, target.temps)
+        fw.rev.data <- evaluate.fw.rev.combinations(opti.fw, opti.rev, compatible.df, template.df)
         print("fw/rev data stats:")
         print(fw.rev.data$stats)
         sel.set <- select.best.primer.set(fw.rev.data$stats)
@@ -365,9 +376,17 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
         if (length(sel.set) == 0) {
             warning("Could not select an optimal fw-rev combination of primers.")
             optimal.primers <- NULL
+            used.settings.fw <- NULL
+            used.settings.rev <- NULL
         } else {
             optimal.primers <- fw.rev.data$sets[[sel.set]]
+            # get used settings for the output:
+            sel.idx.fw <- fw.rev.data$stats$fw_index[sel.set]
+            sel.idx.rev <- fw.rev.data$stats$rev_index[sel.set]
+            used.settings.fw <- optimal.primer.data.fw$all_used_constraints[[sel.idx.fw]]
+            used.settings.rev <- optimal.primer.data.rev$all_used_constraints[[sel.idx.rev]]
         }
+        used.settings <- list("fw" = used.settings.fw, "rev" = used.settings.rev)
         # update melting temp diff and cross dimerization to account for fw/rev primers
         for (i in seq_along(fw.rev.data$sets)) {
             cur.set <- fw.rev.data$sets[[i]]
@@ -378,14 +397,6 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
         cur.set <- update.opti.results(cur.set, settings, template.df)
         optimal.primers <- cur.set
         # construct result: settings
-        if (length(sel.set) != 0) {
-            used.settings.fw <- optimal.primer.data.fw$all_used_constraints[[sel.set]]
-            used.settings.rev <- optimal.primer.data.rev$all_used_constraints[[sel.set]]
-        } else {
-            used.settings.fw <- NULL
-            used.settings.rev <- NULL
-        }
-        used.settings <- list("fw" = used.settings.fw, "rev" = used.settings.rev)
         # unify filtering stats from fw and rev primers
         filter.data <- list()
         for (i in seq_along(optimal.primer.data.fw$filtered)) {
@@ -443,15 +454,16 @@ select.best.primer.set <- function(stats) {
 #'
 #' Evaluates the combinations of forward and reverse primer sets.
 #'
-#' @param opti.fw List with optimized forward primer sets.
-#' @param opti.rev List with optimized reverse primer sets.
+#' @param opti.fw List with forward optimal primer sets.
+#' @param opti.rev List with reverse optimal primer sets.
+#' @param compatible.df Data frame containing the indicices
+#' of temperature-compatible forward and reverse primers sets.
+#' @param opti.rev.indices Indices for accessing \code{opti.rev}.
 #' @param template.df Template data frame for which primers were designed.
-#' @param cur.target.temps Target melting temperatures for each primer data frame given
-#' in \code{opti.fw} and \code{opti.rev}.
 #' @return List with information on the combinations of forward and reverse primers
 #' as well as the combined data frames themselves.
 #' @keywords internal
-evaluate.fw.rev.combinations <- function(opti.fw, opti.rev, template.df, cur.target.temps) {
+evaluate.fw.rev.combinations <- function(opti.fw, opti.rev, compatible.df, template.df) {
     # given optimized fw and rev primers with corresponding target temperatures,
     # determines properties of the corresponding sets
     # opti.fw: list with data frames giving fw optimized primers opti.rev: list with
@@ -461,22 +473,27 @@ evaluate.fw.rev.combinations <- function(opti.fw, opti.rev, template.df, cur.tar
             Number of fw primer sets: ", length(opti.fw), "\n",
             "Number of rev primer sets: ", length(opti.rev))
     }
-    stat.df <- NULL
+    stat.df <- vector("list", nrow(compatible.df)) # stats of compatible sets
+    # select compatible combinations of sets via the indices
     primer.sets <- vector("list", length(opti.fw))
     # set fw temperatures as names as temperatures of fw/rev sets should correspond:
     names(primer.sets) <- names(opti.fw)
-    for (i in seq_along(opti.fw)) {
-        combi.df <- my_rbind(opti.fw[[i]], opti.rev[[i]]) 
+    for (i in seq_len(nrow(compatible.df))) {
+        fw.idx <- compatible.df$fw_idx[i]
+        rev.idx <- compatible.df$rev_idx[i]
+        combi.df <- my_rbind(opti.fw[[fw.idx]], opti.rev[[rev.idx]]) 
         primer.sets[[i]] <- combi.df
         cvg <- get_cvg_ratio(combi.df, template.df)
         temp.diff <- NA
         if ("melting_temp" %in% colnames(combi.df)) {
             temp.diff <- max(combi.df$melting_temp) - min(combi.df$melting_temp)
         }
-        stats <- data.frame(Target_Temperature = cur.target.temps[i], Coverage = cvg, 
-            TempDiff = temp.diff)
-        stat.df <- rbind(stat.df, stats)
+        stats <- data.frame(Coverage = cvg, 
+            TempDiff = temp.diff, fw_index = fw.idx,
+            rev_index = rev.idx)
+        stat.df[[i]] <- stats
     }
+    stat.df <- do.call(rbind, stat.df)
     out <- list(stats = stat.df, sets = primer.sets)
     return(out)
 }
