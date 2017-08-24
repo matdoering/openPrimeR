@@ -321,7 +321,6 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
             max.degen, conservation, target.temps, rev.required.cvg, 
             cur.results.loc = cur.results.loc, primer.df = rev.primers, updateProgress = updateProgress)
 		message("#####\n# (BOTH) Aggregating results\n#####")
-        # TODO: read.table error here after designing for 'both' in test program
         opti.fw <- optimal.primer.data.fw$all_results # base consideration of templates on the best set from the 'fw' run
         opti.rev <- optimal.primer.data.rev$all_results
         #print("FW set:")
