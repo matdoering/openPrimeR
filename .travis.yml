@@ -4,12 +4,12 @@ cache: packages
 
 matrix: # don't test osx + r-devel
     include:
-        - os: linux
-        r: release
-        - os: linux
-        r: bioc-devel
-        - os: osx
-        r: release
+    - os: linux
+    r: release
+    - os: linux
+    r: bioc-devel
+    - os: osx
+    r: release
 
 #r_packages:
     #- covr
