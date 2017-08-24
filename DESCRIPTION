@@ -1,6 +1,6 @@
 Package: openPrimeR
 Title: Multiplex PCR Primer Design and Analysis
-Version: 0.99.4
+Version: 0.99.5
 Authors@R: c(person("Matthias", "Döring", 
                     email = "mdoering@mpi-inf.mpg.de", 
                     role = c("aut", "cre")),

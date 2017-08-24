@@ -353,7 +353,7 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
         } else {
             # set all pairs of fw/rev sets as compatible
             compatible.df <- data.frame(fw_idx = seq_along(opti.fw),
-                                        rev_idx = seq_along(rev.idx))
+                                        rev_idx = seq_along(opti.rev))
         }
         print("Nbr of fw sets:")
         print(length(opti.fw))
