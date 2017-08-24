@@ -4,17 +4,19 @@
 \alias{evaluate.fw.rev.combinations}
 \title{Evaluation of Set Combinations}
 \usage{
-evaluate.fw.rev.combinations(opti.fw, opti.rev, template.df, cur.target.temps)
+evaluate.fw.rev.combinations(opti.fw, opti.rev, compatible.df, template.df)
 }
 \arguments{
-\item{opti.fw}{List with optimized forward primer sets.}
+\item{opti.fw}{List with forward optimal primer sets.}
 
-\item{opti.rev}{List with optimized reverse primer sets.}
+\item{opti.rev}{List with reverse optimal primer sets.}
+
+\item{compatible.df}{Data frame containing the indicices
+of temperature-compatible forward and reverse primers sets.}
 
 \item{template.df}{Template data frame for which primers were designed.}
 
-\item{cur.target.temps}{Target melting temperatures for each primer data frame given
-in \code{opti.fw} and \code{opti.rev}.}
+\item{opti.rev.indices}{Indices for accessing \code{opti.rev}.}
 }
 \value{
 List with information on the combinations of forward and reverse primers

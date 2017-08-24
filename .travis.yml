@@ -3,8 +3,6 @@ language: r
 cache: packages
 sudo: false
 
-bioc_packages: GenomeInfoDbData # not installed for some reason ...
-
 matrix:
   include:
     - os: osx
