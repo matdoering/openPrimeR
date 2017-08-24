@@ -2,6 +2,8 @@ language: r
 
 cache: packages
 
+bioc_required: true
+
 matrix:
   include:
     - os: osx
@@ -9,4 +11,5 @@ matrix:
 
 notifications:
   email:
-      on_failure: mdoering@mpi-inf.mpg.de
+      on_failure: always
+
