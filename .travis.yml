@@ -2,7 +2,8 @@ language: r
 
 cache: packages
 sudo: false
-bioc_required: true
+
+bioc_packages: GenomeInfoDbData # not installed for some reason ...
 
 matrix:
   include:
