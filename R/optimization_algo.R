@@ -323,31 +323,16 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
 		message("#####\n# (BOTH) Aggregating results\n#####")
         opti.fw <- optimal.primer.data.fw$all_results # base consideration of templates on the best set from the 'fw' run
         opti.rev <- optimal.primer.data.rev$all_results
-        print("opti rev sets:")
-        print(length(opti.rev))
-        print(names(opti.rev))
-        #print("FW set:")
-        #print(opti.fw)
-        #print("REV set:")
-        #print(opti.rev)
         if ("melting_temp_diff" %in% names(constraints(settings))) {
             # match fw and rev primers for melting temps if melting temp diff is active
             # matching of sets should be improved ...?
             allowed.diff.fw <- max(sapply(optimal.primer.data.fw$all_used_constraints, function(x) constraints(x)$melting_temp_diff))
             allowed.diff.rev <- max(sapply(optimal.primer.data.fw$all_used_constraints, function(x) constraints(x)$melting_temp_diff))
             allowed.diff <- max(c(allowed.diff.fw, allowed.diff.rev))
-            print("Allowed diff:")
-            print(allowed.diff)
             fw.tm <- as.numeric(names(opti.fw))
             rev.tm <- unlist(lapply(seq_along(optimal.primer.data.rev$all_results), function(x) mean(optimal.primer.data.rev$all_results[[x]][,"melting_temp"], na.rm= TRUE)))
-            print("fw tm:")
-            print(fw.tm)
-            print('rev.tm')
-            print(rev.tm)
             # create a matrix indicating whether the i-th forward set is compatible with the j-th reverse set
             compatible <- do.call(rbind, lapply(fw.tm, function(x) abs(x - rev.tm) < allowed.diff))
-            print("compatible sets:")
-            print(compatible)
             compatible.df <- data.frame(which(compatible, arr.ind = TRUE))
             colnames(compatible.df) <- c("fw_idx", "rev_idx")
         } else {
@@ -355,24 +340,8 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
             compatible.df <- data.frame(fw_idx = seq_along(opti.fw),
                                         rev_idx = seq_along(opti.rev))
         }
-        print("Nbr of fw sets:")
-        print(length(opti.fw))
-        print("Nbr of rev sets:")
-        print(length(opti.rev))
-        print("Target temps:")
-        print(target.temps)
         fw.rev.data <- evaluate.fw.rev.combinations(opti.fw, opti.rev, compatible.df, template.df)
-        print("fw/rev data stats:")
-        print(fw.rev.data$stats)
         sel.set <- select.best.primer.set(fw.rev.data$stats)
-        print("Selected set:")
-        print(sel.set)
-        print("nbr of sets: ")
-        print(length(fw.rev.data$sets))
-        print("Number of used constraints fw: ")
-        print(length(optimal.primer.data.fw$all_used_constraints))
-        print("Number of used constraints rev: ")
-        print(length(optimal.primer.data.fw$all_used_constraints))
         if (length(sel.set) == 0) {
             warning("Could not select an optimal fw-rev combination of primers.")
             optimal.primers <- NULL

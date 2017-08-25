@@ -67,8 +67,7 @@ sig_eval_ref_data <- function(set.name = "openPrimeR2017", top.k = NULL, setting
     return(ref.data)
 }
 generate.country.dists <- function() {
-    # compute distances between countries for determining the fastest mirror:
-    # computed once and stored library(cshapes) library(countrycode)
+    # compute distances between countries for determining the fastest mirror for custom install scripts of the package
     library(cshapes)
     library(countrycode)
     dmat <- distmatrix(as.Date("2002-1-1"), type = "capdist", useGW = FALSE)  # correlates of war
@@ -270,9 +269,12 @@ FPR_TABLE <- create.FPR.table(feature.matrix)
 ########
 # create country dists for install helper function for the shiny app
 ########
-country.dists <- generate.country.dists() # selection of CRAN mirrors using closest distance to countries
+###############
+# not part of sysdata:
+#country.dists <- generate.country.dists() # selection of CRAN mirrors using closest distance to countries
 # store country dists to extdata as shiny app isn't exactly in the package (cannot access sysdata)
-save(country.dists, file = file.path(system.file("extdata", package = "openPrimeR"), "country_dists.Rdata"))
+#save(country.dists, file = file.path(system.file("extdata", package = "openPrimeR"), "country_dists.Rdata"))
+###################################
 ############
 # store sysdata
 ##########
