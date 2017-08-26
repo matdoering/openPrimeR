@@ -149,8 +149,7 @@ fix_constraint_boundaries <- function(constraints, constraint.limits, fix.limit 
             #warning(paste("Had to fix constraint limit of constraint:",
                 #con), ". Constraint limits should be more general than the setting.")
             # limit needs to be adjusted to the current setting
-            other.setting[!test] <- setting[!test]
-            names(other.setting)[!test] <- names(setting)[!test]
+            other.setting[names(setting[!test])] <- setting[!test]
             other.val[[con]] <- other.setting
         } 
     }
@@ -382,9 +381,13 @@ check_interval <- function(constraints) {
             }
         } else if (length(con) == 2) {
             # min & max conditions
-            if (names(con) %in% c("min", "max") &&
+            if (any(names(con) == "min") &&
+                any(names(con) == "max") && 
                 con["min"] <= con["max"]) {
                 check[i] <- TRUE
+            } else {
+                # min/max not specified or min larger than max
+                check[i] <- FALSE
             }
         } else {
             # other lengths are not allowed
@@ -694,6 +697,8 @@ setReplaceMethod("constraints", "DesignSettings",
         }
         value <- value[con.order[con.order %in% names(value)]]
         # b) ensure that limit and constraint entries are concordant
+        #print("con value: ")
+        #print(value)
         fixed.limits <- fix_constraint_boundaries(value, constraintLimits(x))
         constraints(x@Input_Constraint_Boundaries) <- fixed.limits
 		constraints(x@Input_Constraints) <- value
