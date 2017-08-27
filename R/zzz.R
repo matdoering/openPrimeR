@@ -6,7 +6,7 @@
 #' @importFrom plyr ddply summarize arrange . here catcolwise rbind.fill numcolwise
 #' @importFrom foreach foreach %dopar% getDoParRegistered getDoParWorkers
 #' @importFrom IRanges IRanges as.matrix Views findOverlaps overlapsAny CharacterList
-#' @importFrom Biostrings DNAStringSet IUPAC_CODE_MAP extractAt reverseComplement mergeIUPACLetters DNAStringSetList vmatchPattern nucleotideSubstitutionMatrix pairwiseAlignment mismatch matchPattern width compareStrings
+#' @importFrom Biostrings DNAStringSet IUPAC_CODE_MAP extractAt reverseComplement mergeIUPACLetters DNAStringSetList vmatchPattern nucleotideSubstitutionMatrix pairwiseAlignment mismatch matchPattern width compareStrings DNA_BASES
 #' @importFrom RColorBrewer brewer.pal 
 #' @importFrom grDevices colorRampPalette
 #' @importFrom S4Vectors metadata metadata<-

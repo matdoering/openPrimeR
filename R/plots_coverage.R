@@ -1240,7 +1240,7 @@ prepare_template_cvg_mm_data <- function(primer.df, template.df, allowed.mismatc
     additional.df <- expand.grid(Maximal_mismatches = mm.settings, Group = unique(template.df$Group), Status = unique(plot.df$Status), Count = 0)
     plot.df <- merge(plot.df, additional.df, all = TRUE)
     # for the added, duplicate events, select the 'real events'
-    plot.df <- ddply(plot.df, c("Group", "Maximal_mismatches", "Status"), summarise,
+    plot.df <- ddply(plot.df, c("Group", "Maximal_mismatches", "Status"), summarize,
                            Count = max(substitute(Count)))
     total.percentages <- TRUE
     if (!total.percentages) {
@@ -1276,7 +1276,7 @@ plot_template_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
     }
     plot.df <- prepare_template_cvg_mm_data(primer.df, template.df)
     # compute cvg ratio per mismatch setting to show in facet labels:
-    cvg.per.mm <- ddply(plot.df, c("Maximal_mismatches", "Status"), here(summarise),
+    cvg.per.mm <- ddply(plot.df, c("Maximal_mismatches", "Status"), here(summarize),
                            Coverage_Ratio = sum(substitute(Count)) / nrow(template.df)) 
     cvg.per.mm <- cvg.per.mm[cvg.per.mm$Status == "Coverage",]
     cvg.info <- paste0("(", round(cvg.per.mm$Coverage_Ratio * 100, 0), "% coverage)")
@@ -1943,7 +1943,7 @@ get_primer_cvg_mm_plot_df <- function(primer.df, template.df) {
         count.df <- merge(count.df, additional.df, all = TRUE)
     }
     # ensure that for duplicate entries (0 coverage entries), the one with the maximal coverage is chosen:
-    count.df <- ddply(count.df, c("Primer", "Group", "Number_of_mismatches"), summarise,
+    count.df <- ddply(count.df, c("Primer", "Group", "Number_of_mismatches"), summarize,
                             Coverage = max(substitute(Coverage)))
     # make the counts cumulative
     count.df$Cumulative_Coverage <- ave(count.df$Coverage, count.df$Primer, count.df$Group, FUN = cumsum)

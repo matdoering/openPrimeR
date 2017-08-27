@@ -724,7 +724,7 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
     # warn about restriction sites:
     if (adapter.action == "warn") {
         # warn about restriction sites
-        enzymes <- ddply(hit.out, c("Enzyme", "Site"), summarise, 
+        enzymes <- ddply(hit.out, c("Enzyme", "Site"), summarize, 
                     Identifiers = paste(substitute(Primer_Identifier), collapse = ","))
         if (nrow(enzymes) != 0) {
             out <- sapply(seq_len(nrow(enzymes)), function(x) 
