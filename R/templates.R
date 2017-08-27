@@ -200,7 +200,7 @@ setMethod("rbind2", "Templates",
 #' @examples
 #' data(Ippolito)
 #' template.df <- template.df[1:2,]
-setMethod("[", "Templates",
+setMethod("[", c("Templates", "ANY", "ANY"),
     function(x, i, j, ..., drop = TRUE) {
         if (missing(drop)) {
             df <- asS3(x)[i, j, ...]

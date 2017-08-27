@@ -1023,7 +1023,7 @@ rbind.Primers <- function(...) {
 #' @examples
 #' data(Ippolito)
 #' primer.df <- primer.df[1:2,]
-setMethod("[", c("Primers", "ANY", "ANY", "ANY"),
+setMethod("[", c("Primers", "ANY", "ANY"),
     function(x, i, j, ..., drop = TRUE) {
         if (missing(drop)) {
             df <- asS3(x)[i, j, ...]
