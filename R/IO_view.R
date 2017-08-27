@@ -305,7 +305,7 @@ view.primers <- function(primer.df, template.df) {
 format.seqs.tex <- function(seqs) {
     seqs <- seqs
     # italicize ambiguous bases 
-    ambig.bases <- tolower(setdiff(names(Biostrings::IUPAC_CODE_MAP), Biostrings::DNA_BASES))
+    ambig.bases <- tolower(setdiff(names(IUPAC_CODE_MAP), DNA_BASES))
     replacement <- paste0("\\\\textit{", ambig.bases, "}")
     names(replacement) <- ambig.bases
     seqs <- stringr::str_replace_all(seqs, replacement)

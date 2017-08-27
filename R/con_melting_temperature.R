@@ -415,7 +415,7 @@ call.melt <- function(primers, complements, primer_conc, na_salt_conc, mg_salt_c
     }
     melt.tab <- data.frame(Identifier = ids, Primer = out.primers, Complement = out.complements)
     # write one file for each parallel call
-    seqs.per.file <- ceiling(length(out.primers)/foreach::getDoParWorkers())
+    seqs.per.file <- ceiling(length(out.primers)/getDoParWorkers())
     no.files <- ceiling(length(out.primers)/seqs.per.file)
     out.files <- rep(NA, no.files)
     total.seqs.covered <- 0

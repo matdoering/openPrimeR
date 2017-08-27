@@ -122,7 +122,7 @@ get.plot.height <- function(N, px.per.n = 50, min.size = 300,
 #' @return A data frame resulting from row binding of \code{...}.
 #' @keywords internal
 my_rbind <- function(...) {
-    df <- plyr::rbind.fill(...)
+    df <- rbind.fill(...)
     args <- list(...)
     classes <- sapply(args, class)
     if (length(args) == 0) {

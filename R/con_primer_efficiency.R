@@ -53,7 +53,7 @@ compute.efficiency <- function(fw.primers, fw.start, fw.end, covered,
         cur.data <- data.frame(Primers = rep(NA, length(covered.seqs)), Templates = rep(NA, length(covered.seqs)))
         for (j in seq_along(starts)) {
             # identify template regions that are covered
-            targets <- Biostrings::extractAt(covered.seqs[[j]], at = IRanges(start = starts[j], 
+            targets <- extractAt(covered.seqs[[j]], at = IRanges(start = starts[j], 
                 end = ends[j]))  # fw ambig target sequences
             combis <- expand.grid(as.character(unlist(targets)), as.character(fw.primers[[i]]), stringsAsFactors = FALSE)  # possible binding modes for ambig sequences
             # select only the best (i.e. the actual) binding mode -> the one with smallest distance
@@ -72,7 +72,7 @@ compute.efficiency <- function(fw.primers, fw.start, fw.end, covered,
         } else if (mode.directionality == "fw") {
             # reverse complement the binding sequence
             cur.eff <- DECIPHER::CalculateEfficiencyPCR(DNAStringSet(cur.data$Primers[idx]), 
-                    Biostrings::reverseComplement(
+                    reverseComplement(
                         DNAStringSet(cur.data$Templates[idx])
                     ), Ta, primer_conc, 
                     sodium.eq.concentration, 

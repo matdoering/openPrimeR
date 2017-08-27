@@ -53,7 +53,7 @@ estimate.cvg.dir <- function(seqs, k, id = "") {
     # since we're creating before the target region, k mer pos is negative
     kmer.df <- do.call(rbind, lapply(seq_along(kmers), function(x) data.frame("Template_ID" = x, "Primer" = kmers[[x]], "Start" = as.numeric(names(kmers[[x]])), "End" = as.numeric(names(kmers[[x]])) + k)))
     # use ddply to determine binding positions / cvg
-    binding.df <- plyr::ddply(kmer.df, "Primer", plyr::summarize, 
+    binding.df <- ddply(kmer.df, "Primer", summarize, 
                     "Start" = paste(substitute(Start), collapse = ","), 
                     "End" = paste(substitute(End), collapse = ","),
                     "Covered_Seqs" = paste(substitute(Template_ID), collapse = ","),
@@ -362,7 +362,7 @@ check_restriction_sites <- function(primer.df, template.df,
         seqs <- primer.df$Reverse[rev.idx]
         names(seqs) <- primer.df$ID[rev.idx]
         primer.seqs <- DNAStringSet(seqs)
-        template.seqs <- Biostrings::reverseComplement(template.seqs)
+        template.seqs <- reverseComplement(template.seqs)
         rev.sites <- check_restriction_sites_single(primer.seqs, template.seqs, 
                     adapter.action, 
                     direction = "rev", 
@@ -463,7 +463,7 @@ restriction_hits <- function(bad.regions, DB) {
     i <- NULL
     hit.db <- foreach (i = seq_len(nrow(DB)), .combine = cbind) %dopar% {
         enzyme <- as.character(DB$nam[i])
-        temp <- Biostrings::vmatchPattern(DB$rep[i], bad.seqs, 
+        temp <- vmatchPattern(DB$rep[i], bad.seqs, 
                 max.mismatch = 0, with.indels = FALSE)
         hits <- sapply(temp, function(x) length(x) != 0)
         if (length(hits) == 0) {
@@ -496,14 +496,14 @@ restriction_hits <- function(bad.regions, DB) {
 restriction_ali <- function(primer.seqs, template.seqs, search.hits) {
     bad.regions <- vector("list", length(search.hits))
     # define substitution matrix for alignment
-    mat <- Biostrings::nucleotideSubstitutionMatrix(match = 1, mismatch = 0, 
+    mat <- nucleotideSubstitutionMatrix(match = 1, mismatch = 0, 
                                                     baseOnly = FALSE, type = "DNA")
     for (i in seq_along(search.hits)) {
         # align primer with hit region in the templates
         if (is.na(search.hits[i])) {
             next
         }
-        ali <- Biostrings::pairwiseAlignment(primer.seqs[i], search.hits[i],
+        ali <- pairwiseAlignment(primer.seqs[i], search.hits[i],
                     substitutionMatrix = mat,
                      gapOpening = -3, gapExtension = -1, type = "global-local") # open up gaps directly
         # identify indels and non-matching regions
@@ -516,16 +516,16 @@ restriction_ali <- function(primer.seqs, template.seqs, search.hits) {
             sel <- indel@width >= restrict.size
             indel <- indel[sel]
             if (length(indel) != 0) {
-                site <- Biostrings::extractAt(primer.seqs[i], indel)
+                site <- extractAt(primer.seqs[i], indel)
                 bad.regions[[i]] <- unname(site)
             }
         } else {
             # no indels -> look at the longest mismatch region
-            mm.region <- unlist(Biostrings::mismatch(ali@pattern))
+            mm.region <- unlist(mismatch(ali@pattern))
             # discard short mismatch regions:
             if (length(mm.region) > restrict.size) { 
                 # more than 3 mismatches -> consider as adapter seq
-                site <- Biostrings::extractAt(primer.seqs[i], 
+                site <- extractAt(primer.seqs[i], 
                         IRanges(min(mm.region), max(mm.region)))
                 bad.regions[[i]] <- unname(site)
             }
@@ -553,7 +553,7 @@ restriction_match <- function(primer.seqs, template.seqs) {
         for (j in seq_len(length(template.seqs))) { # n^2 * n^2 = n^4 performance ...
             # vmatchpattern doesn't support indels ...
             # max.mismatch: gives the detection limit for adapter sequences/overhang extent
-            d <- Biostrings::matchPattern(as.character(primer.seqs[i]), 
+            d <- matchPattern(as.character(primer.seqs[i]), 
                     as.character(template.seqs[j]), 
                     with.indels = TRUE, 
                     max.mismatch = 12)
@@ -662,7 +662,7 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
     input.regions <- vector("list", length(primer.seqs))
     names(input.regions) <- names(bad.regions)
     for (i in seq_along(primer.seqs)) {
-        input.regions[[i]] <- Biostrings::DNAStringSetList(as.character(primer.seqs[i]))
+        input.regions[[i]] <- DNAStringSetList(as.character(primer.seqs[i]))
     }
     all.regions <- list("Confident" = bad.regions, "Unconfident" = input.regions)
     if (is.function(updateProgress)) {
@@ -716,15 +716,15 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
     }
     hit.out <- do.call(rbind, all.hits)
     # only return unique hits per primer
-    hit.out <- plyr::ddply(hit.out, c("Primer_Identifier", "Sequence", "Enzyme", "Site"),
-            function(x) plyr::arrange(x, substitute(Confidence))[1, ])
+    hit.out <- ddply(hit.out, c("Primer_Identifier", "Sequence", "Enzyme", "Site"),
+            function(x) arrange(x, substitute(Confidence))[1, ])
     if (only.confident.calls) {
         hit.out <- hit.out[hit.out$Confidence == "Confident",]
     }
     # warn about restriction sites:
     if (adapter.action == "warn") {
         # warn about restriction sites
-        enzymes <- plyr::ddply(hit.out, c("Enzyme", "Site"), plyr::summarise, 
+        enzymes <- ddply(hit.out, c("Enzyme", "Site"), summarise, 
                     Identifiers = paste(substitute(Primer_Identifier), collapse = ","))
         if (nrow(enzymes) != 0) {
             out <- sapply(seq_len(nrow(enzymes)), function(x) 
@@ -1091,14 +1091,14 @@ update_primer_cvg <- function(primer.df, template.df, allowed.mismatches, cvg.de
     df <- mm.info[mm.info$Coverage_Type == cvg.definition & mm.info$Number_of_mismatches <= allowed.mismatches, ]
     ##################
     # just move from mismatch rep to coverage rep
-    ddf <-  plyr::ddply(df, c("Primer", "Direction", "Template", "Group"), plyr::summarize,
+    ddf <-  ddply(df, c("Primer", "Direction", "Template", "Group"), summarize,
                             Position = unique(substitute(Position_3terminus)), 
                             Number_of_mismatches = unique(substitute(Number_of_mismatches)))
     #####
     if (mode.directionality == "both") {
         # remove individual binding events
         # for pairs of primers: presence of any other other direction is fine for cvg
-        dir.count.both <- plyr::ddply(ddf, c("Template", "Group"), plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
+        dir.count.both <- ddply(ddf, c("Template", "Group"), summarize, DirectionCount = length(unique(substitute(Direction))))
         rm.idx <- which(dir.count.both$DirectionCount <= 1)
         if (length(rm.idx) != 0) {
             m <- match(dir.count.both$Template[rm.idx], ddf$Template)
@@ -1107,13 +1107,13 @@ update_primer_cvg <- function(primer.df, template.df, allowed.mismatches, cvg.de
     }
     # for primers of both directions: they were replicated (fw+both) earlier, need to select events were pairs are present and then select the individual primer once again
     both.sel <- which(primer.df$Direction[match(ddf$Primer, primer.df$ID)] == "both")
-    dff.both <- plyr::ddply(ddf[both.sel,], c("Primer", "Template"),
-        plyr::summarize, 
+    dff.both <- ddply(ddf[both.sel,], c("Primer", "Template"),
+        summarize, 
         Group = unique(substitute(Group)))
     dff.single <- ddf[setdiff(seq_len(nrow(ddf)), both.sel), c("Primer", "Template", "Group")]
     dff <- rbind(dff.both, dff.single)
     ##########
-    cvd <- plyr::ddply(dff, "Primer", plyr::summarize, Covered_Seqs = paste(substitute(Template), collapse = ","))
+    cvd <- ddply(dff, "Primer", summarize, Covered_Seqs = paste(substitute(Template), collapse = ","))
     m <- match(cvd$Primer, primer.df$ID)
     new.df <- data.frame(ID = primer.df$ID, Covered_Seqs = "", primer_coverage = 0,
                          stringsAsFactors = FALSE)
@@ -1189,7 +1189,7 @@ setGeneric("plot_primer_binding_regions",
 #' @return A histogram of primer binding regions.
 #' @keywords internal
 setMethod("plot_primer_binding_regions", 
-    methods::signature(primers = "Primers", templates = "Templates"),
+    signature(primers = "Primers", templates = "Templates"),
     function(primers, templates,
         direction = c("both", "fw", "rev"), group = NULL, 
         relation = c("fw", "rev"), 
@@ -1278,7 +1278,7 @@ create_region_boxes <- function(primers, templates, relation, region.names, ymin
 #' @return A plot for primer binding region comparison.
 #' @keywords internal
 setMethod("plot_primer_binding_regions", 
-    methods::signature(primers = "list", templates = "list"),
+    signature(primers = "list", templates = "list"),
     function(primers, templates,
         direction = c("both", "fw", "rev"), group = NULL, 
         relation = c("fw", "rev"), 
@@ -1316,9 +1316,9 @@ setMethod("plot_primer_binding_regions",
         }
     }
     # new annotation function for rectangle plot
-    plot.df <- plyr::ddply(plot.df, c("ID", "Start", "End", "Run"), plyr::summarize, Count = length(substitute(ID)))
+    plot.df <- ddply(plot.df, c("ID", "Start", "End", "Run"), summarize, Count = length(substitute(ID)))
     # cumulate counts for multiple primer IDs -> ymax value for rectangles
-    plot.df$ymax <- stats::ave(plot.df$Count, plot.df$Start, plot.df$End, plot.df$Run, FUN = cumsum)
+    plot.df$ymax <- ave(plot.df$Count, plot.df$Start, plot.df$End, plot.df$Run, FUN = cumsum)
     # ymin: cumulative sum minus the current count
     plot.df$ymin <- plot.df$ymax - plot.df$Count
     colnames(plot.df)[colnames(plot.df) %in% c("Start", "End")] <- c("xmin", "xmax")
@@ -1506,7 +1506,7 @@ read_primers_single <- function(primer.location, fw.id = "_fw", rev.id = "_rev",
     }
     # load the primers and at the same time determine whether it's FASTA/CSV input
     primers <- try(my.read.fasta(primer.location, 
-                tolower(names(Biostrings::IUPAC_CODE_MAP))), silent = TRUE)
+                tolower(names(IUPAC_CODE_MAP))), silent = TRUE)
     if (class(primers) == "try-error") {
         # let's try to read as CSV
         fasta.error <- attr(primers, "condition")

@@ -28,11 +28,11 @@ create_fulfilled_counts <- function(primer.df, eval.cols = NULL) {
     }
     constraint.names <- colnames(primer.df)[constraint.idx]
     cols <- c("Run", constraint.names)
-    count.df <- plyr::ddply(primer.df[,cols], "Run", 
-                    plyr::catcolwise(sum))
+    count.df <- ddply(primer.df[,cols], "Run", 
+                    catcolwise(sum))
     # enrich with failures:
-    failure.df <- plyr::ddply(primer.df[,cols], "Run", 
-                    plyr::catcolwise(function(x) length(x) - sum(x)))
+    failure.df <- ddply(primer.df[,cols], "Run", 
+                    catcolwise(function(x) length(x) - sum(x)))
     failure.names <- paste(constraint.names,"_failure", sep = "")
     colnames(failure.df)[colnames(failure.df) %in% constraint.names] <- 
         failure.names
@@ -124,7 +124,7 @@ primer_significance <- function(primer.df, set.name = NULL, active.constraints =
     colnames(tab) <- c("Fulfilled", "Failed")
     # alternative: greater -> check only if odds ratio increases using the tested primers
     # test primers should fulfill more constraints and have less failures
-    test.result <- stats::fisher.test(tab, alternative = "greater")
+    test.result <- fisher.test(tab, alternative = "greater")
     out.constraint.names <- constraint.names[!grepl("_failure", constraint.names)]
     out.constraint.names <- gsub("EVAL_", "", out.constraint.names)
     result <- test.result$p.value

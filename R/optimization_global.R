@@ -51,8 +51,8 @@ score_primers <- function(primer.df, settings, active.constraints = names(constr
     }
     constraint.settings <- constraints(settings)[active.constraints]
     deviations <- get_constraint_deviation_data(primer.df, constraint.settings)
-    penalty.df <- plyr::ddply(deviations, c("ID"), 
-                              plyr::here(plyr::summarize), Penalty = my_penalty(substitute(Deviation)), Deviation = sum(abs(substitute(Deviation))))
+    penalty.df <- ddply(deviations, c("ID"), 
+                              here(summarize), Penalty = my_penalty(substitute(Deviation)), Deviation = sum(abs(substitute(Deviation))))
     return(penalty.df)
 }
 

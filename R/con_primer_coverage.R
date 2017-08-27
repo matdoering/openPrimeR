@@ -665,19 +665,19 @@ evaluate.basic.cvg <- function(template.df, primers, mode.directionality = c("fw
     # disregard empty primers
     idx.fw <- which(primers$Forward != "")
     idx.rev <- which(primers$Reverse != "")
-    seqs <- Biostrings::DNAStringSet(template.df$Sequence)
-    seqs.rc <- Biostrings::DNAStringSet(Biostrings::reverseComplement(seqs))
+    seqs <- DNAStringSet(template.df$Sequence)
+    seqs.rc <- DNAStringSet(reverseComplement(seqs))
     # should we consider only as 'on-target', the events in the target region or just consider all events?
     doFilter <- ifelse(allowed.other.binding.ratio == 0, TRUE, FALSE)
     ### fw primers
-    fw.binding <- evaluate.cvg(seqs, Biostrings::DNAStringSet(primers$Forward), "fw", allowed.mismatches, 
+    fw.binding <- evaluate.cvg(seqs, DNAStringSet(primers$Forward), "fw", allowed.mismatches, 
         updateProgress) # binding events of forward primers
     # determine the allowed binding region:
     allowed.fw <- IRanges(start = template.df$Allowed_Start_fw, end = template.df$Allowed_End_fw)
     # determine allowed binding events for forward primers
     fw.binding.data <- annotate.binding.events(fw.binding, allowed.fw, nrow(primers), allowed.region.definition)
     ### rev primers: analogously
-    rev.binding <- evaluate.cvg(seqs.rc, Biostrings::DNAStringSet(primers$Reverse), "rev", allowed.mismatches, 
+    rev.binding <- evaluate.cvg(seqs.rc, DNAStringSet(primers$Reverse), "rev", allowed.mismatches, 
        updateProgress)
     allowed.rev <- IRanges(start = template.df$Allowed_Start_rev, end = template.df$Allowed_End_rev)
     rev.binding.data <- annotate.binding.events(rev.binding, allowed.rev, nrow(primers), allowed.region.definition)
@@ -714,20 +714,20 @@ evaluate.basic.cvg <- function(template.df, primers, mode.directionality = c("fw
 }
 get.mismatch.info <- function(primers, template.df, binding, covered.seqs.idx, primer.type = c("fw", "rev")) {
     primer.type <- match.arg(primer.type)
-    subject <- Biostrings::DNAStringSet(template.df$Sequence[covered.seqs.idx])
-    w <- Biostrings::width(subject)  # template lengths
+    subject <- DNAStringSet(template.df$Sequence[covered.seqs.idx])
+    w <- Biostrings::width(subject)  # template lengths (Biostrings to diff with 'width' from IRanges)
     # cumulative index in the concatenation of template strings
     idx <- c(0, cumsum(head(w, length(w) - 1)))
     s <- unlist(subject)
     mm.info <- NULL
     if (primer.type == "fw") {
-        f <- IRanges::Views(s, binding@start + idx, (binding@start + binding@width - 1) + idx)  
+        f <- Views(s, binding@start + idx, (binding@start + binding@width - 1) + idx)  
         mm.info <- mismatch.info(primers$Forward, f) 
     } else if (primer.type == "rev") {
         # rev
-        f <- IRanges::Views(s, binding@start + idx, 
+        f <- Views(s, binding@start + idx, 
                     (binding@start + binding@width - 1) + idx)
-        mm.info <- mismatch.info(primers$Reverse, Biostrings::reverseComplement(f))
+        mm.info <- mismatch.info(primers$Reverse, reverseComplement(f))
     }
     return(mm.info)
 }
@@ -1031,13 +1031,13 @@ get_duplex_events <- function(fw.df, annealing.temp, ions, primer.df) {
     #print("get_duplex_Events:")
     #print("fw.df:")
     #print(fw.df)
-    combi.df <- plyr::ddply(fw.df, c("Primer", "Template"), plyr::summarize,
+    combi.df <- ddply(fw.df, c("Primer", "Template"), summarize,
                              PrimerIdentifier = paste(substitute(PrimerIdentifier), collapse = ","), TemplateIdentifier = paste(substitute(TemplateIdentifier), collapse = ","))
     p.ids <- unlist(lapply(combi.df$PrimerIdentifier, function(x) strsplit(x, split = ",")[[1]][1]))
     duplex.result.fw <- get.dimer.data(combi.df$Primer, combi.df$Template, annealing.temp[match(p.ids, primer.df$Identifier)], ions, no.structures = TRUE) 
     if (length(duplex.result.fw) != 0) {
         # get lowest DeltaG for all ambiguities
-        duplex.result.fw <- plyr::ddply(duplex.result.fw, c("Idx1"), function(x) arrange(x, substitute(DeltaG))[1, ])
+        duplex.result.fw <- ddply(duplex.result.fw, c("Idx1"), function(x) arrange(x, substitute(DeltaG))[1, ])
         # restore original dimensions of dat
         m <- lapply(seq_len(nrow(combi.df)), function(x) {
             primer.id <- strsplit(combi.df$PrimerIdentifier[x], split = ",")[[1]]
@@ -1092,7 +1092,7 @@ get.duplex.energies <- function(primer.df, template.df, annealing.temp, settings
         primer.ends.rev <- lapply(strsplit(primer.df$Off_Binding_Position_End_rev, split = ","), as.numeric)
     }
     all.covered.templates <- unlist(lapply(all.covered.seq.idx, function(x) template.df$Sequence[x]))
-    subject <- Biostrings::DNAStringSet(all.covered.templates)
+    subject <- DNAStringSet(all.covered.templates)
     w <- Biostrings::width(subject)  # template lengths
     # cumulative index in the concatenation of template strings
     idx <- c(0, cumsum(head(w, length(w) - 1)))
@@ -1116,14 +1116,14 @@ get.duplex.energies <- function(primer.df, template.df, annealing.temp, settings
         f.rev <- NULL
         if (primer.type == "fw") {
             # fw
-            f.fw <- IRanges::Views(s, primer.starts.fw[[i]] + cur.idx.adjustment, primer.ends.fw[[i]] + cur.idx.adjustment)  
+            f.fw <- Views(s, primer.starts.fw[[i]] + cur.idx.adjustment, primer.ends.fw[[i]] + cur.idx.adjustment)  
         } else if (primer.type == "rev") {
             # rev
-            f.rev <- IRanges::Views(s, primer.starts.rev[[i]] + cur.idx.adjustment, primer.ends.rev[[i]] + cur.idx.adjustment)  
+            f.rev <- Views(s, primer.starts.rev[[i]] + cur.idx.adjustment, primer.ends.rev[[i]] + cur.idx.adjustment)  
         } else {
             # both
-            f.fw <- IRanges::Views(s, primer.starts.fw[[i]] + cur.idx.adjustment, primer.ends.fw[[i]] + cur.idx.adjustment)  
-            f.rev <- IRanges::Views(s, primer.starts.rev[[i]] + cur.idx.adjustment, primer.ends.rev[[i]] + cur.idx.adjustment)  
+            f.fw <- Views(s, primer.starts.fw[[i]] + cur.idx.adjustment, primer.ends.fw[[i]] + cur.idx.adjustment)  
+            f.rev <- Views(s, primer.starts.rev[[i]] + cur.idx.adjustment, primer.ends.rev[[i]] + cur.idx.adjustment)  
         }
         # forward deltaG:
         fw.templates <- rev.comp.sequence(tolower(as.character(f.fw)))
@@ -1248,7 +1248,7 @@ get_feature_matrix <- function(primer.df, template.df, mode = c("on_target", "of
     # select unique binding event for all mismatch contacts:
     # the minimal deltaG is selected to ensure that we consider the
     # disambiguated primer with the least nbr of mismatches
-    df <- plyr::ddply(full.df, c("Primer", "Template", "Group"), plyr::summarize,
+    df <- ddply(full.df, c("Primer", "Template", "Group"), summarize,
                         annealing_DeltaG = min(substitute(annealing_DeltaG)),
                         Number_of_mismatches = min(substitute(Number_of_mismatches)),
                         Position_3terminus = min(substitute(Position_3terminus)),
@@ -1303,7 +1303,7 @@ predict_coverage <- function(primer.df, template.df, settings, mode = c("on_targ
     primer.df <- update.constraint.values(primer.df, p.df)
     pred.matrix <- get_feature_matrix(primer.df, template.df, mode = mode)
     if (length(pred.matrix) != 0 && nrow(pred.matrix) != 0) {
-        pred <- try(stats::predict(CVG_MODEL, newdata = pred.matrix, type = "response"))
+        pred <- try(predict(CVG_MODEL, newdata = pred.matrix, type = "response"))
     } else {
         # if 'newdata' is NULL, the training data would be predicted ..
         pred <- NULL
@@ -1399,26 +1399,26 @@ evaluate.cvg <- function(template.seqs, primers,
 
         idx <- non.empty.idx[i]
         # matchPattern returns all matches below the max mismatch cutoff! need to select the best match later on
-        temp <- Biostrings::matchPattern(primers[[idx]], seqDB, max.mismatch = allowed.mismatches, 
+        temp <- matchPattern(primers[[idx]], seqDB, max.mismatch = allowed.mismatches, 
                                         with.indels = FALSE, fixed = FALSE) # fixed FALSE to allow ambigs
         temp <- as(temp, "IRanges")
         # add additional info
         fp <- rep(idx, length(temp))
         # store the primer idx as metadata using GRanges
         if (length(temp) != 0) {
-            temp <- GenomicRanges::GRanges(seqnames = mode.directionality, ranges = temp, primer_idx = fp)  # changed from RangedData (deprecated)
+            temp <- GRanges(seqnames = mode.directionality, ranges = temp, primer_idx = fp)  # changed from RangedData (deprecated)
         } else {
-            temp <- GenomicRanges::GRanges()
+            temp <- GRanges()
         }
     }
     if (length(f) == 0) {
         return(IRanges())
     }
     fp <- as.numeric(as.character(f$primer_idx))  # primer indices
-    f <- IRanges::Views(seqDB, start(f), end(f))  # extract the sub-sequence of the primer matches
+    f <- Views(seqDB, start(f), end(f))  # extract the sub-sequence of the primer matches
     # try to map from 'f' Iranges to template.mapping to find which template seqs
     # were bound
-    overlaps <- IRanges::findOverlaps(f, template.mapping)  # f is query, template.mapping is the subject
+    overlaps <- findOverlaps(f, template.mapping)  # f is query, template.mapping is the subject
     fw.table <- f[as.matrix(overlaps)[, 1]] # as.matrix from IRanges ..
     fw.idx <- fp[as.matrix(overlaps)[, 1]]
     fw.template.table <- template.mapping[as.matrix(overlaps)[, 2]]  # names: identifier of seq
@@ -1457,7 +1457,7 @@ mismatch.info <- function(primer, seqs) {
     s <- my.disambiguate(DNAStringSet(seqs))
     # select template with minimal mismatches
     As <- lapply(p, function(p.seq) {
-        modes <- lapply(s, function(s.seq) Biostrings::compareStrings(rep(tolower(as.character(p.seq)), length(s.seq)), tolower(as.character(s.seq))))
+        modes <- lapply(s, function(s.seq) compareStrings(rep(tolower(as.character(p.seq)), length(s.seq)), tolower(as.character(s.seq))))
         mm.pos <- lapply(modes, function(x) lapply(strsplit(x, split = ""), function(y) which(y == "?")))
         mm.count <- lapply(mm.pos, function(x) sapply(x, length))
         idx <- unlist(lapply(mm.count, function(x) which.min(x)))
@@ -1492,7 +1492,7 @@ annotate.binding.events <- function(fw.binding, allowed.range, nbr.primers,
         stop("Please provide the 'allowed.region.definition' argument.")
     }
     allowed.region.definition <- match.arg(allowed.region.definition)
-    out <- list("on_target" = IRanges::IRanges(), "all_binding" = IRanges::IRanges(), "off_target" = IRanges::IRanges())
+    out <- list("on_target" = IRanges(), "all_binding" = IRanges(), "off_target" = IRanges())
     if (length(fw.binding) == 0) {
         return(out)  # nothing to filter/annotate
     }
@@ -1513,7 +1513,7 @@ annotate.binding.events <- function(fw.binding, allowed.range, nbr.primers,
     all.bindings <- do.call(c, cur.bindings)
     all.allowed <- allowed.range[unlist(template.indices)]
     # either checks for 'any' overlaps or 'within' allowed region overlaps of primers with template regions
-    allowed <- IRanges::overlapsAny(all.bindings, all.allowed, type = allowed.region.definition)
+    allowed <- overlapsAny(all.bindings, all.allowed, type = allowed.region.definition)
     metadata(fw.binding) <- c(metadata(fw.binding), allowed_region = list(allowed))
     # select on-target binding events
     allowed.binding <- fw.binding[allowed]

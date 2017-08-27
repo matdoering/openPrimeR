@@ -112,7 +112,7 @@ score_degen <- function(seq, gap.char = "-") {
     if (class(seq) != "list") {
         stop("'seq' should be a list of split characters.")
     }
-    gapped.codemap <- Biostrings::IUPAC_CODE_MAP
+    gapped.codemap <- IUPAC_CODE_MAP
 	if (length(gap.char) != 0 && nchar(gap.char) == 1) {
 		gapped.codemap[gap.char] <- gap.char
 	}
@@ -265,8 +265,8 @@ create.primer.ranges <- function(end.position, p.lens, start.position,
                                          Group = rep(groups[i], length(starts[idx])))
     }
     primer.range <- do.call(rbind, primer.ranges)
-    primer.range <- plyr::ddply(primer.range, "Group", 
-                        plyr::summarize,
+    primer.range <- ddply(primer.range, "Group", 
+                        summarize,
                         Start = unique(substitute(Start)),
                         End = unique(substitute(End)))
     return(primer.range)
@@ -369,7 +369,7 @@ hclust.tree <- function(primer.candidates) {
     dist <- stringdist::stringdistmatrix(seqs, method = "hamming",
                                         useNames = "names", nthread = 1) 
     #dist <- cluster::daisy(data.frame(as.character(primer.candidates)), metric = "gower")
-    clusters <- stats::hclust(dist)
+    clusters <- hclust(dist)
     tree <- ape::as.phylo(clusters)
     return(tree)
 }
@@ -540,7 +540,7 @@ create.primers.tree <- function(seqs, seq.IDs, seq.groups, start, end, primer.le
 #' @return The Shannon entropy for the alignment.
 #' @keywords internal
 shannon.entropy <- function(ali) {
-    #gapped.codemap <- Biostrings::IUPAC_CODE_MAP
+    #gapped.codemap <- IUPAC_CODE_MAP
     #gapped.codemap["-"] <- "-"
     # don't consider ambiguous positions to keep the score tight.
     symbols <- c("a", "c", "g", "t")

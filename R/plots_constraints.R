@@ -57,7 +57,7 @@ get_constraint_deviation_data <- function(constraint.df, constraint.settings) {
     boundaries <- constraint.settings[constraints]
     constraints <- constraints_to_unit(constraints)
     ######
-    plot.df <- reshape2::melt(constraint.df, id.vars = c("ID"), 
+    plot.df <- melt(constraint.df, id.vars = c("ID"), 
         measure.vars = unlist(con.cols),
         variable.name = "Constraint", 
         value.name = "Value")
@@ -85,7 +85,7 @@ get_constraint_deviation_data <- function(constraint.df, constraint.settings) {
             return(0)
         }
     }
-    df <- ddply(plot.df, c("ID", "Constraint", "Value"), plyr::here(summarize),            
+    df <- ddply(plot.df, c("ID", "Constraint", "Value"), here(summarize),            
                 Deviation = myfun(substitute(Value), substitute(Constraint), 
                               constraint.settings))
     df$Run <- constraint.df$Run[1]
@@ -167,7 +167,7 @@ plot_constraint.histogram <- function(primer.df, con.cols, con.identifier, bound
     if (any(unlist(lapply(con.cols, function(x) !x %in% colnames(primer.df))))) {
         return(NULL)
     }
-    plot.df <- reshape2::melt(primer.df, id.vars = c("ID"), 
+    plot.df <- melt(primer.df, id.vars = c("ID"), 
         measure.vars = unlist(con.cols),
         variable.name = "Constraint", 
         value.name = "Value")
@@ -208,7 +208,7 @@ plot_constraint.histogram <- function(primer.df, con.cols, con.identifier, bound
         geom_histogram()
     if (length(con.identifier) > 1) {
         # create multiple facets
-        p <- p + facet_wrap(stats::as.formula("~Constraint"), scales = "free_x", ncol = 2,
+        p <- p + facet_wrap(as.formula("~Constraint"), scales = "free_x", ncol = 2,
                             labeller = ggplot2::label_parsed)
 
     } else {
@@ -298,8 +298,8 @@ primer.set.parameter.stats <- function(primer.df, mode.directionality, lex.seq) 
     nbr.primers <- nrow(primer.df)
     if (used.measure == "CI") {
         # CI not so appropriate here imo
-        means <- plyr::ddply(asS3(primer.df)[, sel.cols], plyr::.(), plyr::numcolwise(mean, na.rm = TRUE))[-1]
-        sds <- plyr::ddply(asS3(primer.df)[, sel.cols], plyr::.(), plyr::numcolwise(sd))[-1]  # numcolwise leads to problems with read.csv with NA entries when field is not converted to numeric by read.csv function
+        means <- ddply(asS3(primer.df)[, sel.cols], .(), numcolwise(mean, na.rm = TRUE))[-1]
+        sds <- ddply(asS3(primer.df)[, sel.cols], .(), numcolwise(sd))[-1]  # numcolwise leads to problems with read.csv with NA entries when field is not converted to numeric by read.csv function
         na.idx <- which(is.na(sds))
         if (length(na.idx) != 0) {
             sds[na.idx] <- 0
@@ -309,7 +309,7 @@ primer.set.parameter.stats <- function(primer.df, mode.directionality, lex.seq) 
         conf.right <- round(means + error, 2)
         entries <- paste("[", conf.left, ",", conf.right, "]", sep = "")
     } else if (used.measure == "IQR") {
-        IQR.data <- plyr::ddply(asS3(primer.df)[, sel.cols], plyr::.(), plyr::numcolwise(quantile, na.rm = TRUE))[-1]
+        IQR.data <- ddply(asS3(primer.df)[, sel.cols], .(), numcolwise(quantile, na.rm = TRUE))[-1]
         IQR.l <- IQR.data[2, ]  # 1st quantile
         IQR.r <- IQR.data[4, ]  # 3rd quantile
         entries <- paste("[", round(IQR.l, 2), ",", round(IQR.r, 2), "]", sep = "")
@@ -510,7 +510,7 @@ setGeneric("plot_constraint",
 #' \code{constraints}.
 #' @keywords internal
 setMethod("plot_constraint", 
-    methods::signature(primers = "Primers"), 
+    signature(primers = "Primers"), 
     function(primers, settings, active.constraints) {
 
     if (length(primers) == 0 || nrow(primers) == 0 || length(active.constraints) == 0) {
@@ -550,7 +550,7 @@ setMethod("plot_constraint",
 #' by \code{constraints}.
 #' @keywords internal
 setMethod("plot_constraint", 
-    methods::signature(primers = "list"), 
+    signature(primers = "list"), 
     function(primers, settings, active.constraints,
              highlight.set = NULL, nfacets = NULL) {
     if (length(primers) == 0 || length(active.constraints) == 0) {
@@ -626,7 +626,7 @@ setGeneric("plot_constraint_fulfillment",
 #' @return A data frame with statistics on fulfilled constraints.
 #' @keywords internal
 setMethod("plot_constraint_fulfillment", 
-    methods::signature(primers = "Primers"),
+    signature(primers = "Primers"),
     function(primers, settings, active.constraints, plot.p.vals = TRUE) {
     if (length(primers) == 0 || nrow(primers) == 0) {
         return(NULL)
@@ -680,7 +680,7 @@ setMethod("plot_constraint_fulfillment",
     eval.df <- cbind(Identifier = constraint.df$Identifier, ID = constraint.df$ID, 
                     eval.df, stringsAsFactors = TRUE)
     colnames(eval.df) <- gsub("EVAL_", "", colnames(eval.df))
-    eval.m <- reshape2::melt(eval.df, c("ID", "Identifier"), variable.name = "Constraint", 
+    eval.m <- melt(eval.df, c("ID", "Identifier"), variable.name = "Constraint", 
         value.name = "Outcome")
     # sort columns by name
     levels <- unique(eval.m$Constraint)[order(as.character(unique(eval.m$Constraint)))]
@@ -719,7 +719,7 @@ setMethod("plot_constraint_fulfillment",
 #' for each primer set in \code{primers}. 
 #' @keywords internal
 setMethod("plot_constraint_fulfillment", 
-    methods::signature(primers = "list"),
+    signature(primers = "list"),
     function(primers, settings, active.constraints, 
              plot.p.vals = FALSE, ncol = 2, highlight.set = NULL) {
 
@@ -801,7 +801,7 @@ setGeneric("plot_cvg_constraints",
 #' @return A plot of coverage constraints.
 #' @keywords internal
 setMethod("plot_cvg_constraints", 
-    methods::signature(primers = "Primers"),
+    signature(primers = "Primers"),
     function(primers, settings, active.constraints) {
 
     if (!is(primers, "Primers")) {
@@ -849,7 +849,7 @@ setMethod("plot_cvg_constraints",
 #' @return Plot of primer coverage constraints for multiple sets.
 #' @keywords internal
 setMethod("plot_cvg_constraints", 
-    methods::signature(primers = "list"),
+    signature(primers = "list"),
     function(primers, settings, active.constraints, highlight.set = NULL) {
 
     cvg.constraints <- cvg_constraints(settings)
@@ -942,7 +942,7 @@ setGeneric("plot_constraint_deviation",
 #' @return A boxplot of deviations
 #' @keywords internal
 setMethod("plot_constraint_deviation", 
-    methods::signature(primer.data = "Primers"),
+    signature(primer.data = "Primers"),
     function(primer.data, settings, active.constraints) {
         constraint.settings <- constraints(settings)
         constraint.settings <- constraint.settings[names(constraint.settings) %in% active.constraints]
@@ -986,7 +986,7 @@ setMethod("plot_constraint_deviation",
 #' @return A boxplot of deviations
 #' @keywords internal
 setMethod("plot_constraint_deviation", 
-    methods::signature(primer.data = "list"),
+    signature(primer.data = "list"),
     function(primer.data, settings, active.constraints, deviation.per.primer = FALSE) {
         # check class of primer.data entries
         c <- sapply(primer.data, class)
@@ -1015,12 +1015,12 @@ setMethod("plot_constraint_deviation",
         ylab <- "Absolute deviation"
         if (deviation.per.primer) {
             # show deviation per primer across all constraints
-            plot.data <- plyr::ddply(plot.data, c("ID", "Run"), plyr::summarize, Mean_Deviation = mean(abs(substitute(Deviation))))
+            plot.data <- ddply(plot.data, c("ID", "Run"), summarize, Mean_Deviation = mean(abs(substitute(Deviation))))
             col.id <- "Run"
             title <- "Deviations per primer and set"
         } else {
             # show deviation per considered constraint across all primers
-            plot.data <- plyr::ddply(plot.data, c("Constraint", "Run"), plyr::summarize, Mean_Deviation = abs(substitute(Deviation)))
+            plot.data <- ddply(plot.data, c("Constraint", "Run"), summarize, Mean_Deviation = abs(substitute(Deviation)))
             col.id <- "Constraint"
             title <- "Deviations per constraint and set"
         }

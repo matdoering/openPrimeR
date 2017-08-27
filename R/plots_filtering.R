@@ -38,8 +38,8 @@ plot.filtering.stats.cvg <- function(stats, stats.relax = NULL) {
     }
     yl <- "Primer coverage after filtering"
     ttl <- "Filtering coverage"
-    filter.color <- RColorBrewer::brewer.pal(8, "Accent")[5]
-    relax.color <- RColorBrewer::brewer.pal(8, "Blues")[4]
+    filter.color <- brewer.pal(8, "Accent")[5]
+    relax.color <- brewer.pal(8, "Blues")[4]
     color <- c("Filtering" = filter.color, "Relaxation" = relax.color)
 
     constraint.names <- unlist(constraints_to_unit(levels(plot.stats$Constraint), FALSE))
@@ -66,7 +66,7 @@ stats_plot_data <- function(stats, stats.relax) {
     }
     plot.stats <- stats
     plot.stats$Constraint <- factor(plot.stats$Constraint, levels = rev(unique(plot.stats$Constraint)))
-    ratios <- plyr::ddply(plot.stats, "Direction", plyr::summarize, 
+    ratios <- ddply(plot.stats, "Direction", summarize, 
                 Ratio = substitute(Remaining) / (substitute(Remaining)[1] + substitute(Excluded)[1]))$Ratio
     plot.stats$Ratio <- ratios
     plot.stats$Type <- "Filtering"
@@ -84,7 +84,7 @@ stats_plot_data <- function(stats, stats.relax) {
         plot.relax$Ratio <- c(fw.ratio, rev.ratio)
         # adjust actual coverage using the relaxation info
         plot.relax$Current_Coverage[is.na(plot.relax$Current_Coverage)] <- 0
-        cum.sums <- plyr::ddply(plot.relax, "Direction", plyr::summarize, 
+        cum.sums <- ddply(plot.relax, "Direction", summarize, 
                 Cumulative_Coverage = cumsum(substitute(Current_Coverage)))
         plot.relax$Current_Coverage <- cum.sums$Cumulative_Coverage
         idx <- which(!is.na(plot.relax$Current_Coverage))
@@ -110,8 +110,8 @@ plot.filtering.stats <- function(stats, stats.relax = NULL) {
         return(NULL)
     }
     constraint.names <- unlist(constraints_to_unit(levels(plot.stats$Constraint), FALSE))
-    filter.color <- RColorBrewer::brewer.pal(8, "Accent")[5]
-    relax.color <- RColorBrewer::brewer.pal(8, "Blues")[4]
+    filter.color <- brewer.pal(8, "Accent")[5]
+    relax.color <- brewer.pal(8, "Blues")[4]
     color <- c("Filtering" = filter.color, "Relaxation" = relax.color)
     ggplot(plot.stats, aes_string(y = "Ratio", x = "Constraint", fill = "Type")) + 
         geom_bar(stat = "identity") + coord_flip() + xlab("Filtering constraint") + 

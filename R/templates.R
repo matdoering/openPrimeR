@@ -571,7 +571,7 @@ read_templates_multiple <- function(filenames,  hdr.structure = NULL, delim = NU
 read_templates_fasta <- function(fasta.file, hdr.structure = NULL, delim = NULL, id.column = NULL, 
                            rm.keywords = NULL, remove.duplicates = FALSE, fw.region = c(1,30), 
                            rev.region = c(1,30), gap.character = "-", run = NULL) {
-    allowed.nts <- c(tolower(names(Biostrings::IUPAC_CODE_MAP)), gap.character)
+    allowed.nts <- c(tolower(names(IUPAC_CODE_MAP)), gap.character)
     seqs <- my.read.fasta(fasta.file, allowed.nts)
     if (is.null(seqs)) {
         return(NULL)
@@ -671,7 +671,7 @@ read.sequences <- function(fasta.file, gap.character) {
         return(NULL)
     }
     # supress warning when there's an extra-newline tryCatch(
-    allowed.nts <- c(tolower(names(Biostrings::IUPAC_CODE_MAP)), gap.character)
+    allowed.nts <- c(tolower(names(IUPAC_CODE_MAP)), gap.character)
     seqs <- my.read.fasta(fasta.file, allowed.nts)
     s <- sapply(seqs, function(x) paste(x, collapse = ""))
     hdr <- sapply(seqs, function(x) attr(x, "Annot"))
@@ -1728,7 +1728,7 @@ plot_conservation <- function(entropy.df, alignments, template.df, gap.char = "-
     for (i in seq_len(nrow(entropy.df))) { # for each alignment group
         entropy.df[i, gap.idx[[m[i]]]] <- 1 # max entropy
     }
-    plot.df <- reshape2::melt(entropy.df, value.name = "Entropy")
+    plot.df <- melt(entropy.df, value.name = "Entropy")
     # since we have [0,1] interval entropies, we can simply convert to conservation:
     colnames(plot.df) <- c("Group", "Position", "Entropy")
     plot.df$Conservation <- 1 - plot.df$Entropy
@@ -1788,14 +1788,14 @@ plot_conservation <- function(entropy.df, alignments, template.df, gap.char = "-
         allowed.df[[i]] <- region.df
     }
     allowed.df <- do.call(rbind, allowed.df)
-    group.colors <- RColorBrewer::brewer.pal(8, "Set1")
-    group.colors <- grDevices::colorRampPalette(group.colors)(length(groups))
+    group.colors <- brewer.pal(8, "Set1")
+    group.colors <- colorRampPalette(group.colors)(length(groups))
     group.colors <- c(group.colors, "grey40")
     # only plot the new allowed regions
     allowed.new <- allowed.df[allowed.df$Type == "New",]
     allowed.old <- allowed.df[allowed.df$Type == "Old",]
     # get max bar height for any group for a position
-    #max.conservation <- plyr::ddply(plot.df, c("Position"), plyr::summarize, "TotalConservation" = sum(substitute(Conservation)))
+    #max.conservation <- ddply(plot.df, c("Position"), summarize, "TotalConservation" = sum(substitute(Conservation)))
     #box.extent <- max(max.conservation$TotalConservation) * 0.1
     box.extent <- max(plot.df$Conservation) * 0.1
     box.ymax <- -0.05 * max(plot.df$Conservation)
@@ -1873,7 +1873,7 @@ update.binding.ranges.by.conservation <- function(template.df,
     }
     ranges <- do.call(rbind, primer.ranges)
     # select range with smallest entropy for every group
-    selected.ranges <- plyr::ddply(ranges, "Group", function(x) plyr::arrange(x, substitute(Entropy))[1,])
+    selected.ranges <- ddply(ranges, "Group", function(x) arrange(x, substitute(Entropy))[1,])
     # assign new binding regions for every group of template sequences individually
     new.templates <- template.df
     for (i in seq_along(selected.ranges$Group)) {

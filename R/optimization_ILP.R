@@ -237,11 +237,11 @@ ILPConstrained <- function(D, cvg.matrix, time.limit = NULL, presolve.active = F
 #' @keywords internal
 get.ILP.vars <- function(ILP, original.dim = NULL) {
     if (length(original.dim) == 0) {
-        return(lpSolveAPI::get.variables(ILP))  # does not contain variables that were removed by presolve
+        return(get.variables(ILP))  # does not contain variables that were removed by presolve
     } else {
         # if presolve removed some variables, we need to know the original ILP
         # dimensionality, to find the 'original' decision variable solutions
-        v <- lpSolveAPI::get.primal.solution(ILP, orig = TRUE)  # contains also the variables that were removed by presolve
+        v <- get.primal.solution(ILP, orig = TRUE)  # contains also the variables that were removed by presolve
         vars <- v[(original.dim[1] + 1):length(v)]
         return(vars)
     }
@@ -458,7 +458,7 @@ remove.redundant.cols <- function(S, cvg.matrix) {
         ILP <- ILPConstrained(cur.D, cvg.matrix[M, R, drop = FALSE], time.limit = Inf, 
                              presolve.active = FALSE) 
         return.val <- solve(ILP)
-        vars <- lpSolveAPI::get.variables(ILP)
+        vars <- get.variables(ILP)
         S <- S[-R[vars == 0]]
     }
     return(S)
@@ -848,7 +848,7 @@ subset_primer_set <- function(primer.df, template.df, k = 1, groups = NULL, iden
         if (length(out.loc) != 0) {
             write.lp(ILP, file.path(out.loc, paste("ILP_", k, sep = "")), "lp")  #write it to a file in LP format
         }
-        vars <- lpSolveAPI::get.variables(ILP)
+        vars <- get.variables(ILP)
         primer.vars <- vars[seq_len(nrow(p.df))]
         sel.idx <- which(primer.vars == 1)
         cur.top.primers <- p.df[sel.idx, ]

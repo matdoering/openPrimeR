@@ -54,7 +54,7 @@ get_comparison_table <- function(template.data, primer.data, sample.name = NULL)
         }
         all.results[[j]] <- set.stats
     }
-    sample.result <- do.call(plyr::rbind.fill, all.results)
+    sample.result <- do.call(rbind.fill, all.results)
     # sort sample result by cvg
     if ("Coverage" %in% colnames(sample.result)) {
         hits <- regexpr("[0-9\\.]+%", sample.result$Coverage)
@@ -138,7 +138,7 @@ prepare.constraint.plot <- function(primer.data,
     if (length(new.df) != 0 && length(p.vals) != 0) {
         # adjust/assign p-vals for multiple hypothesis testing
         m <- match(new.df$P_value, p.vals) 
-        p.vals <- stats::p.adjust(p.vals, method = "bonf")
+        p.vals <- p.adjust(p.vals, method = "bonf")
         new.df$P_value <- p.vals[m]
     }
     # re-name constraints
@@ -242,7 +242,7 @@ plot_primer.comparison.box <- function(primer.data,
     if (any(unlist(lapply(con.cols, function(x) !x %in% colnames(plot.df))))) {
         return(NULL)
     }
-    plot.df <- reshape2::melt(plot.df, id.vars = c("ID", "Run", "Forward", "Reverse"), 
+    plot.df <- melt(plot.df, id.vars = c("ID", "Run", "Forward", "Reverse"), 
         measure.vars = unlist(con.cols),
         variable.name = "Constraint", 
         value.name = "Value")
@@ -299,7 +299,7 @@ plot_primer.comparison.box <- function(primer.data,
         guides(colour = FALSE) # remove legend: is redundant here
     if (length(con.identifier) > 1) {
         # multiple constraints are plotted
-        p <- p + facet_wrap(stats::as.formula("~Constraint"), 
+        p <- p + facet_wrap(as.formula("~Constraint"), 
                 scales = "free_y", ncol = nfacets, 
                 labeller = ggplot2::label_parsed)
     } else {

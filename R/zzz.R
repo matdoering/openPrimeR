@@ -3,17 +3,18 @@
 ######
 #' @import ggplot2 lpSolveAPI methods
 #' @importFrom reshape2 melt dcast
-#' @importFrom plyr ddply summarize arrange .
-#' @importFrom foreach foreach %dopar%
-#' @importFrom IRanges IRanges as.matrix
-#' @importFrom Biostrings DNAStringSet
+#' @importFrom plyr ddply summarize arrange . here catcolwise rbind.fill numcolwise
+#' @importFrom foreach foreach %dopar% getDoParRegistered getDoParWorkers
+#' @importFrom IRanges IRanges as.matrix Views findOverlaps overlapsAny CharacterList
+#' @importFrom Biostrings DNAStringSet IUPAC_CODE_MAP extractAt reverseComplement mergeIUPACLetters DNAStringSetList vmatchPattern nucleotideSubstitutionMatrix pairwiseAlignment mismatch matchPattern width compareStrings
 #' @importFrom RColorBrewer brewer.pal 
 #' @importFrom grDevices colorRampPalette
 #' @importFrom S4Vectors metadata metadata<-
 #' @importFrom BiocGenerics unlist start end
 #' @importFrom magrittr %>%
-#' @importFrom stats na.omit qnorm quantile sd 
+#' @importFrom stats na.omit qnorm quantile sd ave fisher.test p.adjust as.formula reshape predict hclust
 #' @importFrom utils head read.csv read.delim setTxtProgressBar tail txtProgressBar write.csv write.table
+#' @importFrom GenomicRanges GRanges
 NULL # need to have some evaluated code here
 
 #' Determination if Selenium is installed.
@@ -241,7 +242,8 @@ parallel_setup <- function(cores = NULL) {
     }
     # set the default number of cores to use
     foreach.available <- requireNamespace("foreach", quietly = TRUE)
-    if (foreach.available && !foreach::getDoParRegistered()) { # prevent doPar warnings that the backend is not registered
+    # prevent doPar warnings that the backend is not registered
+    if (foreach.available && !getDoParRegistered()) { 
         default.nbr.cores <- 2
         parallel_setup(default.nbr.cores)
     }

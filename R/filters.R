@@ -857,9 +857,9 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
     # store final set:
     store.filtering.sets(new.filtered.df, new.excluded.df, results.loc, tag = as.character(while.count), stat.df = relax.df, settings = settings)
     # store new statistics:
-    excl.counts <- plyr::ddply(excluded.df, "Exclusion_Reason", plyr::summarize, "Count" = length(substitute(Exclusion_Reason)))
+    excl.counts <- ddply(excluded.df, "Exclusion_Reason", summarize, "Count" = length(substitute(Exclusion_Reason)))
     # for additional cvg: only the last failed exclusion reason is considered
-    counts <- plyr::ddply(new.filtered.df, "Exclusion_Reason", plyr::summarize, "Count" = length(substitute(Exclusion_Reason)), "Covered" = paste(unique(unlist(strsplit(substitute(Covered_Seqs), split = ","))), collapse = ","))
+    counts <- ddply(new.filtered.df, "Exclusion_Reason", summarize, "Count" = length(substitute(Exclusion_Reason)), "Covered" = paste(unique(unlist(strsplit(substitute(Covered_Seqs), split = ","))), collapse = ","))
     if (nrow(counts) != 0) {
         # remove count entries that didn't fail a constraint
         na.idx <- which(is.na(counts$Exclusion_Reason ))

@@ -314,11 +314,6 @@ compute.all.cross.dimers <- function(primer.df, primer_conc, na_salt_conc, mg_sa
     # slicing info:
     # https://github.com/tidyverse/dplyr/issues/3034
     #########
-    # alternative
-    # result <- as.data.frame(results %>% 
-    #                         dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% 
-    #                         dplyr::arrange_("DeltaG") %>%
-    #                         dplyr::slice(1))
     result <- as.data.frame(results %>% 
                             dplyr::group_by(.dots = c("Idx1", "Idx2")) %>% 
                             dplyr::slice(which.min(!! quote(DeltaG)))) # !! is inline operator to 'unquote' an expression
@@ -629,8 +624,8 @@ prepare.dimer.seqs <- function(s1, s2) {
         return(NULL)
     }
     # disambiguate sequences
-    s1 <- my.disambiguate(Biostrings::DNAStringSet(s1))
-    s2 <- my.disambiguate(Biostrings::DNAStringSet(s2))
+    s1 <- my.disambiguate(DNAStringSet(s1))
+    s2 <- my.disambiguate(DNAStringSet(s2))
     # assign indices
     s1.counts <- IRanges::width(s1@partitioning)
     s2.counts <- IRanges::width(s2@partitioning)
@@ -650,8 +645,8 @@ prepare.dimer.seqs <- function(s1, s2) {
                 })# index for original sequences
     combis.ori <- data.frame(Idx1 = unlist(combis.ori), Idx2 = unlist(combis.ori))
     combis <- cbind(combis.ori, combis.ambig) # TODO: there was a bug here when cbinding for a large set (> 20 mio entries, different number of elements ...)
-    s1 <- IRanges::CharacterList(s1)
-    s2 <- IRanges::CharacterList(s2)
+    s1 <- CharacterList(s1)
+    s2 <- CharacterList(s2)
     # suppress warning that number of columns don't match
     # warning doesn't matter since we select by the correct Ambig_Index
     s1.mat <- suppressWarnings(do.call(rbind, as.list(s1)))
@@ -667,7 +662,7 @@ prepare.dimer.seqs <- function(s1, s2) {
 #' @return A list of lists containing indices corresponding to \code{tasks}, each list gives a batch.
 #' @keywords internal
 batchify.simple <- function(tasks) {
-    tasks.per.job <- ceiling(length(tasks)/foreach::getDoParWorkers())
+    tasks.per.job <- ceiling(length(tasks)/getDoParWorkers())
     no.jobs <- ceiling(length(tasks)/tasks.per.job)
     total.tasks <- 0
     batches <- vector("list", no.jobs)  # idx of the primers in out.primers per file

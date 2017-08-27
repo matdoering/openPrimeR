@@ -428,18 +428,18 @@ prepare_template_cvg_data <- function(df, mode.directionality) {
     # df: coverage for one coverage type
     # select individual binding mode per primer-template pair instead of the representation per individual mismatch
     #########
-    ddf <-  plyr::ddply(df, c("Primer", "Direction", "Template", "Group"), plyr::summarize,
+    ddf <-  ddply(df, c("Primer", "Direction", "Template", "Group"), summarize,
                             Position = unique(substitute(Position_3terminus)), 
                             Number_of_mismatches = unique(substitute(Number_of_mismatches)))
 
     ##########################
     # take the minium number of mismatches binding mode per direction 
-    dff <- plyr::ddply(ddf, c("Template", "Direction"), function(x) plyr::arrange(x, 
+    dff <- ddply(ddf, c("Template", "Direction"), function(x) arrange(x, 
                                         substitute(Number_of_mismatches))[1, ])
     # if mode.directionality is "both" -> retain only templates where we have coverage from a fw AND a rev primer
     if (mode.directionality == "both") {
         # for individual primers, require coverage by fw & rev primers:
-        dir.count <- plyr::ddply(dff, "Template", plyr::summarize, DirectionCount = length(unique(substitute(Direction))))
+        dir.count <- ddply(dff, "Template", summarize, DirectionCount = length(unique(substitute(Direction))))
         # remove all template coverage events where we don't have two primers covering the template
         rm.template.id <- setdiff(dir.count$Template[dir.count$DirectionCount <= 1], dff$Template[dff$Direction == "both"])
         m <- which(dff$Template %in% rm.template.id)
@@ -449,7 +449,7 @@ prepare_template_cvg_data <- function(df, mode.directionality) {
     }
     # take the maximum number of mismatches per template over all directions
     # result is: max(min(fw), min(rev))
-    dff <- plyr::ddply(dff, c("Template"), function(x) plyr::arrange(x, 
+    dff <- ddply(dff, c("Template"), function(x) arrange(x, 
                                         -substitute(Number_of_mismatches))[1, ])
     return(dff)
 }
@@ -520,7 +520,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     full.df <- prepare_mm_plot(primer.df, template.df)
     # select only constrained cvg events
     full.df <- full.df[full.df$Coverage_Type == cvg.definition, ]
-    df <- plyr::ddply(full.df, c("Primer", "Template", "Group"), plyr::summarize,
+    df <- ddply(full.df, c("Primer", "Template", "Group"), summarize,
                             Position = unique(substitute(Position_3terminus)), 
                             Number_of_mismatches = unique(substitute(Number_of_mismatches)))
     if (length(df) == 0 || nrow(df) == 0) {
@@ -533,7 +533,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     for (i in seq_along(mm.range)) {
         mm <- mm.range[i]
         sub.df <- df[df$Number_of_mismatches == mm,]
-        count.df <- plyr::ddply(sub.df, c("Primer"), plyr::summarize,
+        count.df <- ddply(sub.df, c("Primer"), summarize,
                             Coverage = length(unique(substitute(Template))))
         m <- match(count.df$Primer, primer.df$ID)
         mm.stats[m,i] <- count.df$Coverage
@@ -552,7 +552,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     ########
     # determine number of templates covered from each group
     ########
-    count.df <- plyr::ddply(df, c("Primer", "Group"), plyr::summarize,
+    count.df <- ddply(df, c("Primer", "Group"), summarize,
                             Coverage = length(unique(substitute(Template))),
                             CoverageRatio = length(unique(substitute(Template)))/ length(which(template.df$Group == unique(substitute(Group)))))
     # create table entry: value + percentage
@@ -564,7 +564,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     cols <- c("Primer", "Group", "TabEntry")
     count.df <- count.df[order(count.df$Group), cols]
     # to wide format
-    group.df <- stats::reshape(count.df, idvar = "Primer", timevar = "Group", direction = "wide")
+    group.df <- reshape(count.df, idvar = "Primer", timevar = "Group", direction = "wide")
     colnames(group.df) <- gsub("TabEntry.", "", colnames(group.df), fixed = TRUE)
     # replace NA with 0
     group.df[is.na(group.df)] <- "0 (0%)"
@@ -1105,7 +1105,7 @@ setGeneric("plot_template_cvg",
 #' @return A plot showing the number of covered template sequences.
 #' @keywords internal
 setMethod("plot_template_cvg", 
-    methods::signature(primers = "Primers", templates = "Templates"),
+    signature(primers = "Primers", templates = "Templates"),
     function(primers, templates, per.mismatch, groups = NULL) {
     if (length(primers) == 0 || length(templates) == 0) {
         return(NULL)
@@ -1150,10 +1150,10 @@ plot_template_cvg_unstratified <- function(primers, templates, groups = NULL) {
     # need to melt
     # change names of columns
     vars <- c("Group", "primer_coverage", "N")
-    p.df.con <- reshape2::melt(stats[, vars], c("Group"), variable.name = "Status", value.name = "Count")
+    p.df.con <- melt(stats[, vars], c("Group"), variable.name = "Status", value.name = "Count")
     levels(p.df.con$Status) <- c("Expected Coverage (E)", "Available Templates")
     vars <- c("Group", "primer_coverage")
-    p.df.txt <- reshape2::melt(stats.txt[, vars], c("Group"), variable.name = "Status", value.name = "Count")
+    p.df.txt <- melt(stats.txt[, vars], c("Group"), variable.name = "Status", value.name = "Count")
     p.df.txt$Status <- "Identity Coverage (I)"
     # integrate both coverage results
     plot.df <- rbind(p.df.txt, p.df.con)
@@ -1236,11 +1236,11 @@ prepare_template_cvg_mm_data <- function(primer.df, template.df, allowed.mismatc
     o <- order(unique(as.character(cum.data$Group)))
     cum.data$Group <- factor(cum.data$Group, levels = unique(as.character(cum.data$Group))[o])
     # need to plot using identity as stat in order to ensure that bars have all the same width
-    plot.df <- plyr::ddply(cum.data, c("Group", "Maximal_mismatches", "Status"), plyr::summarize, Count = length(substitute(Group)))
+    plot.df <- ddply(cum.data, c("Group", "Maximal_mismatches", "Status"), summarize, Count = length(substitute(Group)))
     additional.df <- expand.grid(Maximal_mismatches = mm.settings, Group = unique(template.df$Group), Status = unique(plot.df$Status), Count = 0)
     plot.df <- merge(plot.df, additional.df, all = TRUE)
     # for the added, duplicate events, select the 'real events'
-    plot.df <- plyr::ddply(plot.df, c("Group", "Maximal_mismatches", "Status"), plyr::summarise,
+    plot.df <- ddply(plot.df, c("Group", "Maximal_mismatches", "Status"), summarise,
                            Count = max(substitute(Count)))
     total.percentages <- TRUE
     if (!total.percentages) {
@@ -1276,7 +1276,7 @@ plot_template_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
     }
     plot.df <- prepare_template_cvg_mm_data(primer.df, template.df)
     # compute cvg ratio per mismatch setting to show in facet labels:
-    cvg.per.mm <- plyr::ddply(plot.df, c("Maximal_mismatches", "Status"), plyr::here(plyr::summarise),
+    cvg.per.mm <- ddply(plot.df, c("Maximal_mismatches", "Status"), here(summarise),
                            Coverage_Ratio = sum(substitute(Count)) / nrow(template.df)) 
     cvg.per.mm <- cvg.per.mm[cvg.per.mm$Status == "Coverage",]
     cvg.info <- paste0("(", round(cvg.per.mm$Coverage_Ratio * 100, 0), "% coverage)")
@@ -1312,7 +1312,7 @@ plot_template_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
 #' @return A plot for comparing primer coverage.
 #' @keywords internal
 setMethod("plot_template_cvg", 
-    methods::signature(primers = "list", templates = "list"),
+    signature(primers = "list", templates = "list"),
     function(primers, templates, per.mismatch, highlight.set = NULL) {
     if (length(primers) == 0 || length(templates) == 0) {
         return(NULL)
@@ -1372,7 +1372,7 @@ plot_template_cvg_comparison_unstratified <- function(primers, templates, highli
             stats <- cbind("Run" = run.names[x], stats)
         }
     })
-    plot.df <- do.call(plyr::rbind.fill, cvg)
+    plot.df <- do.call(rbind.fill, cvg)
     if (length(plot.df) == 0 || nrow(plot.df) == 0) {
         return(NULL)
     }
@@ -1459,7 +1459,7 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
             plot.df <- cbind("Run" = run.names[x], plot.df)
         }
     })
-    plot.df <- do.call(plyr::rbind.fill, cvg)
+    plot.df <- do.call(rbind.fill, cvg)
     if (length(plot.df) == 0 || nrow(plot.df) == 0) {
         return(NULL)
     }
@@ -1485,7 +1485,7 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
         run <- levels(plot.df$Run)[i]
         idx <- which(plot.df$Run == run)
         cur.data <- plot.df[idx,]
-        res <- plyr::ddply(cur.data, c("Maximal_mismatches"), plyr::summarize, Label = sum(substitute(Coverage_Ratio)))$Label
+        res <- ddply(cur.data, c("Maximal_mismatches"), summarize, Label = sum(substitute(Coverage_Ratio)))$Label
         out.idx <- which(plot.df$Run == run & plot.df$Group == levels(plot.df$Group)[1])
         labels[out.idx] <- res
     }
@@ -1583,7 +1583,7 @@ setGeneric("get_cvg_stats",
 #' By default, \code{cvg.definition} is set to "constrained".
 #' @return Data frame with coverage statistics.
 #' @keywords internal
-setMethod("get_cvg_stats", methods::signature(primers = "Primers"), 
+setMethod("get_cvg_stats", signature(primers = "Primers"), 
     function(primers, templates, for.viewing = FALSE, total.percentages = FALSE, 
              allowed.mismatches = Inf, cvg.definition = c("constrained", "basic")) {
 
@@ -1605,7 +1605,7 @@ setMethod("get_cvg_stats", methods::signature(primers = "Primers"),
     templates <- update_template_cvg(templates, primers)
     if (total.percentages) {
         # normalize coverage by total number of templates
-        df <- ddply(templates, "Group", plyr::here(summarize), N = nrow(templates),
+        df <- ddply(templates, "Group", here(summarize), N = nrow(templates),
             N_primer = length(unique(strsplit(as.character(substitute(Covered_By_Primers)), split = ",")[[1]])), 
             primer_coverage = length(which(substitute(primer_coverage) > 0)), 
             Coverage_Ratio = sum(substitute(primer_coverage))/nrow(templates),
@@ -1617,7 +1617,7 @@ setMethod("get_cvg_stats", methods::signature(primers = "Primers"),
             Coverage_Ratio_rev = sum(substitute(primer_coverage_rev))/nrow(templates))
     } else {
         # normalize coverage by number of templates per group
-        df <- ddply(templates, "Group", plyr::here(summarize), N = length(substitute(Group)), N_primer = length(unique(strsplit(as.character(substitute(Covered_By_Primers)), 
+        df <- ddply(templates, "Group", here(summarize), N = length(substitute(Group)), N_primer = length(unique(strsplit(as.character(substitute(Covered_By_Primers)), 
             split = ",")[[1]])), primer_coverage = length(which(substitute(primer_coverage) > 0)), 
             Coverage_Ratio = sum(substitute(primer_coverage))/length(substitute(Group)), N_primer_fw = length(unique(strsplit(as.character(substitute(Covered_By_Primers_fw)), 
                 split = ",")[[1]])), primer_coverage_fw = length(which(substitute(primer_coverage_fw) > 
@@ -1684,7 +1684,7 @@ setMethod("get_cvg_stats", methods::signature(primers = "Primers"),
 #' By default, \code{cvg.definition} is set to "constrained".
 #' @return Data frame with coverage statistics.
 #' @keywords internal
-setMethod("get_cvg_stats", methods::signature(primers = "list"),
+setMethod("get_cvg_stats", signature(primers = "list"),
     function(primers, templates, for.viewing = FALSE, total.percentages = FALSE,
              allowed.mismatches = Inf, cvg.definition = c("constrained", "basic")) {
 
@@ -1713,7 +1713,7 @@ setMethod("get_cvg_stats", methods::signature(primers = "list"),
                 colnames(df) <- c("Run", groups)
                 return(df)
             })
-    stat.df <- do.call(plyr::rbind.fill, stats)
+    stat.df <- do.call(rbind.fill, stats)
     if (ncol(stat.df) >= 3) {
         # don't change Run & Total columns
         idx <- seq(3, ncol(stat.df))
@@ -1770,7 +1770,7 @@ setGeneric("plot_primer_cvg",
 #' @return A bar plot showing the coverage of individual primers.
 #' @keywords internal
 setMethod("plot_primer_cvg", 
-    methods::signature(primers = "Primers", templates = "Templates"),
+    signature(primers = "Primers", templates = "Templates"),
     function(primers, templates, per.mismatch = FALSE, groups = NULL) {
     
     if (length(primers) == 0 || nrow(primers) == 0 || length(templates) == 0) {
@@ -1800,7 +1800,7 @@ setMethod("plot_primer_cvg",
 #' @return A bar plot showing the coverage of individual primers.
 #' @keywords internal
 setMethod("plot_primer_cvg", 
-    methods::signature(primers = "list", templates = "list"),
+    signature(primers = "list", templates = "list"),
     function(primers, templates, per.mismatch = FALSE) {
 
     if (length(primers) == 0 || length(templates) == 0) {
@@ -1923,11 +1923,11 @@ get_primer_cvg_mm_plot_df <- function(primer.df, template.df) {
     full.df <- prepare_mm_plot(primer.df, template.df)
     full.df <- full.df[full.df$Coverage_Type == "constrained",]
     # go from individual mismatches to individual coverage events
-    df <- plyr::ddply(full.df, c("Primer", "Template", "Group"), plyr::summarize,
+    df <- ddply(full.df, c("Primer", "Template", "Group"), summarize,
                             Position = unique(substitute(Position_3terminus)), 
                             Number_of_mismatches = unique(substitute(Number_of_mismatches)))
     # for every primer and group, ensure that there's an entry for every number of mismatches:
-    count.df <- plyr::ddply(df, c("Primer", "Group", "Number_of_mismatches"), plyr::summarize,
+    count.df <- ddply(df, c("Primer", "Group", "Number_of_mismatches"), summarize,
                             Coverage = length(unique(substitute(Template))))
     if (nrow(df) == 0) {
         # just plot a single facet to show nothing is covered
@@ -1943,10 +1943,10 @@ get_primer_cvg_mm_plot_df <- function(primer.df, template.df) {
         count.df <- merge(count.df, additional.df, all = TRUE)
     }
     # ensure that for duplicate entries (0 coverage entries), the one with the maximal coverage is chosen:
-    count.df <- plyr::ddply(count.df, c("Primer", "Group", "Number_of_mismatches"), plyr::summarise,
+    count.df <- ddply(count.df, c("Primer", "Group", "Number_of_mismatches"), summarise,
                             Coverage = max(substitute(Coverage)))
     # make the counts cumulative
-    count.df$Cumulative_Coverage <- stats::ave(count.df$Coverage, count.df$Primer, count.df$Group, FUN = cumsum)
+    count.df$Cumulative_Coverage <- ave(count.df$Coverage, count.df$Primer, count.df$Group, FUN = cumsum)
     # determine ratio of covered seqs per group
     group.counts <- table(template.df$Group) # match to count.df$Group for division
     m <- match(count.df$Group, names(group.counts))

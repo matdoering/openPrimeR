@@ -53,7 +53,7 @@ convert.from.iupac <- function(seqs) {
     }
     # TODO: replace with DECIPHER's function, is much faster
     #warning("DEPRECATD: replace with DECIPHER::Disambiguate for speedup")
-    gapped.codemap <- Biostrings::IUPAC_CODE_MAP
+    gapped.codemap <- IUPAC_CODE_MAP
     gapped.codemap["-"] <- "-"
     s <- strsplit(seqs, split = "")
     i <- NULL # define iteration variable
@@ -89,7 +89,7 @@ convert.to.iupac <- function(seqs) {
     s <- strsplit(toupper(seqs), split = "")
     seq <- sapply(1:N, function(x) paste(sapply(seq_along(s), function(y) s[[y]][x]), 
         collapse = ""))
-    res <- paste(tolower(Biostrings::mergeIUPACLetters(seq)), collapse = "")
+    res <- paste(tolower(mergeIUPACLetters(seq)), collapse = "")
     return(res)
 }
 
@@ -359,7 +359,7 @@ my.disambiguate <- function(template.seqs, gap.char = "-", degen.cutoff = 2^10) 
     degen <- score_degen(strsplit(tolower(as.character(template.seqs)), split = ""), gap.char = gap.char)
     degen.idx <- which(degen <= degen.cutoff) # cutoff for degeneration
     degen.seqs <- DECIPHER::Disambiguate(template.seqs[degen.idx])
-    seqs <- Biostrings::DNAStringSetList(as.list(as.character(template.seqs)))
+    seqs <- DNAStringSetList(as.list(as.character(template.seqs)))
     seqs[degen.idx] <- degen.seqs
     return(seqs)
 }

@@ -182,7 +182,7 @@ optimize.template.binding.regions.single <- function(template.df, annealing.temp
         return(deltaG[which(len >= win.size)])
     }
     # don't select windows that are too short for defining the minDeltaG
-    minG.per.template <- ddply(constrained.foldings, c("ID", "Group"), plyr::here(plyr::summarize),
+    minG.per.template <- ddply(constrained.foldings, c("ID", "Group"), here(summarize),
         MinG = myfun(substitute(Length), substitute(Delta_Delta_G), win.size))
     m <- match(template.df$ID, minG.per.template$ID)
     minG.per.template <- minG.per.template[m,]
@@ -255,7 +255,7 @@ optimize.template.binding.regions.dir <- function(template.df, annealing.tempera
         binding.regions.rev <- optimize.template.binding.regions.single(template.df, annealing.temperature, 
             primer.lengths, "rev")
         intervals <- list(fw = binding.regions.fw$Intervals, rev = binding.regions.rev$Intervals)
-        foldings <- plyr::rbind.fill(binding.regions.fw$Foldings, binding.regions.rev$Foldings)
+        foldings <- rbind.fill(binding.regions.fw$Foldings, binding.regions.rev$Foldings)
     } else {
         binding.regions <- optimize.template.binding.regions.single(template.df, annealing.temperature, 
             primer.lengths, mode.directionality)
