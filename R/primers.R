@@ -1019,7 +1019,7 @@ rbind.Primers <- function(...) {
 #' @rdname Primers-method
 #' @return Subset of primer data frame.
 #' @keywords internal
-#' @aliases [,Primers-method [,Primers,ANY-method]
+#' @aliases [,Primers-method [,Primers,ANY-method
 #' @examples
 #' data(Ippolito)
 #' primer.df <- primer.df[1:2,]

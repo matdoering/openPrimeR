@@ -6,7 +6,7 @@
 \alias{rbind2,Templates,ANY-method}
 \alias{[,Templates,ANY,ANY,ANY-method}
 \alias{[,Templates-method}
-\alias{[,Templates,ANY-Method]}
+\alias{[,Templates,ANY-method}
 \alias{$<-,Templates-method}
 \title{S4 cbind for Templates.}
 \usage{
