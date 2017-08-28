@@ -276,7 +276,7 @@ validate_primers <-  function(object) {
     check.fields <- check_setting(possible.fields, object, required.fields)
     if (check.fields) {
         # Check that "Run" is unique
-        if (length(unique(object$Run)) <= 1)
+        if (length(unique(object$Run)) <= 1) {
             return(TRUE)
         } else {
             msg <- paste0("The 'Run' column may only contain a single unique value. Observed unique values were: ", paste0(unique(object$Run), collapse = ","))
