@@ -846,7 +846,7 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         # only retain primers between min.Tm and max.Tm, the others are not part of a set with neccesary cvg
         excluded.idx <- which(new.filtered.df$melting_temp < min.Tm | new.filtered.df$melting_temp > max.Tm)
         if (length(excluded.idx) != 0) {
-            Tm.exclusion <- filtered.df[excluded.idx,]
+            Tm.exclusion <- new.filtered.df[excluded.idx,]
             Tm.exclusion$Exclusion_Reason <- "melting_temp_range"
             new.excluded.df <- my_rbind(new.excluded.df, Tm.exclusion)
             new.filtered.df <- new.filtered.df[-excluded.idx,]
