@@ -195,7 +195,7 @@ setMethod("rbind2", "Templates",
 #' @exportMethod [
 #' @rdname Templates-method
 #' @keywords internal
-#' @aliases [,Templates-method
+#' @aliases [,Templates-method [,Templates,ANY-Method]
 #' @return Subsetted template data frame.
 #' @examples
 #' data(Ippolito)

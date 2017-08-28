@@ -6,6 +6,7 @@
 \alias{rbind2,Primers,ANY-method}
 \alias{[,Primers,ANY,ANY,ANY-method}
 \alias{[,Primers-method}
+\alias{[,Primers,ANY-method]}
 \alias{$<-,Primers-method}
 \title{S4 cbind for Primers.}
 \usage{
