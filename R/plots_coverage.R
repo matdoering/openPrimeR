@@ -355,7 +355,6 @@ prepare_mm_plot <- function(primer.df, template.df,
             #warning("Nothing covered")
             next
         }
-        #template.ids <- lapply(seq_along(pos.3prime), function(x) lapply(seq_along(pos.3prime[[x]]), function(y) rep(template.df$ID[cvd.idx[[x]][y]], length(unlist(pos.3prime[[x]][y])))))
         template.ids <- lapply(seq_len(nrow(primer.df)), function(x) {
             dir <- primer.df$Direction[x]
             if (dir == "both") {
@@ -386,7 +385,11 @@ prepare_mm_plot <- function(primer.df, template.df,
         # if coverage criteria are available, also include these
         for (z in seq_along(cvg.criteria)) {
             crit <- cvg.criteria[z]
+            print("BUG FIX:")
             if (crit %in% colnames(primer.df)) {
+                print(crit)
+                print(primer.df[, crit])
+                print(nrow(primer.df))
                 val <- lapply(strsplit(primer.df[, crit], split = ","), as.numeric)
                 val <- lapply(seq_along(pos.3prime), function(x)  {
                     dir <- primer.df$Direction[x]
