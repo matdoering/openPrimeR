@@ -18,7 +18,7 @@ ggplot2::theme_set(ggplot2::theme_grey(base_size = 12))
 openPrimeR provides functionalities for designing and analyzing multiplex polymerase chain reaction (PCR) primers. In the following, we introduce typical workflows for three application scenarios, namely designing primers, analyzing primers, and comparing primer sets.
 
 # Overview of the package
-openPrimeR was developed to provide a rational approach for evaluating and designing primers for multiplex PCR such that multiple template sequences are amplified at the same time. The concept of *coverage* is of critical importance for multiplex PCR as it describes the number of templates that can be amplified with a set of primers. This package was specifically developed to enable researchers to evaluate the coverage of existing sets of primers as well as to design novel primer sets that maximize the coverage with a minimal number of primers. To provide a user-friendly tool, we created a Shiny app. Moreover, the package enables the computation of the most important PCR-related physicochemical properties of primers to gauge whether a set of primers can provide high yields. The following list provides research questions that may be answered using openPrimeR:
+openPrimeR was developed to provide a rational approach for evaluating and designing primers for multiplex PCR such that multiple template sequences are amplified at the same time. The concept of *coverage* is of critical importance for multiplex PCR as it describes the number of templates that can be amplified with a set of primers. This package was specifically developed to enable researchers to evaluate the coverage of existing sets of primers as well as to design novel primer sets that maximize the coverage with a minimal number of primers. To provide a user-friendly tool, we created a Shiny app, which is available through the *openPrimeRui* package. The *openPrimeR* package enables the computation of the most important PCR-related physicochemical properties of primers to gauge whether a set of primers can provide high yields. The following list provides research questions that may be answered using openPrimeR:
 
 ## Which templates are amplified by the primers? 
 * Where do the primers bind? Do the primers bind specifically to the target region?
@@ -67,7 +67,7 @@ library(openPrimeR)
 Note that the tool is still functional if there are missing external programs. However, we recommend that all dependencies are fulfilled to guarantee the best user experience.
 
 # Using the Shiny app
-The openPrimeR Shiny application can be started via `startApp()`, which should should open the application in your default browser. If this is not the case, please consider the console output and manually open the displayed URL in your preferred web browser. For more information on how to use the app, please consider the instructions provided in the app itself. In the following, we will solely focus on how to use the R package itself.
+If you would like to use the openPrimer shiny application, please install the *openPrimeRui* package and consider its documentation. In the following, we will solely focus on the *openPrimeR* package itself and not on the frontend.
 
 # Loading data
 In order to design primers, we only need to load a set of template sequences and define the target binding regions. To analyze and compare the properties of existing primer sets, we also need to load one or multiple sets of primers. The following table summarizes the possible input data formats for each task:
@@ -526,4 +526,4 @@ The plot reveals that only the primers from Scheid et al. mostly bind in the tar
 
 # Want to learn more?
 
-For brevity's sake, we did not provide explanations and examples for all possible uses of the package. If you would like to learn more about how you can use openPrimeR, please consider using our interactive tutorial. The tutorial is provided as a Shiny app and can be started via `runTutorial()`.
+For brevity's sake, we did not provide explanations and examples for all possible uses of the package. If you would like to learn more about how you can use openPrimeR, please consider using our interactive tutorial. The tutorial is provided as a Shiny app, which can be started via `runTutorial()`.

@@ -1394,7 +1394,7 @@ evaluate.cvg <- function(template.seqs, primers,
     f <- IRanges()  # forward start/end positions in the templates
     fp <- integer()  # fp: forward primer indices, one index for every template hit
     non.empty.idx <- which(Biostrings::width(primers) != 0)
-    i <- NULL
+    i <- GRanges() # need to define 'i'; used 'GRanges' outside the foreach loop to prevent building error on macOS
     f <- foreach(i = seq_along(non.empty.idx), .combine = c) %dopar% {
 
         idx <- non.empty.idx[i]

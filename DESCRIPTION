@@ -15,8 +15,8 @@ Description: An implementation of methods for designing, evaluating,
     the smallest possible set of primers.
     To guarantee that high-quality primers are generated,
     only primers fulfilling constraints on their physicochemical properties 
-    are selected. All relevant functions are accessible through
-    a user-friendly Shiny application.
+    are selected. A Shiny app providing a user interface for the functionalities
+    of this package is provided by the 'openPrimeRui' package.
 Depends:
     R (>= 3.4.0)
 License: GPL-2
@@ -57,10 +57,6 @@ Imports:
     utils (>= 3.1.0),
     methods (>= 3.1.0)
 Suggests:
-    shiny (>= 1.0.2),
-    shinyjs (>= 0.9),
-    shinyBS (>= 0.61),
-    DT (>= 0.2),
     testthat (>= 1.0.2),
     knitr (>= 1.13),
     rmarkdown (>= 1.0),
