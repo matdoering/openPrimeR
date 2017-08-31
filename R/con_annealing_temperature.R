@@ -22,21 +22,14 @@
 compute_annealing_temp <- function(primer.df, mode.directionality, 
                       template.df, na_salt_conc, mg_salt_conc, k_salt_conc, 
                       tris_salt_conc, primer_conc) {
-    Ta <- NULL
-    #if ("primer_coverage" %in% colnames(primer.df)) {
-        ## "covered Ta" only makes sense for non-mismatch binding events ...? quite low values ...
-        #Ta <- compute.covered.Ta(primer.df, mode.directionality, 
-                          #template.df, na_salt_conc, mg_salt_conc, k_salt_conc, 
-                          #tris_salt_conc, primer_conc)
-        ## take the smallest annealing temperature
-        #if (length(Ta) != 0) {
-            #Ta <- min(Ta, na.rm = TRUE)
-        #}
-    #}
-    #if (length(Ta) == 0) { # no primer cvg
-        # -> use the rule of thumb based on Tm
-    #} 
-    compute.idx <- seq_len(nrow(primer.df))
+    
+    if (length(primer.df) == 0) {
+        # can't suggest an annealing temperature
+        return(NULL)
+    }
+    if (length(primer.df) != 0) {
+        compute.idx <- seq_len(nrow(primer.df))
+    }
     if ("melting_temp" %in% colnames(primer.df)) {
         compute.idx <- which(is.na(primer.df$melting_temp))
     }

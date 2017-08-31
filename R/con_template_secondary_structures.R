@@ -56,7 +56,7 @@ optimize.template.binding.regions.single <- function(template.df, annealing.temp
     if (length(annealing.temperature) == 0) {
         # no annealing temp available yet choice of temperature shouldn't matter too much
         # here, since we compute Delta Delta G only
-        annealing.temperature <- 25  # set to standard thermodynamic temperature. 
+        annealing.temperature <- 50  # set to typical annealing temperature
     }
     region.slack <- 40  # how many additional positions (outside the target region) to consider after the target region has ended. ensures 'correct folding'.
     if (mode.directionality == "fw") {
