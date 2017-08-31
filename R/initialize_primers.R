@@ -120,12 +120,25 @@ create.initial.primer.set <- function(template.df, primer.lengths, mode.directio
     # ensure that required primer lengths can be fulfilled
     if (allowed.region.definition == "within") {
         if (any(max(primer.lengths) > (e.s - l.s + 1))) {
-            stop("The specified primer length cannot be obtained with the specified binding regions.")
+            warning("The specified maximal primer length ('", max(primer.lengths),
+                    "') exceeds the length of the shortest target binding region ('", min(e.s - l.s +1), "').")
+            # select only feasible primer lengths
+            sel <- which(primer.lengths <= min(e.s - l.s + 1))
+            primer.lengths <- primer.lengths[sel]
         }
     } else {
         # any intersection with binding range: primer length may not exceed the sequence length
-        if (any(max(primer.lengths) > nchar(template.df$Sequence))) {
-            stop("Specified primer length exceeded the length of at least one sequence.")
+        end <- NULL
+        if (mode.directionality == "fw") {
+            end <- max(template.df$Allowed_Start_fw)
+        } else {
+            end <- max(template.df$Allowed_End_rev - nchar(template.df$Sequence)) + 1
+        }
+        if (any(max(primer.lengths) > (nchar(template.df$Sequence) - end + 1))) {
+            warning("Specified maximal primer length ('", max(primer.lengths), "') exceeded the length of at least one sequence ('", min(nchar(template.df$Sequence)), "').")
+            sel <- which(primer.lengths <= min(nchar(template.df$Sequence) - end + 1))
+            primer.lengths <- primer.lengths[sel]
+
         }
     }
     # change group IDs to be unique
