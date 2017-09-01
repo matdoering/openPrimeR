@@ -86,18 +86,18 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
 	# clean up result files (prevents viennaRNA possibly appending to existing files)
     ##############################
     # removed the cleanup here: test if macOS vignette building works like this ('.fold' file removed too soon?)
-	#on.exit({
-		#if (file.exists(out.file)) { # remove the .fold file
-			#file.remove(out.file)
-		#}
-        #if (file.exists(input.file)) { # remove the .txt file
-            #file.remove(input.file) 
-        #}
-		## revert back to old working directory in case of wd change (windows)
-		#if (length(old.dir) != 0) {
-			#setwd(old.dir)
-		#}
-	#})
+	on.exit({
+		if (file.exists(out.file)) { # remove the .fold file
+			file.remove(out.file)
+		}
+        if (file.exists(input.file)) { # remove the .txt file
+            file.remove(input.file) 
+        }
+		# revert back to old working directory in case of wd change (windows)
+		if (length(old.dir) != 0) {
+			setwd(old.dir)
+		}
+	})
 	file.string <- paste0("--infile=", input.file, " --outfile=", out.file)
     seqs <- toupper(seqs)
     if (length(folding.constraints) != 0) {
@@ -122,12 +122,22 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     #print(rna.fold)
     #print(param.string)
     #print(file.string)
-	system2(rna.fold, args = c(param.string, file.string))
+	cmd.status <- system2(rna.fold, args = c(param.string, file.string))
+    if (cmd.status != 0) {
+        call <- paste0(rna.fold, " ", param.string, " ", file.string)
+        stop("The RNAfold call: '", call, "' has failed with error code: '", cmd.status, ".")
+    }
     # viennaRNA appends '.fold' to all result files:
+    # TODO: for macOS, check whether the file without ".fold" extension exists
+    out.file.ori <- out.file
     out.file <- paste0(out.file, ".fold")
+    if (file.exists(out.file.ori)) {
+        # for macOS: no .fold appended?
+        out.file <- out.file.ori
+    }
 	if (file.exists(out.file)) {
 		result <- read.secondary.structure.raw(out.file)
-	} else {
+	} else ({
         stop("ViennaRNA did not create the expected output file: '", 
             out.file, "'.") 
 	}
