@@ -839,10 +839,9 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         Tm.cvg.vals <- unlist(get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality, max.only = FALSE))
         set.keep.idx <- which(Tm.cvg.vals >= target.cvg)
         # get melting temperature range of primers to keep
-        Tm.df <- Tm.brackets$df
-        sel.df <- Tm.df[set.keep.idx, c("min_Tm", "max_Tm")]
-        min.Tm <- min(sel.df[,1])
-        max.Tm <- max(sel.df[,2])
+        Tm.df <- Tm.brackets$df[set.keep.idx, ]
+        min.Tm <- min(Tm.df[,"min_Tm"])
+        max.Tm <- max(Tm.df[,"max_Tm"])
         # only retain primers between min.Tm and max.Tm, the others are not part of a set with neccesary cvg
         excluded.idx <- which(new.filtered.df$melting_temp < min.Tm | new.filtered.df$melting_temp > max.Tm)
         if (length(excluded.idx) != 0) {

@@ -76,24 +76,28 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
 	if (grepl("windows", .Platform$OS.type)) {
 		# viennaRNA can't handle windows filename ('sanitizes' them), 'filename-delim' arg doesnt help. 
 		# -> use local files instead. need to be relative to the executable!!
-		old.dir <- setwd(dirname(rna.fold))  # i have to do this such that i can avoid using absolute path specifiers
-		#dir.create("temp", showWarnings=FALSE) # also doesnt work
+		old.dir <- setwd(dirname(rna.fold))  # necessary to avoid using absolute path specifiers
 		input.file <- paste0(id, ".txt")
-		out.file <- input.file
 	} else {
 		input.file <- tempfile(pattern = id, fileext = ".txt")
-		out.file <- input.file
 	}
-	# clean up result files to prevent problem with viennaRNA appending to existing file.
-	on.exit({
-		if (file.exists(out.file)) {
-			file.remove(out.file)
-		}
-		# revert back to old working directory
-		if (length(old.dir) != 0) {
-			setwd(old.dir)
-		}
-	})
+    # specify 'out.file'
+    out.file <- paste0(input.file, "_out")
+	# clean up result files (prevents viennaRNA possibly appending to existing files)
+    ##############################
+    # removed the cleanup here: test if macOS vignette building works like this ('.fold' file removed too soon?)
+	#on.exit({
+		#if (file.exists(out.file)) { # remove the .fold file
+			#file.remove(out.file)
+		#}
+        #if (file.exists(input.file)) { # remove the .txt file
+            #file.remove(input.file) 
+        #}
+		## revert back to old working directory in case of wd change (windows)
+		#if (length(old.dir) != 0) {
+			#setwd(old.dir)
+		#}
+	#})
 	file.string <- paste0("--infile=", input.file, " --outfile=", out.file)
     seqs <- toupper(seqs)
     if (length(folding.constraints) != 0) {
@@ -107,21 +111,25 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     }
     if (!file.exists(input.file)) {
         stop(paste("IO error for secondary structure computation. ",
-                "Could not write fw input file for viennaRNA at:",
+                "Could not write input file for viennaRNA at:",
                 input.file))
     }
     if (length(folding.constraints) != 0) {
         # add constrained folding params:
         param.string <- paste(param.string, "-C", "--batch")
     }
-    vienna.call <- paste(rna.fold, param.string, file.string)
+    #print("VIENNARNA:")
+    #print(rna.fold)
+    #print(param.string)
+    #print(file.string)
 	system2(rna.fold, args = c(param.string, file.string))
-    # read the computed structures and energies from out.file:
+    # viennaRNA appends '.fold' to all result files:
     out.file <- paste0(out.file, ".fold")
 	if (file.exists(out.file)) {
 		result <- read.secondary.structure.raw(out.file)
 	} else {
-		result <- NULL
+        stop("ViennaRNA did not create the expected output file: '", 
+            out.file, "'.") 
 	}
     return(result)
 }
