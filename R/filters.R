@@ -623,6 +623,9 @@ augment.primer.cvg <- function(primer.df, template.df, settings,
     if (!is(settings, "DesignSettings")) {
         stop("Please input a valid settings object.")
     }
+    ###
+    # NOTE: 'coverage_model' is NA for excluded.df = primer.df initially
+    ###
     is.exclusion.df <- "Exclusion_Reason" %in% colnames(primer.df)
     if (!"primer_coverage" %in% colnames(primer.df)) {
         primer.df$primer_coverage <- NA

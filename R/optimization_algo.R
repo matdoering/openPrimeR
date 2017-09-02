@@ -564,7 +564,6 @@ design_primers.single <- function(template.df, sample.name,
         stop("Please supply the 'mode.directionality' argument.")
     }
     mode.directionality <- match.arg(mode.directionality)
-   
     ####################
     # 'Unlist' settings
     #######################

@@ -385,11 +385,7 @@ prepare_mm_plot <- function(primer.df, template.df,
         # if coverage criteria are available, also include these
         for (z in seq_along(cvg.criteria)) {
             crit <- cvg.criteria[z]
-            print("BUG FIX:")
-            if (crit %in% colnames(primer.df)) {
-                print(crit)
-                print(primer.df[, crit])
-                print(nrow(primer.df))
+            if (crit %in% colnames(primer.df) && any(!is.na(primer.df[, crit]))) {
                 val <- lapply(strsplit(primer.df[, crit], split = ","), as.numeric)
                 val <- lapply(seq_along(pos.3prime), function(x)  {
                     dir <- primer.df$Direction[x]
@@ -1345,7 +1341,6 @@ get.run.names <- function(primer.data) {
         # primer.data is not a named list -> use the 'Run' identifier instead
         #run.names <- unname(unlist(lapply(primer.data, function(x) unique(x$Run))))
         run.names <- lapply(primer.data, function(x) unique(x$Run))
-        print(lapply(primer.data, function(x) nrow(x) == 0))
         empty.idx <- which(unlist(lapply(primer.data, function(x) nrow(x) == 0)))
         run.names[empty.idx] <- "Unknown"
         run.names <- unname(unlist(run.names))
