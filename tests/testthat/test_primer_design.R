@@ -137,6 +137,7 @@ test_that("primer_initialization_naive", {
 
 
 test_that("full_design_function", {
+    skip_on_bioc() # design tests require a long time even for small sets
     data(Ippolito)
     template.df <- template.df[1:5,]
     constraints(settings)$primer_length[2] <- 18

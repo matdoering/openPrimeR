@@ -396,8 +396,10 @@ create_coverage_xls <- function(primer.df, template.df, filename, settings) {
 #' create_report(primer.df, template.df, out.file.single, settings)
 #' # Creation of a report for multiple primer sets
 #' data(Comparison)
+#' set.sizes <- sapply(primer.data, nrow)
+#' sel.sets <- order(set.sizes)[1:2]
 #' out.file.comp <- tempfile("comparison_report", fileext = ".pdf")
-#' create_report(primer.data[1:2], template.data[1:2], out.file.comp, settings)
+#' create_report(primer.data[sel.sets], template.data[sel.sets], out.file.comp, settings)
 setGeneric("create_report", 
     function(primers, templates, out.file, settings, 
              sample.name = NULL, used.settings = NULL, ...) {

@@ -69,7 +69,7 @@ test_that("Free energy filter", {
 })
 
 test_that("Efficiency Filter", {
-    # check whether binding events are filtered correctly according to their free energies
+    # check whether binding events are filtered correctly according to their efficiencies
     if (!check.tool.function()["OligoArrayAux"]) {
         # cannot test without OligoArrayAux
         skip("OligoArrayAux not available.")
@@ -139,7 +139,4 @@ test_that("basic_coverage", {
     expect_equal(constraint.df$Binding_Position_Start_fw, c("58,58", "58,58"))
     expect_equal(constraint.df$Binding_Position_End_fw, c("80,80", "80,80"))
     cvg_constraints(settings) <- list("terminal_mismatch_pos" = c(min = 6))
-    constraint.df <- check_constraints(primer.df, template.df, settings,
-                        active.constraints = "primer_coverage")
-
 })

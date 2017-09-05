@@ -21,22 +21,19 @@ test_that("Primer Set Significance", {
                         "Ippolito2012.fasta", package = "openPrimeR")
     primers <- read_primers(primer.location, "_fw", "_rev")
     expect_warning(primer_significance(primers)) # nothing evaluated -> warning
-    conOptions(settings)$allowed_mismatches <- 0
-    constraint.df <- suppressWarnings(check_constraints(primers, template.df, settings,
-                        active.constraints = "primer_coverage"))
-    expect_warning(primer_significance(constraint.df))
-    expect_warning(primer_significance(constraint.df, active.constraints = "gc_ratio"))
+    expect_warning(primer_significance(primer.df, active.constraints = "primer_coverage"))
     p <- primer_significance(primer.df) # should be significant
     expect_lt(as.numeric(p), 1e-3)
 })
 
 test_that("Primer fw+rev", {
-    # check that primer sets with pairs of primers and mixed directions is analyzed correctly
+    # check that primer sets with pairs of primers are analyzed correctly
     data(Ippolito)
     primer.location <- system.file("extdata", "IMGT_data", "primers", "Test", 
                         "test_both.fasta", package = "openPrimeR")
     primers <- read_primers(primer.location, "_fw", "_rev")
-    constraint.df <- check_constraints(primers, template.df, settings)
+    constraint.df <- check_constraints(primers[1:2,], template.df, settings)
     temp.file <- tempfile(fileext = ".pdf")
+    # check whether a report can be generated
     create_report(constraint.df, template.df, temp.file, settings)
 })

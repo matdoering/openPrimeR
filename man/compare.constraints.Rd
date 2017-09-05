@@ -4,7 +4,7 @@
 \alias{compare.constraints}
 \title{Constraint list comparison}
 \usage{
-compare.constraints(A, B)
+\method{compare}{constraints}(A, B)
 }
 \arguments{
 \item{A}{First constraint list.}

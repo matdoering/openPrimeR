@@ -145,7 +145,7 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 #' @export
 #' @examples
 #' data(Ippolito)
-#' design.estimate <- classify_design_problem(template.df)
+#' design.estimate <- classify_design_problem(template.df[1:30,])
 #' # Estimate the number of required primers to amplify the first 5 templates
 #' design.estimate.nbr <- classify_design_problem(template.df[1:5,], mode.directionality = "fw",
 #'                          primer.length = 20, primer.estimate = TRUE)
@@ -1839,30 +1839,32 @@ pair_primers <- function(primer.df, template.df) {
     rev.s.idx <- which(primer.df$Direction == "rev")
     # combinations of fw and rev primers
     combis <- expand.grid(fw.s.idx, rev.s.idx)
-    # determine intersection between all combinations
-    cvd <- covered.seqs.to.idx(primer.df[, "Covered_Seqs"], template.df)
-    cvd.shared <- lapply(seq_len(nrow(combis)), 
-        function(x) intersect(cvd[[combis[x,1]]], cvd[[combis[x,2]]])
-    )
-    cvg.shared <- sapply(cvd.shared, length)
-    combis$Coverage <- cvg.shared
-    # exclude pairs that don't share any coverage
-    sel.combis <- which(combis$Coverage != 0)
-    combis <- combis[sel.combis,]
-    # construct a new primer data frame using the pairs
-    pair.df <- primer.df[combis[,1],]
-    pair.df$Reverse <- primer.df$Reverse[combis[,2]]
-    pair.df$primer_coverage <- combis$Coverage
-    pair.df$Coverage_Ratio <- pair.df$primer_coverage / nrow(template.df)
-    pair.df$Covered_Seqs <- unlist(lapply(cvd.shared[sel.combis], function(x) paste(template.df$Identifier[x], collapse = ",")))
-    pair.df$Direction <- rep("both", nrow(combis))
     if (nrow(combis) != 0) {
+        # determine intersection between all combinations
+        cvd <- covered.seqs.to.idx(primer.df[, "Covered_Seqs"], template.df)
+        cvd.shared <- lapply(seq_len(nrow(combis)), 
+            function(x) intersect(cvd[[combis[x,1]]], cvd[[combis[x,2]]])
+        )
+        cvg.shared <- sapply(cvd.shared, length)
+        combis$Coverage <- cvg.shared
+        # exclude pairs that don't share any coverage
+        sel.combis <- which(combis$Coverage != 0)
+        combis <- combis[sel.combis,]
+        # construct a new primer data frame using the pairs
+        pair.df <- primer.df[combis[,1],]
+        pair.df$Reverse <- primer.df$Reverse[combis[,2]]
+        pair.df$primer_coverage <- combis$Coverage
+        pair.df$Coverage_Ratio <- pair.df$primer_coverage / nrow(template.df)
+        pair.df$Covered_Seqs <- unlist(lapply(cvd.shared[sel.combis], function(x) paste(template.df$Identifier[x], collapse = ",")))
+        pair.df$Direction <- rep("both", nrow(combis))
         pair.df$ID <- factor(paste0(abbreviate(primer.df$ID[combis[,1]], 5), "+", abbreviate(primer.df$ID[combis[,2]], 5)))
+        # select non-redundant pairs of primers:
+        cvg.matrix <- get.coverage.matrix(pair.df, template.df)
+        sel.cols <- remove.redundant.cols(seq_len(nrow(pair.df)), cvg.matrix)
+        pair.df <- pair.df[sel.cols,]
+    } else {
+        pair.df <- NULL
     }
-    # select non-redundant pairs of primers:
-    cvg.matrix <- get.coverage.matrix(pair.df, template.df)
-    sel.cols <- remove.redundant.cols(seq_len(nrow(pair.df)), cvg.matrix)
-    pair.df <- pair.df[sel.cols,]
     # output the already paired primers as well as the new pairs
     out.df <- my_rbind(both.df, pair.df)
     ################
