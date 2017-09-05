@@ -141,7 +141,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
 		result <- read.secondary.structure.raw(out.file)
 	} else {
         stop("ViennaRNA did not create the expected output file: '", 
-            out.file, "'.") 
+            out.file, "'") 
 	}
     return(result)
 }
