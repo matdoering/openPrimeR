@@ -131,12 +131,11 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
         stop("The RNAfold call: '", call, "' has failed with error code: '", cmd.status, ". Please check whether you have an appropriate version of 'ViennaRNA' installed.")
     }
     # viennaRNA used to append '.fold' to result files (version before 2.4.1)
-    #out.file.ori <- out.file
-    #out.file <- paste0(out.file, ".fold")
-    #if (file.exists(out.file.ori)) {
-        #print("ori out file exists")
-        #out.file <- out.file.ori
-    #}
+    out.file.ori <- out.file
+    out.file <- paste0(out.file, ".fold")
+    if (file.exists(out.file.ori)) {
+        out.file <- out.file.ori
+    }
 	if (file.exists(out.file)) {
 		result <- read.secondary.structure.raw(out.file)
 	} else {
