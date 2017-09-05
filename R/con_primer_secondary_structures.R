@@ -62,7 +62,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
         return(NULL)
     }
 	runID <- digest::digest(seqs, "md5")
-    id <- paste0("viennaRNA_", id, "_", runID)
+    id <- paste0("viennaRNA", id, runID)
     #message("Computing secondary structures @ annealing temp: ", annealing.temperature)
     rna.fold <- Sys.which("RNAfold")
     if (rna.fold == "") {
@@ -125,7 +125,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     #print(rna.fold)
     #print(param.string)
     #print(file.string)
-	cmd.status <- system2(rna.fold, args = c(param.string, file.string))
+	cmd.status <- system2(rna.fold, args = c(param.string, file.string), wait = TRUE)
     if (cmd.status != 0) {
         call <- paste0(rna.fold, " ", param.string, " ", file.string)
         stop("The RNAfold call: '", call, "' has failed with error code: '", cmd.status, ". Please check whether you have an appropriate version of 'ViennaRNA' installed.")
@@ -140,7 +140,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
 	if (file.exists(out.file)) {
 		result <- read.secondary.structure.raw(out.file)
 	} else {
-        stop("ViennaRNA did not create the expected output file: '", 
+        stop("ViennaRNA (RNAfold) did not create the expected output file: '", 
             out.file, "'") 
 	}
     return(result)
