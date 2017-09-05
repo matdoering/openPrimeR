@@ -146,8 +146,8 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 #' @examples
 #' data(Ippolito)
 #' design.estimate <- classify_design_problem(template.df)
-#' # Estimate the number of required primers to amplify the first 10 templates
-#' design.estimate.nbr <- classify_design_problem(template.df[1:10,], mode.directionality = "fw",
+#' # Estimate the number of required primers to amplify the first 5 templates
+#' design.estimate.nbr <- classify_design_problem(template.df[1:5,], mode.directionality = "fw",
 #'                          primer.length = 20, primer.estimate = TRUE)
 classify_design_problem <- function(template.df, 
                                     mode.directionality = c("both", "fw", "rev"),

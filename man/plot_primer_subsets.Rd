@@ -34,7 +34,7 @@ possibly indicate the existence of redundant coverage events.
 }
 \examples{
 data(Ippolito)
-primer.subsets <- subset_primer_set(primer.df, template.df)
+primer.subsets <- subset_primer_set(primer.df, template.df, k = 3)
 # Plot the coverage of optimal primer subsets
 p <- plot_primer_subsets(primer.subsets, template.df)
 }

@@ -793,7 +793,7 @@ primer.coverage.for.groups <- function(primer.df, template.df, groups) {
 #' @export
 #' @examples
 #' data(Ippolito)
-#' primer.subsets <- subset_primer_set(primer.df, template.df)
+#' primer.subsets <- subset_primer_set(primer.df, template.df, k = 3)
 subset_primer_set <- function(primer.df, template.df, k = 1, groups = NULL, identifier = NULL, cur.results.loc = NULL) {
     if (k <= 0) {
         stop("k has to be positive ...")
@@ -840,19 +840,19 @@ subset_primer_set <- function(primer.df, template.df, k = 1, groups = NULL, iden
     # for (i in seq_along(K)) {
     k <- NULL
     top.primers <- foreach(k = seq_along(K), .combine = c) %dopar% {
-        ILP <- subset.ILP(p.df, template.df, k)
+        ILP <- subset.ILP(p.df, template.df, K[k])
         return.val <- solve(ILP)
         if (return.val != 0) {
             warning(return.val)
         }
         if (length(out.loc) != 0) {
-            write.lp(ILP, file.path(out.loc, paste("ILP_", k, sep = "")), "lp")  #write it to a file in LP format
+            write.lp(ILP, file.path(out.loc, paste("ILP_", K[k], sep = "")), "lp")  #write it to a file in LP format
         }
         vars <- get.variables(ILP)
         primer.vars <- vars[seq_len(nrow(p.df))]
         sel.idx <- which(primer.vars == 1)
         cur.top.primers <- p.df[sel.idx, ]
-        fname <- file.path(out.loc, paste("subset_k=", k, ".csv", sep = ""))
+        fname <- file.path(out.loc, paste("subset_k=", K[k], ".csv", sep = ""))
         if (length(fname) != 0) {
             write.csv(cur.top.primers, fname, row.names = FALSE)
         }

@@ -594,7 +594,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
 #' @family coverage visualizations
 #' @examples
 #' data(Ippolito)
-#' primer.subsets <- subset_primer_set(primer.df, template.df)
+#' primer.subsets <- subset_primer_set(primer.df, template.df, k = 3)
 #' # Plot the coverage of optimal primer subsets
 #' p <- plot_primer_subsets(primer.subsets, template.df)
 plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
@@ -1083,9 +1083,9 @@ plot.excluded.hist <- function(excluded.df, filtered.stats, template.df) {
 #' p.mm.cvg <- plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
 #' # Compare the coverage of multiple primer sets
 #' data(Comparison)
-#' p.cmp.cvg <- plot_template_cvg(primer.data[1:3], template.data[1:3])
+#' p.cmp.cvg <- plot_template_cvg(primer.data[1:2], template.data[1:2])
 #' # Stratify by allowed mismatches:
-#' p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:3], template.data[1:3], per.mismatch = TRUE)
+#' p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:2], template.data[1:2], per.mismatch = TRUE)
 setGeneric("plot_template_cvg", 
     function(primers, templates, per.mismatch = FALSE, ...) {
         standardGeneric("plot_template_cvg")

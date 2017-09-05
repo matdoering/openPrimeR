@@ -44,5 +44,5 @@ for primer sets that are already of high quality.
 }
 \examples{
 data(Ippolito)
-primer.subsets <- subset_primer_set(primer.df, template.df)
+primer.subsets <- subset_primer_set(primer.df, template.df, k = 3)
 }

@@ -34,9 +34,9 @@ p.cvg <- plot_template_cvg(primer.df, template.df)
 p.mm.cvg <- plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
 # Compare the coverage of multiple primer sets
 data(Comparison)
-p.cmp.cvg <- plot_template_cvg(primer.data[1:3], template.data[1:3])
+p.cmp.cvg <- plot_template_cvg(primer.data[1:2], template.data[1:2])
 # Stratify by allowed mismatches:
-p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:3], template.data[1:3], per.mismatch = TRUE)
+p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:2], template.data[1:2], per.mismatch = TRUE)
 }
 \seealso{
 Other coverage visualizations: \code{\link{plot_primer_binding_regions}},
