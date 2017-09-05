@@ -74,9 +74,9 @@ data(Ippolito)
 settings.xml <- system.file("extdata", "settings", 
                  "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
 settings <- read_settings(settings.xml)
-# Check all constraints in 'settings' for the first two primers:
-constraint.df <- check_constraints(primer.df[1:2,], template.df, 
-                     settings, active.constraints = names(constraints(settings)))
+# Check GC clamp and number of runs for all primers:
+constraint.df <- check_constraints(primer.df, template.df, 
+                     settings, active.constraints = c("gc_clamp", "no_runs"))
 # Summarize the evaluation results
 summary(constraint.df)
 }

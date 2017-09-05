@@ -35,6 +35,10 @@ coverage condition is annotated for each cell.
 \examples{
 data(Ippolito)
 filename <- tempfile("cvg_overview", fileext = ".xls")
-# Store coverage of the first 2 primers as an XLS file
-create_coverage_xls(primer.df[1:2,], template.df, filename, settings)
+# Store coverage of a single primer in an XLS file:
+my.primers <- primer.df[3,]
+cvd <- unique(unlist(strsplit(my.primers$Covered_Seqs, split = ",")))
+m <- match(cvd, template.df$Identifier)
+my.templates <- template.df[m,]
+create_coverage_xls(my.primers, my.templates, filename, settings)
 }

@@ -325,8 +325,8 @@ validate_primers <-  function(object) {
 #' @family primer functions
 #' @examples
 #' data(Ippolito)
-#' # Check the first primer for restriction sites:
-#' site.df <- check_restriction_sites(primer.df[1,], template.df)
+#' # Check the first primer for restriction sites with respect to the first 10 templates
+#' site.df <- check_restriction_sites(primer.df[1,], template.df[1:10])
 check_restriction_sites <- function(primer.df, template.df, 
                             adapter.action = c("warn", "rm"), 
                             selected = NULL, only.confident.calls = TRUE,

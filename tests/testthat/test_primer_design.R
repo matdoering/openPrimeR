@@ -10,11 +10,9 @@ test_that("primer_filtering_constraints", {
     constraints(settings)$no_repeats <- c("min" = 0, "max" = 3)
     constraints(settings)$melting_temp_range <- c("min" = 55, "max" = 65)
     constraints(settings)$melting_temp_diff <- c("min" = 0, "max" = 5)
-    constraints(settings)$self_dimerization <- c("min" = -5)
     constraints(settings)$secondary_structure <- c("min" = -2)
     constraints(settings)$primer_coverage <- c("min" = 1)
     constraints(settings)$primer_specificity <- c("min" = 0.9, "max" = 1)
-    constraints(settings)$cross_dimerization <- c("min" = -5)
     conOptions(settings)$allowed_mismatches <- 5
     cvg_constraints(settings) <- list("annealing_DeltaG" = c("max" = -5))
     # evaluate constraints first to have reference values

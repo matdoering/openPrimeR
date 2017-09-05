@@ -1,6 +1,6 @@
 Package: openPrimeR
 Title: Multiplex PCR Primer Design and Analysis
-Version: 0.99.14
+Version: 0.99.15
 Authors@R: c(person("Matthias", "Döring", 
                     email = "mdoering@mpi-inf.mpg.de", 
                     role = c("aut", "cre")),
@@ -66,7 +66,7 @@ Suggests:
     learnr (>= 0.9)
 SystemRequirements: MAFFT (>= 7.305),
     OligoArrayAux (>= 3.8),
-    ViennaRNA (>= 2.2.4),
+    ViennaRNA (>= 2.4.1),
     MELTING (>= 5.1.1),
     Pandoc (>= 1.12.3)
 biocViews: Software, Technology
