@@ -115,9 +115,12 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
                 input.file))
     }
     if (length(folding.constraints) != 0) {
-        # add constrained folding params:
+        # -C: necessary for having constraints
+        # --filename-delim: for MacOS -> data/out.txt isn't changed to data_out.txt by forcing to use '/' for sanitizing file names
         param.string <- paste(param.string, "-C", "--batch")
     }
+    # ensure that the right delim is used
+    param.string <- paste(param.string, "--filename-delim=/")
     #print("VIENNARNA:")
     #print(rna.fold)
     #print(param.string)
