@@ -29,14 +29,14 @@ Creates a bar plot showing the coverage for every group of template sequences.
 \examples{
 # Visualize the template coverage of a single primer set
 data(Ippolito)
-plot_template_cvg(primer.df, template.df)
+p.cvg <- plot_template_cvg(primer.df, template.df)
 # Stratify by allowed mismatches:
-plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
+p.mm.cvg <- plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
 # Compare the coverage of multiple primer sets
 data(Comparison)
-plot_template_cvg(primer.data[1:3], template.data[1:3])
+p.cmp.cvg <- plot_template_cvg(primer.data[1:3], template.data[1:3])
 # Stratify by allowed mismatches:
-plot_template_cvg(primer.data[1:3], template.data[1:3], per.mismatch = TRUE)
+p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:3], template.data[1:3], per.mismatch = TRUE)
 }
 \seealso{
 Other coverage visualizations: \code{\link{plot_primer_binding_regions}},

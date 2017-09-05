@@ -33,10 +33,10 @@ primers break the constraints.
 \examples{
 # Plot fulfillment for a single primer set:
 data(Ippolito)
-plot_constraint_fulfillment(primer.df, settings)
+p <- plot_constraint_fulfillment(primer.df, settings)
 # Plot fulfillment for multiple primer sets:
 data(Comparison)
-plot_constraint_fulfillment(primer.data[1:5], settings)
+p.cmp <- plot_constraint_fulfillment(primer.data[1:5], settings)
 }
 \seealso{
 Other constraint visualizations: \code{\link{plot_constraint_deviation}},

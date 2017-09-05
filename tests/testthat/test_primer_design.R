@@ -173,27 +173,14 @@ test_that("full_design_function", {
     opti.set <- optimal.primers.greedy$opti
     cvg.ratio <- as.numeric(get_cvg_ratio(opti.set, template.df))
     expect_equal(cvg.ratio, 1.0) # 100% cvg?
-    # test what happens if we forbid any relaxation:
-    data(Ippolito)
-    template.df <- template.df[1:5,]
-    constraintLimits(settings) <- constraints(settings)
-    # no relaxation should happen in this case ... coverage should be lower
-    optimal.primers.greedy <- design_primers(template.df, "both", settings)
-    opti.set <- optimal.primers.greedy$opti
-    cvg.ratio <- as.numeric(get_cvg_ratio(opti.set, template.df))
-    expect_lte(cvg.ratio, 1.0) # less/equal to 100% cvg?
-    # test whehther we are also happy with a lower target cvg if specified so
+    # test for ILP: use required.cvg arg
     data(Ippolito)
     template.df <- template.df[1:5,]
     # ramp up the constraints a bit to ensure we don't get a too high cvg
     constraints(settings)$no_runs <- c("min" = 2, "max" = 2)
     constraints(settings)$no_repeats <- c("min" = 2, "max" = 2)
     constraints(settings)$gc_clamp <- c("min" = 1, "max" = 1)
-    optimal.primers.greedy <- design_primers(template.df, "both", settings,
-                              required.cvg = 0.2)
-    opti.set <- optimal.primers.greedy$opti
-    expect_gte(as.numeric(get_cvg_ratio(opti.set, template.df)), 0.2)
-    # test this with ILP as well 
+    # test with ILP
     optimal.primers.ILP <- design_primers(template.df, "both", settings,
                               required.cvg = 0.2, opti.algo = "ILP")
     opti.set <- optimal.primers.ILP$opti

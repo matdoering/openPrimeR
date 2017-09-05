@@ -45,10 +45,10 @@ with respect to the allowed binding regions in the templates.
 \examples{
 # Primer binding regions of a single primer set
 data(Ippolito)
-plot_primer_binding_regions(primer.df, template.df)
+p <- plot_primer_binding_regions(primer.df, template.df)
 # Primer binding regions of multiple primer sets
 data(Comparison)
-plot_primer_binding_regions(primer.data[1:3], template.data[1:3])
+p.comp <- plot_primer_binding_regions(primer.data[1:3], template.data[1:3])
 }
 \seealso{
 Other coverage visualizations: \code{\link{plot_primer_cvg}},

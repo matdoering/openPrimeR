@@ -30,7 +30,7 @@ against the size of the sets.
 }
 \examples{
 data(Comparison)
-plot_cvg_vs_set_size(primer.data, template.data)
+p <- plot_cvg_vs_set_size(primer.data, template.data)
 }
 \seealso{
 Other comparison visualizations: \code{\link{plot_penalty_vs_set_size}}

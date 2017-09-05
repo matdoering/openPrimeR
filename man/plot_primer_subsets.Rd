@@ -36,7 +36,7 @@ possibly indicate the existence of redundant coverage events.
 data(Ippolito)
 primer.subsets <- subset_primer_set(primer.df, template.df)
 # Plot the coverage of optimal primer subsets
-plot_primer_subsets(primer.subsets, template.df)
+p <- plot_primer_subsets(primer.subsets, template.df)
 }
 \seealso{
 Other coverage visualizations: \code{\link{plot_primer_binding_regions}},

@@ -37,10 +37,10 @@ and otherwise, i.e. if \eqn{s <= p <= e}, we output 0.
 \examples{
 # Deviations for a single primer set
 data(Ippolito)
-plot_constraint_deviation(primer.df, settings)
+p.dev <- plot_constraint_deviation(primer.df, settings)
 # Deviations for multiple primer sets
 data(Comparison)
-plot_constraint_deviation(primer.data, settings)
+p.dev.cmp <- plot_constraint_deviation(primer.data, settings)
 }
 \seealso{
 Other constraint visualizations: \code{\link{plot_constraint_fulfillment}},

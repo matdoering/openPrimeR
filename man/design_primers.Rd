@@ -132,7 +132,9 @@ the greedy solution may yield larger primer sets than the ILP solution.
 \examples{
 # Define PCR settings and primer criteria
 data(Ippolito)
+# design only with minimal set of constraints
 constraints(settings)$primer_length <- c("min" = 18, "max" = 18)
+constraints(settings) <- constraints(settings)[c("primer_length", "primer_coverage")]
 # Design only forward primers using a greedy algorithm
 optimal.primers.greedy <- design_primers(template.df[1:2,], "both", settings, init.algo = "naive")
 # Usage of the tree-based initialization strategy (requires MAFFT)

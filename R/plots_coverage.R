@@ -17,7 +17,7 @@
 #' @export
 #' @examples
 #' data(Comparison)
-#' plot_cvg_vs_set_size(primer.data, template.data)
+#' p <- plot_cvg_vs_set_size(primer.data, template.data)
 plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE, highlight.set = NULL) {
     if (length(primer.data) == 0 || length(template.data) == 0) {
         return(NULL)
@@ -113,7 +113,7 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
 #' @export
 #' @examples
 #' data(Comparison)
-#' plot_penalty_vs_set_size(primer.data, settings)
+#' p <- plot_penalty_vs_set_size(primer.data, settings)
 plot_penalty_vs_set_size <- function(primer.data, settings, 
         active.constraints = names(constraints(settings)), alpha = 0) {
     if (length(primer.data) == 0) {
@@ -596,7 +596,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
 #' data(Ippolito)
 #' primer.subsets <- subset_primer_set(primer.df, template.df)
 #' # Plot the coverage of optimal primer subsets
-#' plot_primer_subsets(primer.subsets, template.df)
+#' p <- plot_primer_subsets(primer.subsets, template.df)
 plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
                             
     if (length(primer.subsets) == 0) {
@@ -912,7 +912,7 @@ get_plot_primer_data <- function(primer.df, template.df, identifier = NULL, rela
 #' @family coverage visualizations
 #' @examples
 #' data(Ippolito)
-#' plot_primer(primer.df[1,], template.df[1:30,])
+#' p <- plot_primer(primer.df[1,], template.df[1:30,])
 plot_primer <- function(primer.df, template.df, identifier = NULL, 
                         relation = c("fw", "rev"), 
                         region.names = c("Binding region", "Amplification region")) {
@@ -1078,14 +1078,14 @@ plot.excluded.hist <- function(excluded.df, filtered.stats, template.df) {
 #' @examples
 #' # Visualize the template coverage of a single primer set
 #' data(Ippolito)
-#' plot_template_cvg(primer.df, template.df)
+#' p.cvg <- plot_template_cvg(primer.df, template.df)
 #' # Stratify by allowed mismatches:
-#' plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
+#' p.mm.cvg <- plot_template_cvg(primer.df, template.df, per.mismatch = TRUE)
 #' # Compare the coverage of multiple primer sets
 #' data(Comparison)
-#' plot_template_cvg(primer.data[1:3], template.data[1:3])
+#' p.cmp.cvg <- plot_template_cvg(primer.data[1:3], template.data[1:3])
 #' # Stratify by allowed mismatches:
-#' plot_template_cvg(primer.data[1:3], template.data[1:3], per.mismatch = TRUE)
+#' p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:3], template.data[1:3], per.mismatch = TRUE)
 setGeneric("plot_template_cvg", 
     function(primers, templates, per.mismatch = FALSE, ...) {
         standardGeneric("plot_template_cvg")
@@ -1745,12 +1745,12 @@ setMethod("get_cvg_stats", signature(primers = "list"),
 #' @examples
 #' # Plot expected coverage per primer
 #' data(Ippolito)
-#' plot_primer_cvg(primer.df, template.df)
+#' p.cvg <- plot_primer_cvg(primer.df, template.df)
 #' # Plot coverage stratified by allowed mismatches:
-#' plot_primer_cvg(primer.df, template.df, per.mismatch = TRUE)
+#' p.cvg.mm <- plot_primer_cvg(primer.df, template.df, per.mismatch = TRUE)
 #' # Plot coverage of multiple primer sets
 #' data(Comparison)
-#' plot_primer_cvg(primer.data[1:3], template.data[1:3])
+#' p.cvg.cmp <- plot_primer_cvg(primer.data[1:3], template.data[1:3])
 setGeneric("plot_primer_cvg", 
     function(primers, templates, per.mismatch = FALSE, ...) {
         standardGeneric("plot_primer_cvg")

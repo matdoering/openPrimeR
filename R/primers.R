@@ -1159,10 +1159,10 @@ update_primer_cvg <- function(primer.df, template.df, allowed.mismatches, cvg.de
 #' @examples
 #' # Primer binding regions of a single primer set
 #' data(Ippolito)
-#' plot_primer_binding_regions(primer.df, template.df)
+#' p <- plot_primer_binding_regions(primer.df, template.df)
 #' # Primer binding regions of multiple primer sets
 #' data(Comparison)
-#' plot_primer_binding_regions(primer.data[1:3], template.data[1:3])
+#' p.comp <- plot_primer_binding_regions(primer.data[1:3], template.data[1:3])
 setGeneric("plot_primer_binding_regions", 
     function(primers, templates, direction = c("both", "fw", "rev"), 
         group = NULL, relation = c("fw", "rev"), 

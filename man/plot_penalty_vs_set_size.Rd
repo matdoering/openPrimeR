@@ -33,7 +33,7 @@ where more information is provided on how to set \code{alpha}.
 }
 \examples{
 data(Comparison)
-plot_penalty_vs_set_size(primer.data, settings)
+p <- plot_penalty_vs_set_size(primer.data, settings)
 }
 \seealso{
 Other comparison visualizations: \code{\link{plot_cvg_vs_set_size}}

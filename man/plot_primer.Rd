@@ -32,7 +32,7 @@ the target binding region in the corresponding template sequences.
 }
 \examples{
 data(Ippolito)
-plot_primer(primer.df[1,], template.df[1:30,])
+p <- plot_primer(primer.df[1,], template.df[1:30,])
 }
 \seealso{
 Other coverage visualizations: \code{\link{plot_primer_binding_regions}},

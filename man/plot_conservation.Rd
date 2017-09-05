@@ -35,10 +35,10 @@ Computing the conservation scores for the plot requires the MAFFT software for m
 data(Ippolito)
 # Select binding regions for every group of templates and plot:
 template.df <- select_regions_by_conservation(template.df, win.len = 30)
-plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
+p1 <- plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
 # Select binding regions for all templates and plot:
 data(Ippolito)
 template.df <- select_regions_by_conservation(template.df, by.group = FALSE)
-plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
+p2 <- plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
 } 
 }

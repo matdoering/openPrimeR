@@ -481,10 +481,10 @@ dimerization.table <- function(dimer.data, deltaG.cutoff,
 #' @examples
 #' # Plot histogram of constraints for a single primer set
 #' data(Ippolito)
-#' plot_constraint(primer.df, settings, active.constraints = c("gc_clamp", "gc_ratio"))
+#' p <- plot_constraint(primer.df, settings, active.constraints = c("gc_clamp", "gc_ratio"))
 #' # Compare constraints across multiple primer sets
 #' data(Comparison)
-#' plot_constraint(primer.data[1:3], settings, active.constraints = c("gc_clamp", "gc_ratio"))
+#' p.cmp <- plot_constraint(primer.data[1:3], settings, active.constraints = c("gc_clamp", "gc_ratio"))
 setGeneric("plot_constraint", 
     function(primers, settings, active.constraints = names(constraints(settings)), ...) {
         if (is(settings, "DesignSettings")) {
@@ -602,10 +602,10 @@ setMethod("plot_constraint",
 #' @examples
 #' # Plot fulfillment for a single primer set:
 #' data(Ippolito)
-#' plot_constraint_fulfillment(primer.df, settings)
+#' p <- plot_constraint_fulfillment(primer.df, settings)
 #' # Plot fulfillment for multiple primer sets:
 #' data(Comparison)
-#' plot_constraint_fulfillment(primer.data[1:5], settings)
+#' p.cmp <- plot_constraint_fulfillment(primer.data[1:5], settings)
 setGeneric("plot_constraint_fulfillment", 
     function(primers, settings, active.constraints = names(constraints(settings)), 
              plot.p.vals = FALSE, ...) {
@@ -779,10 +779,10 @@ setMethod("plot_constraint_fulfillment",
 #' @examples
 #' # Plot coverage constraints of a single primer set
 #' data(Ippolito)
-#' plot_cvg_constraints(primer.df, settings)
+#' p <- plot_cvg_constraints(primer.df, settings)
 #' # Plot coverage constraints for mulitple primer sets
 #' data(Comparison)
-#' plot_cvg_constraints(primer.data[1:2], settings)
+#' p.cmp <- plot_cvg_constraints(primer.data[1:2], settings)
 setGeneric("plot_cvg_constraints", 
     function(primers, settings, active.constraints = names(cvg_constraints(settings)), ...) {
         if (!is(settings, "DesignSettings")) {
@@ -915,10 +915,10 @@ setMethod("plot_cvg_constraints",
 #' @examples
 #' # Deviations for a single primer set
 #' data(Ippolito)
-#' plot_constraint_deviation(primer.df, settings)
+#' p.dev <- plot_constraint_deviation(primer.df, settings)
 #' # Deviations for multiple primer sets
 #' data(Comparison)
-#' plot_constraint_deviation(primer.data, settings)
+#' p.dev.cmp <- plot_constraint_deviation(primer.data, settings)
 setGeneric("plot_constraint_deviation", 
     function(primer.data, settings, active.constraints = names(constraints(settings)), ...) {
         if (is(settings, "DesignSettings")) {

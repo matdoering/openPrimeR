@@ -31,12 +31,12 @@ Shows which groups of templates are covered by individual primers.
 \examples{
 # Plot expected coverage per primer
 data(Ippolito)
-plot_primer_cvg(primer.df, template.df)
+p.cvg <- plot_primer_cvg(primer.df, template.df)
 # Plot coverage stratified by allowed mismatches:
-plot_primer_cvg(primer.df, template.df, per.mismatch = TRUE)
+p.cvg.mm <- plot_primer_cvg(primer.df, template.df, per.mismatch = TRUE)
 # Plot coverage of multiple primer sets
 data(Comparison)
-plot_primer_cvg(primer.data[1:3], template.data[1:3])
+p.cvg.cmp <- plot_primer_cvg(primer.data[1:3], template.data[1:3])
 }
 \seealso{
 Other coverage visualizations: \code{\link{plot_primer_binding_regions}},

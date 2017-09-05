@@ -27,8 +27,8 @@ Plots the distribution of the coverage constraint values.
 \examples{
 # Plot coverage constraints of a single primer set
 data(Ippolito)
-plot_cvg_constraints(primer.df, settings)
+p <- plot_cvg_constraints(primer.df, settings)
 # Plot coverage constraints for mulitple primer sets
 data(Comparison)
-plot_cvg_constraints(primer.data[1:2], settings)
+p.cmp <- plot_cvg_constraints(primer.data[1:2], settings)
 }
