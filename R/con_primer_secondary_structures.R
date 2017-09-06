@@ -71,17 +71,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     # set parameters for the call to RNAfold:
     # we removed --noLP here, too slow now?
     param.string <- paste("--temp", annealing.temperature, "--noconv", "--noPS")
-	old.dir <- NULL
-    # out.file can be equal to inputfile as RNAfold appends '.fold' to the specified file
-	if (grepl("windows", .Platform$OS.type)) {
-		# viennaRNA can't handle windows filename ('sanitizes' them), 'filename-delim' arg doesnt help. 
-		# -> use local files instead. need to be relative to the executable!!
-		old.dir <- setwd(dirname(rna.fold))  # necessary to avoid using absolute path specifiers
-		input.file <- paste0(id, ".txt")
-	} else {
-		input.file <- tempfile(pattern = id, fileext = ".txt")
-	}
-    # specify 'out.file'
+	input.file <- tempfile(pattern = id, fileext = ".txt")
     out.file <- paste0(input.file, "_out")
 	# clean up result files (prevents viennaRNA possibly appending to existing files)
     ##############################
@@ -130,12 +120,15 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
         call <- paste0(rna.fold, " ", param.string, " ", file.string)
         stop("The RNAfold call: '", call, "' has failed with error code: '", cmd.status, ". Please check whether you have an appropriate version of 'ViennaRNA' installed.")
     }
+	##################
     # viennaRNA used to append '.fold' to result files (version before 2.4.1)
+	# NB: this code is still necessary (wait time before write-out is complete?) for MacOS:
     out.file.ori <- out.file
     out.file <- paste0(out.file, ".fold")
     if (file.exists(out.file.ori)) {
         out.file <- out.file.ori
     }
+	#########################
 	if (file.exists(out.file)) {
 		result <- read.secondary.structure.raw(out.file)
 	} else {

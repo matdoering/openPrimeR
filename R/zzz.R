@@ -196,11 +196,11 @@ copy.melt.config <- function(melt.bin = NULL) {
 #' }
 parallel_setup <- function(cores = NULL) {
     doParallel.available <- requireNamespace("doParallel", quietly = TRUE)
-	is.win <- grepl("windows", .Platform$OS.type)
-    if (is.win) {
-        warning("Parallel computations are not supported under Windows, sorry.")
-		return(NULL)
-    }
+	#is.win <- grepl("windows", .Platform$OS.type)
+    #if (is.win) {
+     #   warning("Parallel computations are not supported under Windows, sorry.")
+		#return(NULL)
+    #}
     if (doParallel.available) { # no parallel support for windows at the moment (unserialize errors if we don't do clusterexport/clustercall)
         if (length(cores) == 0) {
             avail.cores <- parallel::detectCores()
