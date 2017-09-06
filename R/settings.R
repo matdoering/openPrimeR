@@ -198,6 +198,8 @@ setMethod("initialize", "DesignSettings",
         # .Object is the prototype from the class for which slots should be set
         if (is(constraint.settings, "ConstraintSettings")) {
             # ok
+        } else if (is.null(constraint.settings)) {
+            constraint.settings <- ConstraintSettings()   
         } else if (is(constraint.settings, "list")) {
             obj <- ConstraintSettings()
             constraints(obj) <- constraint.settings
@@ -208,6 +210,8 @@ setMethod("initialize", "DesignSettings",
         .Object@Input_Constraints <- constraint.settings
         if (is(constraint.limits, "ConstraintSettings")) {
             # ok
+         } else if (is.null(constraint.limits)) {
+            constraint.limits <- ConstraintSettings()   
          } else if (is(constraint.limits, "list")) {
             obj <- ConstraintSettings()
             constraints(obj) <- constraint.limits
@@ -218,6 +222,8 @@ setMethod("initialize", "DesignSettings",
         .Object@Input_Constraint_Boundaries <- constraint.limits
         if (is(cvg.constraints, "CoverageConstraints")) {
             # ok
+        } else if (is.null(cvg.constraints)) {
+            cvg.constraints <- CoverageConstraints() # no cvg constraints 
         } else if (is(cvg.constraints, "list")) {  
             obj <- CoverageConstraints()
             constraints(obj) <- cvg.constraints
@@ -228,6 +234,8 @@ setMethod("initialize", "DesignSettings",
         .Object@Coverage_Constraints <- cvg.constraints
         if (is(PCR.conditions, "PCR_Conditions")) {
             # ok
+        } else if (is.null(PCR.conditions)) {
+            stop("'PCR_conditions' are mandatory, but were not provided.")
         } else if (is(PCR.conditions, "list")) {
             obj <- PCR_Conditions()
             constraints(obj) <- PCR.conditions
@@ -238,6 +246,8 @@ setMethod("initialize", "DesignSettings",
         .Object@PCR_conditions <- PCR.conditions
         if (is(constraint.options, "ConstraintOptions")) {
             # ok
+        } else if (is.null(constraint.options)) {
+            stop("'ConstraintOptions' are mandatory, but were not provided.")
         } else if (is(constraint.options, "list")) {
             obj <- ConstraintOptions()
             constraints(obj) <- constraint.options
