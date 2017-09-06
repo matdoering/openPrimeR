@@ -83,10 +83,6 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
         if (file.exists(input.file)) { # remove the .txt file
             file.remove(input.file) 
         }
-		# revert back to old working directory in case of wd change (windows)
-		if (length(old.dir) != 0) {
-			setwd(old.dir)
-		}
 	})
 	file.string <- paste0("--infile=", input.file, " --outfile=", out.file)
     seqs <- toupper(seqs)
