@@ -731,6 +731,7 @@ get.mismatch.info <- function(primers, template.df, binding, covered.seqs.idx, p
     }
     return(mm.info)
 }
+
 #' Computation of Coverage Details
 #'
 #' Determines binding properties of primers.
@@ -789,10 +790,13 @@ compute.basic.details <- function(binding, mode = c("on_target", "off_target"), 
     rev.binding <- NULL
     x <- NULL
     cvg.df <- foreach(fw.binding = fw.bindings, rev.binding = rev.bindings, x = seq_len(nrow(primers)), .combine = "rbind") %dopar% {
-        if (is.function(updateProgress)) {
-            detail <- ""
-            updateProgress(x/nrow(primers), detail, "set")
-        }
+		##############
+		# NB: DO NOT updateProgress here -> breaks parallel evaluation under Windows in the frontend!
+        #if (is.function(updateProgress)) {
+         #   detail <- ""
+          #  updateProgress(x/nrow(primers), detail, "set")
+        #}
+		###############
         # blueprint output
         p.result <- data.frame(primer_coverage = integer(1), Coverage_Ratio = numeric(1), 
             Binding_Position_Start_fw = character(1), Binding_Position_End_fw = character(1), 

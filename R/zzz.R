@@ -242,9 +242,9 @@ parallel_setup <- function(cores = NULL) {
     }
     # set the default number of cores to use
     foreach.available <- requireNamespace("foreach", quietly = TRUE)
-    # prevent doPar warnings that the backend is not registered
+    # register parallel backend if not registered already
     if (foreach.available && !getDoParRegistered()) { 
         default.nbr.cores <- 2
-        parallel_setup(default.nbr.cores)
+		parallel_setup(default.nbr.cores)
     }
 }
