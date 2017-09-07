@@ -514,7 +514,12 @@ get_template_cvg_data <- function(primer.df, template.df) {
 #' primer.cvg.stats <- get_cvg_stats_primer(primer.df, template.df)
 get_cvg_stats_primer <- function(primer.df, template.df,
                                 cvg.definition = c("constrained", "basic")) {
-
+    if (!is(primer.df, "Primers")) {
+        stop("'primer.df' should be a 'Primers' object.")
+    }
+    if (!is(template.df, "Templates")) {
+        stop("'template.df' should be a 'Templates' object.")
+    }
     cvg.definition <- match.arg(cvg.definition)
     full.df <- prepare_mm_plot(primer.df, template.df)
     # select only constrained cvg events
