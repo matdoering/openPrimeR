@@ -7,9 +7,9 @@
 score_degen(seq, gap.char = "-")
 }
 \arguments{
-\item{seq}{A list of vectors with single characters.}
+\item{seq}{A list of vectors containing individual characters of a nucleotide sequence.}
 
-\item{gap.char}{The gap character in sequences.}
+\item{gap.char}{The gap character in the sequences.}
 }
 \value{
 The number of unambiguous sequences represented by \code{seq}.
@@ -27,6 +27,11 @@ at position \eqn{i} of the primer. Then the degeneracy \eqn{D} of a primer
 can be defined as 
 \deqn{D = \prod_i{|s_i|}}
 where \eqn{|s_i|} provides the number of disambiguated bases at position \eqn{i}.
+}
+\examples{
+# Compute degeneration for sequences with differing number of ambiguous bases
+seq <- strsplit(c("ctggaattacggtacc", "taggaaccggrtaagc", "rtaaasrygtar"), split = "")
+degen <- score_degen(seq)
 }
 \seealso{
 Other primer functions: \code{\link{Primers-class}},

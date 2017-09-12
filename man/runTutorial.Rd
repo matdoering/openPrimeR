@@ -27,7 +27,7 @@ all suggested dependencies.
 }
 \examples{
 # Open the tutorial
-\dontrun{
+if (interactive()) {
 runTutorial()
 }
 }
