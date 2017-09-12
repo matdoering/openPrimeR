@@ -31,14 +31,18 @@ the Shannon entropy of the sequences.
 Computing the conservation scores for the plot requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
 }
 \examples{
-\dontrun{
 data(Ippolito)
 # Select binding regions for every group of templates and plot:
 template.df <- select_regions_by_conservation(template.df, win.len = 30)
-p1 <- plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
+if (length(template.df) != 0) {
+     p1 <- plot_conservation(attr(template.df, "entropies"), 
+                             attr(template.df, "alignments"), template.df)
+}
 # Select binding regions for all templates and plot:
 data(Ippolito)
 template.df <- select_regions_by_conservation(template.df, by.group = FALSE)
-p2 <- plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
+if (length(template.df) != 0) {
+     p2 <- plot_conservation(attr(template.df, "entropies"), 
+                             attr(template.df, "alignments"), template.df)
 } 
 }

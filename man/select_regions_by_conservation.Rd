@@ -38,8 +38,6 @@ and determines the most conserved regions.
 Requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
 }
 \examples{
-\dontrun{
 data(Ippolito)
 new.template.df <- select_regions_by_conservation(template.df)
-}
 }

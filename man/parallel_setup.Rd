@@ -17,8 +17,6 @@ Returns \code{NULL}
 Registers the specified number of cores with the parallel backend.
 }
 \examples{
-\dontrun{
 # Use two cores for parallel processing:
 parallel_setup(2)
-}
 }

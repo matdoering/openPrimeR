@@ -100,11 +100,15 @@ filter.primer.candidates <- function(primer.candidates, min.len) {
 #' \deqn{D = \prod_i{|s_i|}}
 #' where \eqn{|s_i|} provides the number of disambiguated bases at position \eqn{i}.
 #'
-#' @param seq A list of vectors with single characters.
-#' @param gap.char The gap character in sequences.
+#' @param seq A list of vectors containing individual characters of a nucleotide sequence.
+#' @param gap.char The gap character in the sequences.
 #' @return The number of unambiguous sequences represented by \code{seq}.
 #' @family primer functions
 #' @export
+#' @examples
+#' # Compute degeneration for sequences with differing number of ambiguous bases
+#' seq <- strsplit(c("ctggaattacggtacc", "taggaaccggrtaagc", "rtaaasrygtar"), split = "")
+#' degen <- score_degen(seq)
 score_degen <- function(seq, gap.char = "-") {
     if (length(seq) == 0) {
         return(NA)
@@ -301,7 +305,7 @@ score.conservation <- function(primer.range, ali.entropy) {
 #' @return Updated primer regions according to the desired conservation.
 #' @keywords internal
 select.primer.region.by.conservation <- function(primer.range, ali.entropy, 
-        conservation, bin) {
+                                                conservation, bin) {
     # conservation: select only the top percent (ratio) of alignments 100% ->
     # consider all sub-alignments
     if (conservation == 1) {
@@ -321,7 +325,9 @@ select.primer.region.by.conservation <- function(primer.range, ali.entropy,
     allowed.gaps <- 0
     sel.idx <- NULL
     selected <- FALSE
-    while (!selected) { # i think this region selection doesn't work for 'rev'
+    # TODO: check region detection for 'rev'
+    while (!selected) { 
+        #print(gap.idx)
         sel.idx <- which(unlist(lapply(gap.idx, function(x) length(x) <= allowed.gaps)))
         if (length(sel.idx) != 0) {
             # region found

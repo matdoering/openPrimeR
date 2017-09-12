@@ -17,7 +17,7 @@
 #' @return Opens the openPrimeR tutorial in a web browser.
 #' @examples
 #' # Open the tutorial
-#' \dontrun{
+#' if (interactive()) {
 #' runTutorial()
 #' }
 runTutorial <- function(dev = FALSE) {

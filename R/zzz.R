@@ -190,10 +190,8 @@ copy.melt.config <- function(melt.bin = NULL) {
 #' @return Returns \code{NULL}
 #' @export
 #' @examples
-#' \dontrun{
 #' # Use two cores for parallel processing:
 #' parallel_setup(2)
-#' }
 parallel_setup <- function(cores = NULL) {
     doParallel.available <- requireNamespace("doParallel", quietly = TRUE)
 	#is.win <- grepl("windows", .Platform$OS.type)

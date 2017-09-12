@@ -1711,15 +1711,19 @@ detect.gap.columns <- function(bins, gap.cutoff = 0.95, gap.char = "-") {
 #' @export
 #' @note Computing the conservation scores for the plot requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
 #' @examples
-#' \dontrun{
 #' data(Ippolito)
 #' # Select binding regions for every group of templates and plot:
 #' template.df <- select_regions_by_conservation(template.df, win.len = 30)
-#' p1 <- plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
+#' if (length(template.df) != 0) {
+#'      p1 <- plot_conservation(attr(template.df, "entropies"), 
+#'                              attr(template.df, "alignments"), template.df)
+#' }
 #' # Select binding regions for all templates and plot:
 #' data(Ippolito)
 #' template.df <- select_regions_by_conservation(template.df, by.group = FALSE)
-#' p2 <- plot_conservation(attr(template.df, "entropies"), attr(template.df, "alignments"), template.df)
+#' if (length(template.df) != 0) {
+#'      p2 <- plot_conservation(attr(template.df, "entropies"), 
+#'                              attr(template.df, "alignments"), template.df)
 #' } 
 plot_conservation <- function(entropy.df, alignments, template.df, gap.char = "-") {
     # set gappy columns to 0 conservation for all groups
@@ -1932,10 +1936,8 @@ update.binding.ranges.by.conservation <- function(template.df,
 #' @export
 #' @note Requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
 #' @examples
-#' \dontrun{
 #' data(Ippolito)
 #' new.template.df <- select_regions_by_conservation(template.df)
-#' }
 select_regions_by_conservation <- function(template.df, 
                                     gap.char = "-", 
                                     win.len = 30, by.group = TRUE,
@@ -1943,10 +1945,18 @@ select_regions_by_conservation <- function(template.df,
     if (!is(template.df, "Templates")) {
         stop("Please input an object of class 'Templates'.")
     }
+    if (!check.tool.function()["MAFFT"]) {
+        warning("MAFFT is required for selecting conserved regions (http://mafft.cbrc.jp/alignment/software/).")
+        return(NULL)
+    }
     direction <- match.arg(direction)
-    # TODO: save time by not computing the entropy of the full sequence, but only the entropy of the possible binding regions?
-    # TODO: individual binding regions are not really respected as selection is via groups and not individual sequences.
+    # note: time could be saved by not computing the entropy of the full sequence, but only the entropy of the possible binding regions?
+    # note: individual binding regions are not really respected as selection is via groups and not individual sequences.
     entropy.data <- score_conservation(template.df, gap.char, win.len, by.group)
+    if (!by.group) {
+        # ignore group annotation for updating binding regions
+        template.df$Group <- "default"
+    }
     bins <- entropy.data$Alignments # list with DNABin objects
     entropy.df <- entropy.data$Entropies # list with data frames giving the entropies
     if (direction == "fw" || direction == "rev") {
