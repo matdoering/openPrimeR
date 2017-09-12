@@ -74,6 +74,7 @@ check.tool.installation <- function(frontend = FALSE) {
 #' @keywords internal
 check.tool.function <- function(frontend = FALSE) {
     available.tools <- check.tool.installation(frontend)
+    # check for oligoArrayAux
     if (available.tools["OligoArrayAux"] && Sys.getenv("UNAFOLDDAT") == "") {
         available.tools["OligoArrayAux"] <- FALSE
         warning("Please define the UNAFOLDDAT variable in your path before using OligoArrayAux.")
@@ -86,28 +87,34 @@ check.tool.function <- function(frontend = FALSE) {
             available.tools["OligoArrayAux"] <- FALSE
         }
     }
-    # check whether custom MELTING parameter file exists
-    melt.bin <- Sys.which("melting-batch")
-    # custom tandem file removed: ...
-    ##################
-    #if (melt.bin != "") {
-        #tandem.mm.file <- system.file("extdata", 
-                        #"AllawiSantaluciaPeyret1997_1998_1999tanmm_mod.xml",
-                        #package = "openPrimeR")
-       #melt.config.file <- file.path(dirname(melt.bin), "..", "Data", 
-                        #basename(tandem.mm.file))
-       #if (!file.exists(melt.config.file)) {
-            #warning("Could not find MELTING parameter file '", melt.config.file,  
-                     #"', which should have been copied by openPrimeR from ",
-                     #tandem.mm.file, ". Check your write permissions!")
-            #available.tools["MELTING"] <- FALSE
-        #}
-    #}
-    #################
+    # check for Pandoc/Latex
     if (available.tools["Pandoc"] && Sys.which("pdflatex") == "") {
         # don't warn here, otherwise too many warnings are generated
         #warning("Cannot create reports with pandoc since LateX is missing.")
         available.tools["Pandoc"] <- FALSE
+    }
+    # check for ViennaRNA version
+    if (available.tools["ViennaRNA"]) {
+        # check version
+        version <- system2("RNAfold", "--version", stdout = TRUE, stderr = TRUE)
+        if (length(attr(version, "status")) == 0) {
+            # the command worked -> check the version string
+            v <- strsplit(version, " ")[[1]]
+            if (length(v) >= 2) {
+                nbr <- try(as.numeric(gsub("\\.", "", v[2])))
+                if (class(nbr) != "try-error") {
+                    if (nbr < 241) { # version smaller than 2.4.1
+                        available.tools["ViennaRNA"] <- FALSE
+                    }
+                } else {
+                    available.tools["ViennaRNA"] <- FALSE # unknown version
+                }
+            } else {
+                available.tools["ViennaRNA"] <- FALSE # unknown version
+            }
+        } else {
+            available.tools["ViennaRNA"] <- FALSE # could not get version info
+        }
     }
     return(available.tools)
 }
