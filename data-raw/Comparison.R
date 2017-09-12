@@ -92,7 +92,10 @@ get_templates <- function() {
     # initial retrieval templates from IMGT
     script.loc <- system.file("inst", "shiny", "shiny_server", 
                               "extra_IMGT_template_set_extractor.py",
-                    package = "openPrimeR")
+                    package = "openPrimeRui")
+    if (script.loc == "") {
+        stop("Please load the 'openPrimeRui' package first.")
+    }
     # define what we want to extract:
     species <- "Homo sapiens"
     loci <- c("IGH", "IGK", "IGL")
@@ -102,7 +105,7 @@ get_templates <- function() {
         for (j in seq_along(funcs)) {
             func <- funcs[i]
             # retrieve & store leader+variable in extdata folder
-            retrieve.IMGT.templates(species, locus, func, TRUE)
+            openPrimeRui::retrieve.IMGT.templates(species, locus, func, TRUE)
         }
     }
     message("templates reside in extdata target dir now :-)")
@@ -115,11 +118,11 @@ get_primers <- function() {
     cmd <- paste("Python", script.loc)
     res <- system(cmd) # stored in data/IMGT_data/IMGT_primers
     # combine literature and IMGT primer sets
-    data.dir <- file.path("data", "IMGT_data")
+    data.dir <- system.file("data-raw", "IMGT_data", package = "openPrimeR")
     IMGT.loc <- file.path(data.dir, "IMGT_primers")
     # n.b.: for literature primers: apply mac2unix first to change formatting from mac
     lit.loc <- file.path(data.dir, "literature_primers")
-    primer.loc <- file.path(data.dir, "primers_raw")
+    primer.loc <- file.path(data.dir, "primers_raw") # primers_raw/ -> (manual) primers_mod/ -> primers/
     # copy primers from both locations
     IMGT.dirs <- list.files(IMGT.loc, full.names = TRUE)
     out.dirs <- file.path(primer.loc, basename(IMGT.dirs))
@@ -133,19 +136,7 @@ get_primers <- function() {
     }
     warning(paste("extdata was not updated with primers, need to manually modify adaptors.",
                 "If you don't want this, use the existing processed primers."))
-    # adaptor removal was done by hand:
-    ## Modify primers (remove duplicates, remove adapters: restriction sites, overhangs, etc)
-    #fixed.primers.loc <- file.path(data.dir, "primers")
-    #dir.create(fixed.primers.loc, showWarnings=FALSE)
-    #primers.fixed <- file.path(fixed.primers.loc, names(PRIMERS))
-    #names(primers.fixed) <- names(PRIMERS)
-    #raw.primers <- file.path(out.dirs)
-    #remove.all.duplicates.from.fasta(out.dirs, primers.fixed) # only needs to be called once to write the primers without duplicates
-    ## TODO: fix adapters when we know the stats of each set (low cvg primers -> probably have adaptors .. )
-    ## now, copy primers to extdata/ folder of the openPrimeR package
-    #target.dir <- system.file("extdata", "IMGT_data", "primers")
-    #res <- dir.copy(primer.loc, target.dir)
-    #message("primers reside in extdata target dir now :-)")
+    # adaptor removal was done by hand -> manually create primers/ folder entries
 }
 generate_evaluation_primers <- function(settings) {
     # evaluates the comparison primer sets according  to the provided settings
@@ -184,8 +175,8 @@ generate_evaluation_primers <- function(settings) {
                                     "primer_sets", package = "openPrimeR")
     create.primer.set.evaluation.data(functional.data, settings,
                                       comp.primer.out, primer.locations, 
-                                      rm.partials = TRUE, max.degen = max.degen,
-                                      fw.id = fw.id, rev.id = rev.id)
+                                      rm.partials = TRUE, max.degen = 16,
+                                      fw.id = "_fw", rev.id = "_rev")
 }
 generate_Comparison <- function(settings) {
     # store comparison data for IGH: primers and templates  
@@ -207,14 +198,13 @@ generate_Comparison <- function(settings) {
 ###########
 # SOURCES
 #############
-devtools::load_all("src/openPrimeR")
-source("src/analyses/load_data.R")
-source("src/analyses/set_default_parameters.R") # load settings
-source(system.file("inst", "shiny", "shiny_server", "extra_IO_shiny.R", package = "openPrimeR"))
-
+devtools::load_all()
+# load settings
+settings.filename <- system.file("extdata", "settings", "B_Taq_PCR_evaluate.xml", package = "openPrimeR")
+settings <- read_settings(settings.filename)
 refresh_src <- FALSE # should source primers/templates be retrieved once again?
 if (refresh_src) {
-    # WARNING: should never be run as primers were selected by hand afterwards ..
+    # WARNING: should never be run as primers were selected by hand after retrieval from the data sources
     get_templates()
     get_primers()
 }

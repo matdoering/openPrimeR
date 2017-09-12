@@ -242,7 +242,7 @@ utils::data("enzdata", package = "seqRFLP")
 # common restriction enzymes retrieved from:
 # https://www.addgene.org/mol-bio-reference/restriction-enzymes/
 # annotate common sites in enzdata
-common.file <- file.path("src", "openPrimeR", "data-raw", "common_restriction_sites.txt")
+common.file <- system.file("data-raw", "common_restriction_sites.txt", package = "openPrimeR")
 common.sites <- as.character(read.table(common.file)[,1])
 m <- match(common.sites, enzdata$nam)
 enzdata$common <- FALSE

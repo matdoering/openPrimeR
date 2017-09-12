@@ -1,0 +1,133 @@
+Manually adjusted primer sets (removed adaptors). This is a backup in case
+that primers/ is overwritten.
+
+IGH:
+- Xho: ctcgag
+IGK:
+- Sac1: gagctc
+
+Listing with primer sets with 0 cvg
+---------------------------------
+IGH
+------------
+IPS000032_Persson1991: done
+IPS000046_Cardona1995: nothing found
+IPS000069_Rubinstein1998: removed xho sites.
+IPS000095_Glamann1998: done
+IPS000221_vanDongen2003: nothing found
+Kueppers1993_IGHV_1st: nothing found -> analysis of rearranged genes ->
+primers don't bind to 'normal genes'?
+
+IGK:
+IPS000038_Persson1991: already done
+IPS000045_Atkinson1996: Xho1 sites not contained in all primers?
+IPS000049_Chen1986: nothing found
+IPS000063_Giachino1995: nothing found (germline cells)
+IPS000078_Glamann1998:  already done
+IPS000088_Rubinstein1998:  removed sac1 site.
+IPS000121_Cox1994: HindIII restriction site removed.
+IPS000122_Padyukov2001: HindIII and Xho1 sites removed. Combine IPS000122 and
+IPS000126 into one set.
+IPS000154_Juul1997: MboI site removed.
+IPS000158_Huber1993: not clear which sites are present?
+IPS000160_Timmers1993: removed Xba1 sites.
+Kueppers1993_IGKV_1st:  already done
+
+IGL:
+IPS000073_Stiernholm1994: no access :-(
+IPS000083_Moraes2003: added a missing sequence, no adaptors (ecoR1?)
+IPS000145_Rubinstein1998: removed sac1 site.
+Tiller2008_IGLV_1st: no restriction sites found! primer still don't 'work',
+TODO?
+Wardemann2003_IGLV_1st: are the same as the Murugan2015 primers and I couldn't
+find a corresponding publicatio, so i removed this set ..
+
+Comparison:
+- only consider 1st primers of nested PCR!
+
+Listing of primer sets with one primer with 0 cvg:
+
+IGH:
+- Brezinschek
+ccatggactggacctgg
+cacaggccccctaccagc
+-> Die primer wuerden ohne "cc" vorne binden! mehr mismatches erlauben? Kein
+Zugriff aufs Paper.
+- Ippolito
+tcaacacaacggttcccagtta
+-> VH3N primer (VH3-23)
+- vanEs: removed restriction sites from two primers where sites were not
+  removed yet.
+- Verhagen
+>Verhagen2000|IGHV2-10*01|2
+aacagtgatcaacatggacattgtg
+>Verhagen2000|IGHV3-15*05|4
+ctatctgcaaatggacagtctgaaa
+-> konnte keine Info ueber restriction finden.
+- Lim2010
+tcaacacaacggttcccagtta
+-> VH3N primer wie bei Ippolito ...
+
+Conclusion: do we miss VH3N in our templates?
+
+IGK:
+- Cardona1995
+>Cardona1995|IGKV4-1*01|15
+gacatcgtgatgacccagttctc
+-> Konnte nichts finden.
+- Burg2001
+van2001|IGKV7-3*01|29	aggacagagggccaccatcacc
+-> Konnte nichts finden.
+- vanDongen2003
+van2003|IGKV|6	gaccgatttcaccctcacaattaatcc
+-> nichts gefunden.
+- Lim2010
+Lim2010|VK2N1|5	agatgctgtgtgamccagcctc
+Lim2010|VK2N2|6	tccctccaagttcacatcctgag
+-> Both primers are a Design for putative functional genes suggested from VBASE2.
+- Murugan2015
+Murugan2015|5' L-Vk1/2|1 atgaggstcccygctcagctgctgg
+-> Konnte nichts finden
+- Tiller2008
+Tiller2008|5_L_Vk_1/2|1	atgaggstcccygctcagctgctgg
+-> Gleicher primer wie bei Murugan. Hat Murugan 'abgeschrieben von Tiller'?
+Tiller sagt auch nichts besonders ueber den primer.
+- Wardemann2003
+Wardemann2003|5' L V魏1/2|1	atgaggstcccygctcagctgctgg
+-> Gleicher wie bei Tiller2008/Murugan2015. Wardemann gibt im Suppl. auch
+keine Beschreibung ab.
+
+Conclusion: Should we consider putative functional genes (VBASE2)? What is
+wrong with the IGK 1/2 primer?
+
+IGL:
+- Ippolito2012
+Ippolito2014|VL3-fwd|5	tcctatgwgctgacwcagccaa
+-> Nichts gefunden
+- Marks1991
+Marks1991|IGLV4-69*01|5	cacgttatactgactcaaccgcc
+-> konnte nichts finden
+- Lim2010
+Lim2010|Vl3|5	tcctatgwgctgacwcagccaa
+Lim2010|VlNA|10	gtccagttcctctattatgrtag
+-> Zweiter primer ist wieder experimentell (putative). Beim ersten primer
+reporten sie coverage auch mit 1 mismatch...
+- Sblattero1998
+Sblattero1998|VL3back|2	tcctatgwgctgacwcagccaa
+-> Gleicher primer with Ippo/Lim2010
+
+Conclusion:
+Was ist mit dem tcctatgwgctgacwcagccaa Primer los?
+
+Summary
+-----------
+IGH:
+- What about the VH3N primer tcaacacaacggttcccagtta?
+IGK:
+- What is wrong with the IGK 1/2 primer atgaggstcccygctcagctgctgg?
+
+IGL:
+- What is wrong with the VL3 primer tcctatgwgctgacwcagccaa?
+
+General:
+- Should we consider putative functional genes (VBASE2)?

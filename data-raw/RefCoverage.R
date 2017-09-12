@@ -246,7 +246,7 @@ devtools::load_all("src/openPrimeR")
 ######
 # get reference coverage data frame:
 ######
-xls.file <- "data/PCR_ref_data.xlsx"
+xls.file <- system.file("data-raw", "PCR_ref_data.xlsx", package = "openPrimeR")
 ref.data <- get_ref_data (xls.file)
 ######
 # get feature matrix for supervised learning
