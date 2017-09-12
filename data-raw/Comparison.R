@@ -187,7 +187,7 @@ generate_evaluation_primers <- function(settings) {
                                       rm.partials = TRUE, max.degen = max.degen,
                                       fw.id = fw.id, rev.id = rev.id)
 }
-generate_Comparison <- function() {
+generate_Comparison <- function(settings) {
     # store comparison data for IGH: primers and templates  
     comp.files.primer <- list.files(path = system.file("extdata", "IMGT_data", 
                             "comparison", "primer_sets", "IGH", package = "openPrimeR"),
@@ -202,7 +202,7 @@ generate_Comparison <- function() {
                             update_template_cvg(template.data[[x]], primer.data[[x]])
     })
     out.loc <- system.file("data", "Comparison.rda", package = "openPrimeR")
-    save(primer.data, template.data, file = out.loc, compress = "xz")
+    save(primer.data, template.data, settings, file = out.loc, compress = "xz")
 }
 ###########
 # SOURCES
@@ -220,4 +220,4 @@ if (refresh_src) {
 }
 generate_evaluation_primers(settings) # evaluate primers
 # n.b. need to copy templates from primer to template folder manually atm
-generate_Comparison() # create rda file
+generate_Comparison(settings) # create rda file
