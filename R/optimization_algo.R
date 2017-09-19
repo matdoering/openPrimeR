@@ -1128,6 +1128,10 @@ compute.Tm.sets <- function(primer.df, template.df, Tm.brackets, settings, mode.
     if (length(mode.directionality) == 0) {
         stop("Please supply the 'mode.directionality' arg.")
     }
+    print("compute.Tm.sets: nrow is:")
+    print(nrow(primer.df))
+    print("compute.Tm.sets: nrow is:")
+    print(nrow(primer.df))
     mode.directionality <- match.arg(mode.directionality) 
     # load initial settings:
     opti.constraints <- opti(settings)
@@ -1158,6 +1162,7 @@ compute.Tm.sets <- function(primer.df, template.df, Tm.brackets, settings, mode.
         target.temp <- target.temps[i]
         # compute absolute melting temperature differences
         annealing.temp <- Tm.brackets$df$annealing_temp[i]
+
         # select Tm set:
         if (!is.na(target.temp) & "melting_temp" %in% colnames(primer.df)) {
             # target is not specified or melting temperature is not available
@@ -1165,6 +1170,8 @@ compute.Tm.sets <- function(primer.df, template.df, Tm.brackets, settings, mode.
         } else {
             cur.sel <- seq_len(nrow(primer.df))  # select all
         }
+        print("current selection:")
+        print(cur.sel)
          # message(paste('Available primers in Tm set:', length(cur.sel), sep = '')) no
         # available primers for current temp
         Tm.set <- primer.df[cur.sel, ]

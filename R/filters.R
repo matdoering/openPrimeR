@@ -760,6 +760,10 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
                         constraintLimits(settings)$melting_temp_diff <- set.new.limits(optiLimits(settings), initial.opti.limits, 
                                                                     initial.opti.constraints, "melting_temp_diff")$melting_temp_diff
                         Tm.brackets <- create.Tm.brackets(new.filtered.df, template.df, settings, target.temps)
+                        print("number of primers from new.filtered.df:")
+                        print(nrow(new.filtered.df))
+                        print("number of primers from Tm.brackets:")
+                        print(nrow(Tm.brackets$primers))
                         new.filtered.df <- Tm.brackets$primers
                         max.cvg <- get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality)
                     }
