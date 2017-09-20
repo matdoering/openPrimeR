@@ -760,11 +760,8 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
                         constraintLimits(settings)$melting_temp_diff <- set.new.limits(optiLimits(settings), initial.opti.limits, 
                                                                     initial.opti.constraints, "melting_temp_diff")$melting_temp_diff
                         Tm.brackets <- create.Tm.brackets(new.filtered.df, template.df, settings, target.temps)
-                        print("number of primers from new.filtered.df:")
-                        print(nrow(new.filtered.df))
-                        print("number of primers from Tm.brackets:")
-                        print(nrow(Tm.brackets$primers))
                         new.filtered.df <- Tm.brackets$primers
+                        # something goes wrong in get_max_set_coverage i think ..
                         max.cvg <- get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality)
                     }
             }
@@ -818,7 +815,6 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
             new.excluded.df <- new.excluded.df[-exclusion.idx, ]
             new.excluded.df <- my_rbind(new.excluded.df, filter.result$excluded)
         }
-        #print(new.excluded.df) # many things are NA here, why?
         # store actual coverage gain
         if (con.name %in% new.filtered.df$Exclusion_Reason) {
             new.covered <- unique(unlist(strsplit(new.filtered.df$Covered_Seqs[new.filtered.df$Exclusion_Reason == con.name], split = ",")))
@@ -847,17 +843,20 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         set.keep.idx <- which(Tm.cvg.vals >= target.cvg)
         # get melting temperature range of primers to keep
         Tm.df <- Tm.brackets$df[set.keep.idx, ]
-        min.Tm <- min(Tm.df[,"min_Tm"])
-        max.Tm <- max(Tm.df[,"max_Tm"])
-        # only retain primers between min.Tm and max.Tm, the others are not part of a set with neccesary cvg
-        excluded.idx <- which(new.filtered.df$melting_temp < min.Tm | new.filtered.df$melting_temp > max.Tm)
-        if (length(excluded.idx) != 0) {
-            Tm.exclusion <- new.filtered.df[excluded.idx,]
-            Tm.exclusion$Exclusion_Reason <- "melting_temp_range"
-            new.excluded.df <- my_rbind(new.excluded.df, Tm.exclusion)
-            new.filtered.df <- new.filtered.df[-excluded.idx,]
-            # update current cvg (should be the same as before ...)
-            max.cvg <- get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality)
+        if (length(Tm.df) != 0 && nrow(Tm.df) != 0) {
+            # only remove additional primers if any set fulfills the criterion
+            min.Tm <- min(Tm.df[,"min_Tm"])
+            max.Tm <- max(Tm.df[,"max_Tm"])
+            # only retain primers between min.Tm and max.Tm, the others are not part of a set with neccesary cvg
+            excluded.idx <- which(new.filtered.df$melting_temp < min.Tm | new.filtered.df$melting_temp > max.Tm)
+            if (length(excluded.idx) != 0) {
+                Tm.exclusion <- new.filtered.df[excluded.idx,]
+                Tm.exclusion$Exclusion_Reason <- "melting_temp_range"
+                new.excluded.df <- my_rbind(new.excluded.df, Tm.exclusion)
+                new.filtered.df <- new.filtered.df[-excluded.idx,]
+                # update current cvg (should be the same as before ...)
+                max.cvg <- get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality)
+            }
         }
     }
     # store final set:
