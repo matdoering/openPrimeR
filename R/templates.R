@@ -1693,24 +1693,13 @@ detect.gap.columns <- function(bins, gap.cutoff = 0.95, gap.char = "-") {
     mask.idx <- lapply(gap.freq, function(x) which(x >= gap.cutoff))
     return(mask.idx)
 }
-#' Plot of Template Sequence Conservation.
-#'
-#' Plots the template sequence conservation (range [0,1]) according to
-#' the Shannon entropy of the sequences. 
-#'
-#' @param entropy.df A data frame with entropies.
-#' Each row gives the entropies of a group of related template
-#' sequences for all columns of the alignment.
-#' @param alignments A list with \code{DNABin} alignment objects
-#' corresponding to the groups (rows) in the alignment.
-#' @param template.df The \code{Templates} object for which 
-#' the conservation has been determined.
-#' @param gap.char The gap char in the alignments. By default,
-#' \code{gap.char} is set to "-".
-#' @return A plot showing the degree of sequence conservation in the templates.
+#' @rdname Plots
+#' @return \code{plot_conseration} returns a plot showing the degree of sequence conservation in the templates.
 #' @export
-#' @note Computing the conservation scores for the plot requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
+#' @note Computing the conservation scores for using \code{plot_conservation} requires
+#' the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
 #' @examples
+#'
 #' data(Ippolito)
 #' # Select binding regions for every group of templates and plot:
 #' template.df <- select_regions_by_conservation(template.df, win.len = 30)

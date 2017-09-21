@@ -459,32 +459,20 @@ dimerization.table <- function(dimer.data, deltaG.cutoff,
     return(dimer.counts)
 }
 
-#' Plot of Constraint Values.
-#'
-#' Shows the distribution of the primer properties.
-#' The current constraint settings are indicated with dashed lines in the plot.
-#'
-#' @param primers Either an evaluated object of class \code{Primers}
-#' or a list of \code{Primers} objects.
-#' @param settings A \code{DesignSettings} object containing the
-#' settings for the constraints to be plotted. 
-#' @param active.constraints Identifiers of constraints to be plotted.
-#' If \code{active.constraints} is not provided, the plotting method
-#' automatically plots all constraints defined in \code{settings}
-#' that are annotated in \code{primers}.
-#' @param ... \code{highlight.set} (a character vector identifying the set
-#' that is to be highlighted when \code{primers} is a list).
-#' @return A plot showing the distribution of primer properties.
+#' @rdname Plots
+#' @return \code{plot_constraint} returns a plot showing the distribution of primer properties.
 #' @export
 #' @include primers.R settings.R
-#' @family constraint visualizations
 #' @examples
+#' 
 #' # Plot histogram of constraints for a single primer set
 #' data(Ippolito)
-#' p <- plot_constraint(primer.df, settings, active.constraints = c("gc_clamp", "gc_ratio"))
+#' p <- plot_constraint(primer.df, settings, 
+#'                      active.constraints = c("gc_clamp", "gc_ratio"))
 #' # Compare constraints across multiple primer sets
 #' data(Comparison)
-#' p.cmp <- plot_constraint(primer.data[1:3], settings, active.constraints = c("gc_clamp", "gc_ratio"))
+#' p.cmp <- plot_constraint(primer.data[1:3], settings, 
+#'                          active.constraints = c("gc_clamp", "gc_ratio"))
 setGeneric("plot_constraint", 
     function(primers, settings, active.constraints = names(constraints(settings)), ...) {
         if (is(settings, "DesignSettings")) {
@@ -581,25 +569,13 @@ setMethod("plot_constraint",
             nfacets = nfacets)
     return(p)
 })
-#' Constraint Fulfillment Plot.
-#'
-#' Visualizes which which primers pass the constraint settings and which
-#' primers break the constraints.
-#'
-#' @param primers Either an object of class \code{Primers} or a list of such objects.
-#' @param settings A \code{DesignSettings} object containing
-#' the constraints to be evaluated.
-#' @param active.constraints The identifiers of constraints to be plotted for fulfillment. By default \code{active.constraints} is set according to 
-#' all active constarints defined in \code{settings}.
-#' @param plot.p.vals An optional logical argument indicating whether
-#' p-values computed via \code{\link{primer_significance}} should be annotated in the plot. The default is \code{FALSE}.
-#' @param ... The optional arguments \code{ncol} (a numeric indicating the number of facet columns if \code{primers} is a list),
-#' \code{highlight.set} (the identifier of the primer set to be highlighted if \code{primers} is a list)
-#' @return A plot indicating the constraints that fulfilled by the input primers.
+
+#' @rdname Plots
+#' @return \code{plot_constraint_fulfillment} returns a plot indicating the constraints that are fulfilled by the input primers.
 #' @export
 #' @include primers.R settings.R
-#' @family constraint visualizations
 #' @examples
+#' 
 #' # Plot fulfillment for a single primer set:
 #' data(Ippolito)
 #' p <- plot_constraint_fulfillment(primer.df, settings)
@@ -763,20 +739,12 @@ setMethod("plot_constraint_fulfillment",
     }
     return(p)
 })
-#' Plot of Coverage Constraints.
-#'
-#' Plots the distribution of the coverage constraint values.
-#'
-#' @param primers A \code{Primers} object or a list with objects of class \code{Primers}. 
-#' @param settings A \code{DesignSettings} object.
-#' @param active.constraints Names of coverage constraints to be plotted.
-#' By default, all active coverage constraints in \code{settings} are plotted.
-#' @param ... \code{highlight.set} (a character vector identifying the set
-#' that is to be highlighted when \code{primers} is a list).
-#' @return A plot showing the distribution of the coverage constraint values.
+#' @rdname Plots
+#' @return \code{plot_cvg_constraints} returns a plot showing the distribution of the coverage constraint values.
 #' @export
 #' @include primers.R settings.R
 #' @examples
+#' 
 #' # Plot coverage constraints of a single primer set
 #' data(Ippolito)
 #' p <- plot_cvg_constraints(primer.df, settings)
@@ -889,30 +857,19 @@ setMethod("plot_cvg_constraints",
     return(p)
 })
 
-#' Plot of Constraint Deviations.
-#'
-#' Shows the deviation of primer properties from
-#' the target ranges.
-#'
-#' Deviations are computed in the following way. Let the
+#' @rdname Plots
+#' @details
+#' The deviations for \code{plot_constraint_deviation} are computed in the following way. Let the
 #' minimum and maximum allowed constraint values be given by
 #' the interval \eqn{[s, e]} and the observed value be \eqn{p}. Then,
 #' if \eqn{p < s}, we output \eqn{-p/|s|}, if \eqn{p > e} we output \eqn{p/|e|},
 #' and otherwise, i.e. if \eqn{s <= p <= e}, we output 0.
 #'
-#' @param primer.data An evaluated object of class \code{Primers} or a list with \code{Primers} objects.
-#' @param settings A \code{DesignSettings} object
-#' containing the target ranges for the primer properties.
-#' @param active.constraints Constraint identifiers to be plotted. By default,
-#' all constraints found in \code{settings} are plotted.
-#' @param ... \code{deviation.per.primer} (a boolean indicating whether 
-#' the deviations should be plotted per primer rather than per constraint
-#' if \code{primer.data} is a list)
-#' @return A plot showing the deviations of the primer properties from the targets.
+#' @return \code{plot_constraint_deviation} returns a plot showing the deviations of the primer properties from the target constraints.
 #' @export
 #' @include primers.R settings.R
-#' @family constraint visualizations
 #' @examples
+#' 
 #' # Deviations for a single primer set
 #' data(Ippolito)
 #' p.dev <- plot_constraint_deviation(primer.df, settings)
@@ -920,7 +877,7 @@ setMethod("plot_cvg_constraints",
 #' data(Comparison)
 #' p.dev.cmp <- plot_constraint_deviation(primer.data, settings)
 setGeneric("plot_constraint_deviation", 
-    function(primer.data, settings, active.constraints = names(constraints(settings)), ...) {
+    function(primers, settings, active.constraints = names(constraints(settings)), ...) {
         if (is(settings, "DesignSettings")) {
             # use only the constraints that are defined in the settings
             active.constraints <- active.constraints[active.constraints %in% names(constraints(settings))]
@@ -935,18 +892,18 @@ setGeneric("plot_constraint_deviation",
 #' Plots a box plot of deviations of 
 #' primer properties from the target ranges.
 #'
-#' @param primer.data An evaluated object of class \code{Primers}.
+#' @param primers An evaluated object of class \code{Primers}.
 #' @param settings A \code{DesignSettings} object
 #' containing the target ranges for the primer properties.
 #' @param active.constraints Constraint identifiers to be plotted.
 #' @return A boxplot of deviations
 #' @keywords internal
 setMethod("plot_constraint_deviation", 
-    signature(primer.data = "Primers"),
-    function(primer.data, settings, active.constraints) {
+    signature(primers = "Primers"),
+    function(primers, settings, active.constraints) {
         constraint.settings <- constraints(settings)
         constraint.settings <- constraint.settings[names(constraint.settings) %in% active.constraints]
-        df <- get_constraint_deviation_data(primer.data, constraint.settings)
+        df <- get_constraint_deviation_data(primers, constraint.settings)
         if (length(df) == 0) {
             return(NULL)
         }
@@ -986,12 +943,12 @@ setMethod("plot_constraint_deviation",
 #' @return A boxplot of deviations
 #' @keywords internal
 setMethod("plot_constraint_deviation", 
-    signature(primer.data = "list"),
-    function(primer.data, settings, active.constraints, deviation.per.primer = FALSE) {
+    signature(primers = "list"),
+    function(primers, settings, active.constraints, deviation.per.primer = FALSE) {
         # check class of primer.data entries
-        c <- sapply(primer.data, class)
+        c <- sapply(primers, class)
         if (!all(c == "Primers")) {
-            stop("Please ensure that all 'primer.data' objects are of class 'Primers'.")
+            stop("Please ensure that all 'primers' objects are of class 'Primers'.")
         }
         # select active.constraints
         constraint.settings <- constraints(settings)
@@ -1000,9 +957,9 @@ setMethod("plot_constraint_deviation",
             warning("No active constraint settings available.")
             return(NULL)
         }
-        plot.data <- vector("list", length(primer.data))
-        for (i in seq_along(primer.data)) {
-            primer.df <- primer.data[[i]]
+        plot.data <- vector("list", length(primers))
+        for (i in seq_along(primers)) {
+            primer.df <- primers[[i]]
             df <- get_constraint_deviation_data(primer.df, constraint.settings)
             plot.data[[i]] <- df
         }

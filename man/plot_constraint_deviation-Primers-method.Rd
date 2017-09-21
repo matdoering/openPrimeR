@@ -5,11 +5,11 @@
 \alias{plot_constraint_deviation,Primers-method}
 \title{Plot of Constraint Deviations for a Single Primer Set.}
 \usage{
-\S4method{plot_constraint_deviation}{Primers}(primer.data, settings,
+\S4method{plot_constraint_deviation}{Primers}(primers, settings,
   active.constraints)
 }
 \arguments{
-\item{primer.data}{An evaluated object of class \code{Primers}.}
+\item{primers}{An evaluated object of class \code{Primers}.}
 
 \item{settings}{A \code{DesignSettings} object
 containing the target ranges for the primer properties.}

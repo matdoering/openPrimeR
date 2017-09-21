@@ -1,19 +1,7 @@
-#' Evaluated Primer Data from Ippolito et al.
-#'
-#' Primer and template data for IGHV from Ippolito et al.
-#'
-#' @docType data
+#' @rdname Data
+#' @name Ippolito
 #'
 #' @usage data(Ippolito)
-#' @name Ippolito
-#' @format \code{primer.df} provides a \code{Primers} object containing
-#' the evaluated set of primers from Tiller et al.
-#' \code{template.df} provides
-#' a \code{Templates} object containing functional, human IGHV
-#' templates for, and \code{settings} provides a 
-#' \code{DesignSettings} object providing the used analysis settings.
-#'
-#' @keywords datasets
 #'
 #' @aliases template.df primer.df settings
 #'
@@ -23,8 +11,9 @@
 #' Cells Reveals Human-Like Diversification and Tolerance Checkpoints 
 #' in the Mouse. PLoS One 7:e35497.
 #' @examples
+#' 
+#' # Load the data from Ippolito et al.
 #' data(Ippolito)
-#' # Explore the data:
 #' primer.df
 #' template.df
 #' constraints(settings)

@@ -1,21 +1,9 @@
-#' Plot of Primer Coverage Ratio vs Set Size.
-#'
-#' Plots the coverage ratios of the input primer sets 
-#' against the size of the sets.
-#'
-#' @param primer.data List with objects of class \code{Primers} containing
-#' the primer sets that are to be compared.
-#' @param template.data List with objects of class \code{Templates} containing
-#' the templates corresponding to \code{primer.data}.
-#' @param show.labels Whether the identifiers of the primer sets
-#' should be annotated in the plot. The default is \code{TRUE}.
-#' @param highlight.set A character vector providing the identifiers
-#' of primer sets to highlight. By default, \code{highlight.set} is \code{NULL}
-#' such that no highlighting takes place.
-#' @return A plot of coverage vs set size.
-#' @family comparison visualizations
+#' @rdname Plots
+#' @return \code{plot_cvg_vs_set_size} returns a plot of coverage vs set size.
 #' @export
 #' @examples
+#' 
+#' # Plot coverage vs primer set size
 #' data(Comparison)
 #' p <- plot_cvg_vs_set_size(primer.data, template.data)
 plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE, highlight.set = NULL) {
@@ -91,27 +79,14 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
    } 
     return(p)
 }
-#' Plot of Primer Penalties vs Set Size.
-#'
-#' Plots the penalties of the input primer sets 
-#' against the number of primers contained in each set.
-#' The penalties are computed using \code{\link{score_primers}}
-#' where more information is provided on how to set \code{alpha}.
-#'
-#' @param primer.data List with objects of class \code{Primers}.
-#' @param settings An object of class \code{DesignSettings}.
-#' @param active.constraints A character vector with constraint identifiers
-#' to be considered for generating the plot.
-#' @param alpha A numeric in the range [0,1] defining the trade-off between
-#' the maximal deviation of a constraint (large code{alpha}) and
-#' all constraint deviations (large \code{alpha}).
-#' By default, \code{alpha} is set to 0 such that the absolute
-#' deviation across all constraints is considered.
-#' @return A plot showing the association between 
-#' primer penalties and the size of the primer sets.
-#' @family comparison visualizations
+
+#' @rdname Plots
+#' @return \code{plot_penalty_vs_set_size} returns a plot of constraint penalties
+#' vs primer set sizes.
 #' @export
 #' @examples
+#' 
+#' # Plot penalties vs number of primers
 #' data(Comparison)
 #' p <- plot_penalty_vs_set_size(primer.data, settings)
 plot_penalty_vs_set_size <- function(primer.data, settings, 
@@ -575,32 +550,22 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     out <- list("cvg_per_nbr_mismatches" = mm.stats, "cvg_per_group" = group.df)
     return(out)
 }
-#' Plot of Primer Subset Coverage.
-#'
-#' Visualizes the coverage of optimized primer subsets.
-#'
-#' The input for the \code{primer.subsets} argument can be computed using
+#' @rdname Plots
+#' @details
+#' The \code{primer.subsets} argument for \code{plot_primer_subsets} can be computed using
 #' \code{\link{subset_primer_set}}. 
 #' The line plot indicates the ratio of covered templates when considering
 #' all primers in a primer set of a given size. The bar plots indicate
 #' the coverage ratios of individual primers in a set. The target coverage
 #' ratio is indicated by a horizontal line. Bars exceeding the target ratio
 #' possibly indicate the existence of redundant coverage events.
-#'
-#' @param primer.subsets A list with optimal primer subsets, each of class \code{Primers}. The \emph{k}-th list entry should correspond to an object of class \code{Primers}
-#' representing the primer subset of size \emph{k} whose coverage ratio
-#' is the largest among all possible subsets of size \emph{k}.
-#' @param template.df An object of class \code{Templates} containing the
-#' template sequences corresponding to the primers specified in \code{primer.subsets}.
-#' @param required.cvg The required coverage ratio.
-#' The default is 100\%; this value is plotted as a horizontal line.
-#' @return Plot of the coverages of the primer subsets in \code{primer.subsets}.
+#' @return \code{plot_primer_subsets} plots the coverages of the primer subsets provided via \code{primer.subsets}.
 #' @export
-#' @family coverage visualizations
 #' @examples
+#' 
+#' # Plot the coverage of optimal primer subsets
 #' data(Ippolito)
 #' primer.subsets <- subset_primer_set(primer.df, template.df, k = 3)
-#' # Plot the coverage of optimal primer subsets
 #' p <- plot_primer_subsets(primer.subsets, template.df)
 plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
                             
@@ -896,26 +861,12 @@ get_plot_primer_data <- function(primer.df, template.df, identifier = NULL, rela
     d <- dcast(m, ID + y + Type ~ variable)
     return(d)
 }
-#' Primer View Plot.
-#' 
-#' Visualizes the binding positions of every primer relative to
-#' the target binding region in the corresponding template sequences.
-#'
-#' @param primer.df An object of class \code{Primers} containing
-#' primers with evaluated primer coverage.
-#' @param template.df An object of class \code{Templates} with template sequences
-#' corresponding to \code{primer.df}.
-#' @param identifier Identifiers of primers that are to be considered.
-#' If \code{identifier} is set to \code{NULL} (the default), all primers are considered.
-#' @param relation Compute binding positions relative to forward ("fw") or reverse ("rev") binding regions.
-#' The default is "fw".
-#' @param region.names Character vector of length 2 providing the names
-#' of the binding and amplification region.
-#'
-#' @return A plot of primer binding sites in the templates.
+#' @rdname Plots
+#' @return \code{plot_primer} plots the primer binding sites in the templates.
 #' @export
-#' @family coverage visualizations
 #' @examples
+#' 
+#' # Plot of individual primer binding positions
 #' data(Ippolito)
 #' p <- plot_primer(primer.df[1,], template.df[1:30,])
 plot_primer <- function(primer.df, template.df, identifier = NULL, 
@@ -1061,26 +1012,14 @@ plot.excluded.hist <- function(excluded.df, filtered.stats, template.df) {
         scale_y_continuous(labels = scales::percent) +
         facet_wrap(~Direction)
 }
-#' Bar Plot of Template Coverage.
-#'
-#' Creates a bar plot showing the coverage for every group of template sequences.
-#'
-#' @param primers Either a \code{Primers} object with evaluated primer coverage
-#' or a list containing \code{Primers} objects.
-#' @param templates If \code{primers} is a \code{Primers} object, \code{templates} should be a \code{Templates} object.
-#' If \code{primers} is a list, then \code{templates} should be a list of \code{Templates} objects.
-#' @param per.mismatch A logical specifying whether the visualization should be stratified
-#' according to the allowed number of mismatches. By default,
-#' \code{per.mismatch} is set to \code{FALSE} such that the overall coverage
-#' is plotted.
-#' @param ... Optional arguments \code{groups} (a character vector of groups to be plotted when \code{primers} is a single primer set), \code{highlight.set} (the identifier of a primer set to be highlighted when \code{primers} is a list)
-#'
-#' @return A plot showing the number of covered template sequences.
+
+#' @rdname Plots
+#' @return \code{plot_template_cvg} creates a plot showing the number of covered template sequences.
 #' @family templates
 #' @export
 #' @include primers.R templates.R
-#' @family coverage visualizations
 #' @examples
+#' 
 #' # Visualize the template coverage of a single primer set
 #' data(Ippolito)
 #' p.cvg <- plot_template_cvg(primer.df, template.df)
@@ -1090,7 +1029,8 @@ plot.excluded.hist <- function(excluded.df, filtered.stats, template.df) {
 #' data(Comparison)
 #' p.cmp.cvg <- plot_template_cvg(primer.data[1:2], template.data[1:2])
 #' # Stratify by allowed mismatches:
-#' p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:2], template.data[1:2], per.mismatch = TRUE)
+#' p.cmp.cvg.mm <- plot_template_cvg(primer.data[1:2], template.data[1:2], 
+#'                                  per.mismatch = TRUE)
 setGeneric("plot_template_cvg", 
     function(primers, templates, per.mismatch = FALSE, ...) {
         standardGeneric("plot_template_cvg")
@@ -1728,26 +1668,12 @@ setMethod("get_cvg_stats", signature(primers = "list"),
     stat.df <- stat.df[order(stat.df$Run), ]
     return(stat.df)
 })
-#' Plot of Primer Coverage.
-#'
-#' Shows which groups of templates are covered by individual primers.
-#' 
-#' @param primers An object of class \code{Primers} or a list with with objects
-#' of class \code{Primers}.
-#' @param templates If \code{primers} is an object of class \code{Primers},
-#' please supply a \code{Templates} object. If \code{primers} is a list,
-#' please supply a corresponding list with \code{Templates} objects.
-#' @param per.mismatch A logical identifiying whether the coverage should
-#' be plotted for individual settings of allowed mismatches. By default
-#' \code{per.mismatch} is set to \code{FALSE} such that the overall
-#' coverage is plotted.
-#' @param ... \code{groups} (the identifiers of template groups
-#' to be excluded from the plot if \code{primers} is a single primer set)
-#' @return A plot showing the coverage of individual primers.
+#' @rdname Plots
+#' @return \code{plot_primer_cvg} creates a plot showing the coverage of individual primers.
 #' @export
-#' @family coverage visualizations
 #' @include primers.R templates.R
 #' @examples
+#' 
 #' # Plot expected coverage per primer
 #' data(Ippolito)
 #' p.cvg <- plot_primer_cvg(primer.df, template.df)

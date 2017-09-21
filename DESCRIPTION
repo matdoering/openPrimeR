@@ -72,11 +72,13 @@ biocViews: Software, Technology
 VignetteBuilder: knitr
 Collate: 
     'Comparison.R'
+    'Data.R'
     'templates.R'
     'primers.R'
     'IO.R'
     'IO_view.R'
     'Ippolito.R'
+    'Plots.R'
     'RefCoverage.R'
     'Tiller.R'
     'ambiguity.R'

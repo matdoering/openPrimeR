@@ -1128,35 +1128,12 @@ update_primer_cvg <- function(primer.df, template.df, allowed.mismatches, cvg.de
     return(new.primer.df)
 }
 
-#' Plot of Primer Binding Regions.
-#'
-#' Visualizes the number of binding events of the input primers
-#' with respect to the allowed binding regions in the templates.
-#'
-#' @param primers Either a single \code{Primers} object or 
-#' a list with \code{Primers} objects.
-#' @param templates If \code{primers} is a \code{primers} object,
-#' please supply a \code{Templates} object.
-#' If \code{primers} is a list, please supply a corresponding list of
-#' \code{Templates} objects.
-#' @param direction The directionality of primers to be plotted. This can either
-#' be "both" to plot primers of both directions (the default), "fw" to plot
-#' only forward primers, or "rev" to plot only reverse primers.
-#' @param group Optional identifiers of template groups for which binding events should
-#' be determined. By default, \code{group} is set to \code{NULL} such that
-#' all templates are considered.
-#' @param relation An optional character vector specifying whether binding region data shall
-#' be plotted relative to the forward (\code{fw}) or reverse (\code{rev}) 
-#' target binding regions.
-#' @param region.names An optional, two-component character vector specifying
-#' the identifiers for the primer binding region and the amplified region.
-#' @param ... \code{highlight.set} (the identifiers of primer sets
-#' to be highlighted, if \code{primers} is a list)
-#' @return A plot for primer binding region comparison.
+#' @rdname Plots
+#' @return \code{plot_primer_binding_regions} returns a plot of the primer binding regions.
 #' @export
 #' @include templates.R
-#' @family coverage visualizations
 #' @examples
+#' 
 #' # Primer binding regions of a single primer set
 #' data(Ippolito)
 #' p <- plot_primer_binding_regions(primer.df, template.df)

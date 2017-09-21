@@ -5,7 +5,7 @@
 \alias{plot_constraint_deviation,list-method}
 \title{Plot of Constraint Deviations for Multiple Primer Sets.}
 \usage{
-\S4method{plot_constraint_deviation}{list}(primer.data, settings,
+\S4method{plot_constraint_deviation}{list}(primers, settings,
   active.constraints, deviation.per.primer = FALSE)
 }
 \arguments{
