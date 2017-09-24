@@ -44,12 +44,8 @@ validate_templates <-  function(object) {
     }
 }
 
-#' The Templates Class.
-#'
-#' The \code{Templates} class encapsulates a data frame
-#' containing the sequencs of the templates, their binding regions,
-#' as well as additional information (e.g. template coverage).
-#'
+#' @rdname Input
+#' @details
 #' In the following you can find a description
 #' of the most important columns that can be found
 #' in an object of class \code{Templates}. Note that
@@ -71,19 +67,13 @@ validate_templates <-  function(object) {
 #' \item{\code{primer_coverage}}{The number of primers covering the templates,
 #' when the template coverage has been annotated.}
 #' }
-#' @name Templates-class
-#' @return A \code{Templates} object, an instance of a data frame.
-#' @rdname Templates-class
+#' @return The \code{Templates} constructor returns 
+#' a \code{Templates} object, an instance of a data frame.
 #' @exportClass Templates
 #' @export
-#' @keywords Classes
-#' @family template functions
-#' @seealso \code{\link{read_templates}} for loading template sequences,
-#' \code{\link{assign_binding_regions}} for adjusting the primer binding regions,
-#' \code{\link{update_template_cvg}} for setting the template coverage,
-#' \code{\link{plot_template_cvg}} for plotting the template coverage,
-#'
 #' @examples
+#' 
+#' # Load a set of templates:
 #' fasta.file <- system.file("extdata", "IMGT_data", "templates", 
 #'      "Homo_sapiens_IGH_functional_exon.fasta", package = "openPrimeR")
 #' hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
@@ -102,11 +92,8 @@ setMethod("show", "Templates", function(object) {
     # overwrite the 'print' function
     my_show_df(asS3(object))
 })
-#' @name Templates
-#' @rdname Templates-class
+#' @rdname Input
 #' @export
-#' @param ... A data frame fulfilling the structural requirements
-#' for initializing a \code{Templates} object.
 Templates <- function(...) new("Templates", ...) 
 
 #' cbind for Template class.
@@ -312,12 +299,9 @@ parse.header <- function(hdr, delim, hdr.str, id.column) {
     return(result)
 }
 
-
-#' Input of Template Sequences.
-#' 
-#' Read one or multiple files with template sequences in FASTA or CSV format.
-#'
-#' When supplying a FASTA file with template sequences,
+#' @rdname Input
+#' @details
+#' When loading a FASTA file with \code{read_templates},
 #' the input arguments \code{hdr.structure}, \code{delim}, \code{id.column}, 
 #' \code{rm.keywords}, \code{remove.duplicates}, \code{fw.region}, 
 #' \code{rev.region}, \code{gap.character}, and \code{run} are utilized.
@@ -325,36 +309,15 @@ parse.header <- function(hdr, delim, hdr.str, id.column) {
 #' match the FASTA header structure.
 #' To learn more about setting the primer binding regions, consider the
 #' \code{\link{assign_binding_regions}} function.
-#' In contrast, when supplying a CSV file with template sequences,
+#' In contrast, when a CSV file is loaded with \code{read_templates},
 #' the data are loaded without performing any modifications because the CSV file
 #' should represent an object of class \code{\link{Templates}}, which 
 #' can be stored using the \code{\link{write_templates}} function.
 #'
-#' @param template.file Path to one or multiple FASTA or CSV files 
-#' containing the template sequences.
-#' @param hdr.structure A character vector describing the information contained in the FASTA headers. In case that the headers of \code{fasta.file} contain
-#' template group information, please include the keyword "GROUP" in
-#' \code{hdr.structure}. If the numer of elements provided via \code{hdr.structure}
-#' is shorter than the actual header structure, the missing fields are ignored.
-#' @param delim Delimiter for the information in the FASTA headers.
-#' @param id.column Field in the header to be used as the identifier of individual
-#' template sequences.
-#' @param rm.keywords A vector of keywords that are used to remove templates whose headers contain any of the keywords.
-#' @param remove.duplicates Whether duplicate sequence shall be removed.
-#' @param fw.region The positional interval from the template 5' end specifying the  
-#' binding sites for forward primers. The default \code{fw.region} is set to
-#' the first 30 bases of the templates.
-#' @param rev.region The positional interval from the template 3' end specifying
-#' the binding sites for reverse primers. The default \code{rev.region}
-#' is set to the last 30 bases of the templates.
-#' @param gap.character The character in the input file representing gaps. 
-#' Gaps are automatically removed upon input and the default character is "-".
-#' @param run An identifier for the set of template sequences. By default,
-#' \code{run} is \code{NULL} and its value is set via \code{template.file}.
-#' @return An object of class \code{Templates}.
+#' @return \code{read_templates} returns a single object of class
+#' \code{Templates} if a single filename was provided or a list
+#' of such objects if multiple file names were provided.
 #' @export
-#' @family template functions
-#' @keywords Templates
 #' @examples
 #' # Load templates from a FASTA file
 #' fasta.file <- system.file("extdata", "IMGT_data", "templates", 
@@ -374,24 +337,24 @@ parse.header <- function(hdr, delim, hdr.str, id.column) {
 #' # Load a mixture of FASTA/CSV files:
 #' mixed.files <- c(csv.file, fasta.file)
 #' template.data <- read_templates(mixed.files)
-read_templates <- function(template.file, hdr.structure = NULL, delim = NULL, id.column = NULL, 
+read_templates <- function(fname, hdr.structure = NULL, delim = NULL, id.column = NULL, 
                            rm.keywords = NULL, remove.duplicates = FALSE, fw.region = c(1,30), 
-                           rev.region = c(1,30), gap.character = "-", run = NULL) {
+                           rev.region = c(1,30), gap.char = "-", run = NULL) {
 
-    if (length(template.file) > 1) {
-        template.df <- read_templates_multiple(template.file, 
+    if (length(fname) > 1) {
+        template.df <- read_templates_multiple(fname, 
             hdr.structure = hdr.structure, delim = delim, 
             id.column = id.column, rm.keywords = rm.keywords,
             remove.duplicates = remove.duplicates, 
             fw.region = fw.region, rev.region = rev.region, 
-            gap.character = gap.character, run = run)
+            gap.character = gap.char, run = run)
     } else {
-        template.df <- read_templates_single(template.file, 
+        template.df <- read_templates_single(fname, 
             hdr.structure = hdr.structure, delim = delim, 
             id.column = id.column, rm.keywords = rm.keywords,
             remove.duplicates = remove.duplicates, 
             fw.region = fw.region, rev.region = rev.region, 
-            gap.character = gap.character, run = run)
+            gap.character = gap.char, run = run)
 
     }
     return(template.df)
@@ -680,21 +643,13 @@ read.sequences <- function(fasta.file, gap.character) {
     rownames(d) <- NULL
     return(d)
 }
-#' Annotation of Template Coverage.
-#'
-#' Annotates the templates with coverage information.
-#'
-#' @param template.df An object of class \code{Templates}.
-#' @param primer.df An object of class \code{Primers} containing
-#' primers with annotated coverage that are to be used to update 
-#' the template coverage in \code{template.df}.
-#' @param mode.directionality Directionality of primers.
-#' The default is \code{NULL}, which means that the directionality
-#' of primers is identified automatically.
-#' @return An object of class \code{Templates} with updated coverage columns.
+#' @rdname Templates
+#' @return \code{update_template_cvg} returns an object of class 
+#' \code{Templates} with updated coverage columns.
 #' @export
-#' @family template functions
 #' @examples
+#'
+#' Annotate the coverage of the templates
 #' data(Ippolito)
 #' template.df <- update_template_cvg(template.df, primer.df)
 update_template_cvg <- function(template.df, primer.df, 
@@ -786,27 +741,22 @@ update_template_cvg <- function(template.df, primer.df,
     return(template.df)
 }
 
-#' Adjustment of Existing Binding Regions.
-#'
-#' Adjusts the existing annotation of binding regions by specifying
-#' a new binding interval relative to the existing binding region. 
-#'
-#' The new binding intervals provided by \code{fw} and \code{rev}
-#' for forward and reverse primers, respectively, are provided
-#' relative to the existing definition of binding regions in \code{template.df},
-#' which can be set using \code{\link{assign_binding_regions}}.
-#' When specifying relative positions, position \code{0} is defined as the first position after the end of the existing
+#' @rdname Templates
+#' @details
+#' When modifying binding regions with \code{adjust_binding_regions}, new
+#' binding intervals can be specified via \code{fw} and \code{rev}
+#' for forward and reverse primers, respectively. The new regions should
+#' be provided relative to the existing definition of binding regions 
+#' in \code{template.df}.
+#' For specifying the new binding regions, position \code{0} refers to 
+#' the first position after the end of the existing
 #' binding region. Hence, negative positions relate to regions within the
-#' existing binding region while non-negative values 
-#' extend the binding region further.
+#' existing binding region, while non-negative values relate to positions
+#' outside the defined binding region.
 #'
-#' @param template.df A \code{Templates} object providing the template sequences
-#' for which the binding regions shall be adjusted.
-#' @param region.fw Interval of new binding regions relative to the forward binding region defined in \code{template.df}.
-#' @param region.rev Interval of new binding regions relative to the reverse binding region defined in \code{template.df}
-#' @return A \code{Templates} object with updated binding regions.
+#' @return \code{adjust_binding_regions} returns a \code{Templates} object with
+#' updated binding regions.
 #' @export
-#' @keywords Templates
 #' @examples
 #' data(Ippolito)
 #' # Extend the binding region by one position
@@ -903,11 +853,10 @@ update.individual.binding.region <- function(min, max, template.df, mode.directi
     }
     return(template.df)
 }
-#' Assignment of Template Binding Regions.
-#'
-#' Assigns the primer target binding regions to a set of template sequences.
-#'
-#' The arguments \code{fw} and \code{rev} provide data describing
+#' @rdname Templates
+#' @details
+#' Binding regions are defined using \code{assign_binding_regions}, where
+#' the arguments \code{fw} and \code{rev} provide data describing
 #' the binding regions of the forward and reverse primers, respectively.
 #' To specify binding regions for each template
 #' individually, \code{fw} and \code{rev} should provide the paths to FASTA files. The headers of these
@@ -923,32 +872,12 @@ update.individual.binding.region <- function(min, max, template.df, mode.directi
 #' If \code{optimize.region} is \code{TRUE}, the input binding region is
 #' adjusted such that regions forming secondary structures are avoided.
 #'
-#' @param template.df A \code{Templates} object containing the sequences
-#' for which primer binding regions should be annotated.
-#' @param fw Binding regions for forward primers. Either a numeric interval indicating a uniform
-#' binding range relative to the template 5' end or a path to a FASTA file providing
-#' binding sequences for every template. If \code{fw} is missing, only
-#' \code{rev} is considered.
-#' @param rev Binding regions for reverse primers. Either a numeric interval indicating a uniform
-#' binding range relative to the template 3' end or the path to a FASTA file providing
-#' binding sequences for every template. If \code{rev} is missing,
-#' only \code{fw} is considered.
-#' @param optimize.region If \code{TRUE}, the binding regions
-#' specified via \code{fw} and \code{rev} are 
-#' adjusted such that binding regions that may form secondary structures are 
-#' avoided. This feature requires ViennaRNA (see notes). If \code{FALSE}
-#' (the default), the input binding regions are not modified.
-#' @param primer.length A numeric scalar providing the probe length that is used for
-#' for adjusting the primer binding regions when \code{optimize.region} is \code{TRUE}.
-#' @param gap.char The character indicating gaps in aligned sequences.
-#' The default is "-".
-#' @return An object of class \code{Templates} with assigned binding regions.
+#' @return \code{assign_binding_regions} returns an object of class \code{Templates} with newly assigned binding regions.
 #' @export
-#' @keywords Templates
-#' @family template functions
-#' @note The program ViennaRNA (https://www.tbi.univie.ac.at/RNA/) must be
-#' installed to perform the computations that are triggered
-#' when \code{optimize.region} is set to \code{TRUE}.
+#' @note \code{assign_binding_regions} requires the program ViennaRNA
+#' (https://www.tbi.univie.ac.at/RNA/)
+#' for adjusting the binding regions when \code{optimize.region} 
+#' is set to \code{TRUE}.
 #' @examples
 #' data(Ippolito)
 #' # Assignment of individual binding regions
@@ -1570,19 +1499,12 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
     }
     return(final.df)
 }
-#' Storing Templates to Disk.
-#'
-#' Stores a set of templates as a FASTA or CSV file.
-#'
-#' @param template.df An object of class \code{Templates} to be stored to disk.
-#' @param fname The path to the file where the templates should be stored.
-#' @param ftype A character vector giving the filetype.
-#' This can either be "FASTA" or "CSV" (default: "FASTA").
-#' @return Stores templates to \code{fname}.
-#' @family template functions
-#' @keywords Templates
+
+#' @rdname Output
+#' @return \code{write_templates} stores templates to \code{fname}.
 #' @export
 #' @examples
+#'
 #' data(Ippolito)
 #' # Store templates as FASTA
 #' fname.fasta <- tempfile("my_templates", fileext = ".fasta")
@@ -1603,28 +1525,17 @@ write_templates <- function(template.df, fname, ftype = c("FASTA", "CSV")) {
     }
 }
 
-#' Scoring of Template Conservation.
-#'
-#' Determines the sequence conservation scores of a set of templates
-#' using Shannon entropy.
-#'
-#' @param template.df A \code{Templates} object providing the sequence
-#' conservation shall be determined.
-#' @param gap.char The alignment gap character. By default, this is set to "-".
-#' @param win.len The size of a window for evaluating conservation.
-#' The default window size is set to 30.
-#' @param by.group Whether the determination of binding regions 
-#' should be stratified according to the groups defined in \code{template.df}.
-#' The default is \code{TRUE}.
+#' @rdname Scoring
 #' @return A list containing \code{Entropies} and \code{Alignments}.
-#' Entropies are given as a data frame with conservation scores. 
+#' \code{Entropies} is a data frame with conservation scores. 
 #' Each column indicates a position in the alignment of template sequences
 #' and each row gives the entropies of the sequences 
 #' belonging to a specific group of template sequences.
-#' Alignments are given as lists of \code{DNABin} objects, where each
+#' \code{Alignments} is a list of \code{DNABin} objects, where each
 #' object gives the alignment corresponding to one group of template sequences.
 #' @export
-#' @note Requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
+#' @note \code{score_conservation} requires the MAFFT software 
+#' for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
 #' @examples
 #' \dontrun{
 #' data(Ippolito)
@@ -1902,35 +1813,22 @@ update.binding.ranges.by.conservation <- function(template.df,
     return(new.templates)
 }
 
-#' Selection of Primer Binding Regions by Conservation.
-#'
-#' Computes Shannon entropy for putative binding regions
-#' and determines the most conserved regions.
-#'
-#' @param template.df A \code{Templates} object containing
-#' the template sequences for which the binding regions
-#' shall be determined according to conservation.
-#' @param gap.char The alignment gap character. This is "-" by default.
-#' @param win.len The extent of the desired primer binding region.
-#' This should be smaller than the \code{allowed.region}. The default is 30.
-#' @param by.group Shall the determination of binding regions be stratified
-#' according to the groups defined in \code{template.df}. By default,
-#' this is set to \code{TRUE}.
-#' @param direction Whether regions shall be selected for primers of
-#' both directions ("both"), forward primers ("fw"), or reverse primers ("rev").
-#' The default is "both".
-#' @return A \code{Templates} object with adjusted binding regions.
+#' @rdname Templates
+#' @return \code{select_regions_by_conservation} returns a
+#' \code{Templates} object with adjusted binding regions.
 #' The attribute \code{entropies} gives a data frame with positional entropies
 #' and the attribute \code{alignments} gives the alignments of the templates.
 #' @export
-#' @note Requires the MAFFT software for multiple alignments (http://mafft.cbrc.jp/alignment/software/).
+#' @note \code{select_regions_by_conservation} requires the MAFFT software
+#' for multiple alignments 
+#' (http://mafft.cbrc.jp/alignment/software/).
 #' @examples
 #' data(Ippolito)
 #' new.template.df <- select_regions_by_conservation(template.df)
 select_regions_by_conservation <- function(template.df, 
                                     gap.char = "-", 
                                     win.len = 30, by.group = TRUE,
-                                    direction = c("both", "fw", "rev")) {
+                                    mode.directionality = c("both", "fw", "rev")) {
     if (!is(template.df, "Templates")) {
         stop("Please input an object of class 'Templates'.")
     }
@@ -1938,7 +1836,7 @@ select_regions_by_conservation <- function(template.df,
         warning("MAFFT is required for selecting conserved regions (http://mafft.cbrc.jp/alignment/software/).")
         return(NULL)
     }
-    direction <- match.arg(direction)
+    direction <- match.arg(mode.directionality)
     # note: time could be saved by not computing the entropy of the full sequence, but only the entropy of the possible binding regions?
     # note: individual binding regions are not really respected as selection is via groups and not individual sequences.
     entropy.data <- score_conservation(template.df, gap.char, win.len, by.group)

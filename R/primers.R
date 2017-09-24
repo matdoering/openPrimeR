@@ -738,14 +738,8 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
     }
     return(hit.out)
 }
-#' The Primers Class.
-#'
-#' The \code{Primers} class encapsulates a data frame
-#' representing a set of primers. Objects of this class
-#' store all properties associated with a set of primers,
-#' for example the results from evaluating the properties
-#' of a primer set or from determining its coverage.
-#'
+#' @rdname Input
+#' 
 #' @section Basic columns:
 #' In the following you can find a description of the most
 #' important columns that can be found in objects of class \code{Primers}. 
@@ -767,7 +761,8 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
 #' }
 #'
 #' @section Coverage-related columns:
-#' The following columns are only available after primer coverage
+#' The following columns are only available in an object of
+#' class \code{Primers} after primer coverage
 #' has been computed, that is after \code{\link{check_constraints}}
 #' has been called with the active \code{primer_coverage} constraint. Computed coverage
 #' values relating solely to string matching are indicated by the prefix
@@ -820,26 +815,13 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
 #' if all \code{active.constraints} used by \code{\link{check_constraints}} were fulfilled
 #' and \code{FALSE} otherwise.
 #'
-#' @name Primers-class
-#' @return A \code{Primers} object, an instance of a data frame.
-#' @rdname Primers-class
-#' @keywords Classes
+#' @return The \code{Primers} constructor returns an object of 
+#' class \code{Primers}.
 #' @exportClass Primers
 #' @export
-#' @family primer functions
-#' @seealso \code{\link{read_primers}} for loading a primer set,
-#' \code{\link{score_degen}} for scoring the degeneracy of a primer,
-#' \code{\link{primer_significance}} for determining the significance
-#' of a primer set,
-#' \code{\link{get_initial_primers}} for computing an initial set of primers,
-#' \code{\link{design_primers}} for designing primer sets,
-#' \code{\link{check_constraints}} for determining the properties of a primer set,
-#' \code{\link{filter_primers}} for filtering a primer set,
-#' \code{\link{check_restriction_sites}} to search for restriction sites,
-#' \code{\link{get_cvg_ratio}} to determine the coverage ratio of a primer set,
-#' \code{\link{create_report}} to create a PDF report for a primer set.
-#'
 #' @examples
+#' 
+#' # Load a set of primers
 #' primer.location <- system.file("extdata", "IMGT_data", "primers", "IGHV", 
 #'                      "Ippolito2012.fasta", package = "openPrimeR")
 #' primer.df <- read_primers(primer.location, "_fw", "_rev")
@@ -853,11 +835,8 @@ setMethod("initialize", "Primers",
         Object <- callNextMethod(.Object, ...)
     }
 ) 
-#' @name Primers
-#' @rdname Primers-class
+#' @rdname Input
 #' @export
-#' @param ... A data frame fulfilling the structural
-#' requirements for initializing a \code{Primers} object.
 Primers <- function(...) new("Primers", ...) 
 
 my_format_df <- function (x) {
@@ -1379,49 +1358,23 @@ setMethod("plot_primer_binding_regions",
     return(p)
 })
 
-#' Input of Primers.
-#'
-#' Reads one or multiple input files with primer sequences. The input can either be in FASTA
-#' or in CSV format.
-#'
-#' The input arguments \code{fw.id}, \code{rev.id}, \code{merge.ambig}, and \code{max.degen} are only used for loading primers from a FASTA file.
-#' If you want to load a FASTA file, please ensure that \code{fw.id} and 
+#' @rdname Input
+#' @details
+#' When loading primers via \code{read_primers}, the input arguments
+#' \code{fw.id}, \code{rev.id}, \code{merge.ambig}, and \code{max.degen} 
+#' are only used for loading primers from a FASTA file.
+#' In this case, please ensure that \code{fw.id} and 
 #' \code{rev.id} are set according to the keywords indicating
 #' the primer directionalities in the FASTA file.
-#' When loading a CSV file, the format of the file should adhere
+#' When loading primers from a CSV file, the format of the file should adhere
 #' to the structure defined by the \code{\link{Primers}} class. 
-#' You can easily store a \code{Primers} objects as a CSV file using the
-#' \code{\link{write_primers}} function.
 #' 
-#' @param primer.location Path to a single or multiple primer FASTA or CSV files.
-#' @param fw.id For FASTA input, the identifier for forward primers in the FASTA headers.
-#' @param rev.id For FASTA input, the identifier for reverse primers in the FASTA headers.
-#' @param merge.ambig Indicates whether similar primers should be merged
-#' ("merge") using IUPAC ambiguity codes or whether primers should 
-#' be disambiguated ("unmerge").
-#' By default \code{merge.ambig} is set to "none", leaving primers as they are.
-#' @param max.degen A scalar numeric providing the maximum
-#' allowed degeneracy for merging primers if
-#' \code{merge.ambig} is set to "merge".
-#' Degeneracy is defined by the number of disambiguated sequences 
-#' that are represented by a degenerate primer.
-#' @param template.df An object of class \code{Templates}.
-#' If \code{template.df} is provided the primers are checked
-#' for restriction sites upon input. By default
-#' \code{template.df} is \code{NULL} such that the primers are not
-#' checked for restriction sites.
-#' @param adapter.action The action to be performed when \code{template.df} is
-#' provided for identifying adapter sequences.
-#' Either "warn" to issue warning about adapter sequences or
-#' "rm" to remove identified adapter sequences. The default is "warn".
-#' @param sample.name An identifier for the input primers. 
-#' @param updateProgress A Shiny progress callback function. This is
-#' \code{NULL} by default such that no progress is tracked.
-#' @return An object of class \code{Primers} for a single 
-#' \code{primer.location} or a list of such objects for multiple locations.
+#' @return \code{read_primers} returns a single object of class \code{Primers}
+#' if a single input file is provided or a list of such objects if multiple
+#' files are provided.
 #' @export
-#' @keywords Primers
 #' @examples
+#' 
 #' primer.fasta <- system.file("extdata", "IMGT_data", "primers", "IGHV", 
 #'                      "Ippolito2012.fasta", package = "openPrimeR")
 #' primer.df <- read_primers(primer.fasta, "_fw", "_rev")
@@ -1442,7 +1395,7 @@ setMethod("plot_primer_binding_regions",
 #' # Read a mixture of FASTA/CSV files:
 #' mixed.primers <- c(primer.fasta, primer.csv)
 #' primer.data <- read_primers(mixed.primers)
-read_primers <- function(primer.location, fw.id = "_fw", rev.id = "_rev", 
+read_primers <- function(fname, fw.id = "_fw", rev.id = "_rev", 
                     merge.ambig = c("none", "merge", "unmerge"), 
                     max.degen = 16, template.df = NULL, 
                     adapter.action = c("warn", "rm"), sample.name = NULL,
@@ -1453,16 +1406,16 @@ read_primers <- function(primer.location, fw.id = "_fw", rev.id = "_rev",
         detail <- "Reading primers"
         updateProgress(1/2, detail, "inc")
     }
-    if (length(primer.location) > 1) {
+    if (length(fname) > 1) {
         # load multiple primer FASTA/CSV files
-        primers <- read_primers_multiple(primer.location, fw.id = fw.id, 
+        primers <- read_primers_multiple(fname, fw.id = fw.id, 
                     rev.id = rev.id, merge.ambig = merge.ambig, max.degen = max.degen, 
                     template.df = template.df,
                     adapter.action = adapter.action, sample.name = sample.name,
                     updateProgress = updateProgress) 
     } else {
         # load a single primer set from FASTA/CSV
-        primers <- read_primers_single(primer.location, fw.id = fw.id, rev.id = rev.id,
+        primers <- read_primers_single(fname, fw.id = fw.id, rev.id = rev.id,
                     merge.ambig = merge.ambig, max.degen = max.degen, 
                     template.df = template.df,
                     adapter.action = adapter.action, sample.name = sample.name,
@@ -1853,19 +1806,11 @@ pair_primers <- function(primer.df, template.df) {
     return(out.df)
 }
 
-#' Storing Primers to Disk.
-#'
-#' Writes a set of primers to disk, either as a FASTA or CSV file.
-#'
-#' @param primer.df An object of class \code{Primers} to be stored to disk.
-#' @param fname The path to the file where the primers should be stored.
-#' @param ftype A character vector giving the type of the file.
-#' This can either be "FASTA" or "CSV" (default: "FASTA").
-#' @return Stores primers to \code{fname}.
+#' @rdname Output
+#' @return \code{write_primers} stores primers to disk.
 #' @export
-#' @keywords Primers
-#' @family primer functions
 #' @examples
+#' 
 #' data(Ippolito)
 #' # Store primers as FASTA
 #' fname.fasta <- tempfile("my_primers", fileext = ".fasta")
@@ -1908,79 +1853,58 @@ get.analysis.mode <- function(primers) {
     }
     return(mode)
 }
-#' Determination of the Ratio of Covered Templates. 
-#'
-#' Determines the ratio of template sequences 
-#' that are covered by the evaluated input primers. The ratio
-#' is in the interval [0,1] where 0 indicates 0\% coverage (no templates
-#' covered) and 1 indicates 100\% coverage (all templates covered).
-#'
-#' The manner in which the coverage ratio is evaluated depends on 
-#' the directionality of the input primers.
+
+#' @rdname CoverageStats
+#' @details
+#' The manner in which \code{get_cvg_ratio} determines the coverage ratio 
+#' depends on the directionality of the input primers.
 #' If either only forward or reverse primers are inputted, the individual
 #' coverage of each primer is used to determine the overall coverage. 
 #' If, however, forward and reverse primers are inputted at the same time, 
 #' the coverage is defined by the intersection of binding events from both,
 #' forward and reverse primers.
 #'
-#' @param primers A \code{Primers} object containing the primers
-#' for which the coverage should be evaluated.
-#' @param template.df A \code{Templates} object containing
-#' the template sequences corresponding to \code{primers}. 
-#' @param allowed.mismatches The number of allowed mismatches
-#' for determining the coverage of the templates. By default,
-#' \code{allowed.mismatches} is set to \code{NULL} such that
-#' all annotated coverage events are considered.
-#' @param cvg.definition Whether to output the coverage obtained
-#' from string matching ("basic") or the expected coverage ("constrained"),
-#' which is constructed by applying the coverage constraints. By default,
-#' \code{cvg.definition} is set to "constrained".
-#' @param mode.directionality If \code{mode.directionality} is provided,
-#' the coverage of templates is computed for a specific direction of primers.
-#' Either "fw" (forward coverage only), "rev" (reverse coverage only), or "both" for both directions. By default, \code{mode.directionality} is \code{NULL}
-#' such that the directionality of the primers is determined automatically.
-#' @param as.char Whether the coverage ratio should
-#' be outputted as a percentage-formatted character vector. By default,
-#' \code{as.char} is set to \code{FALSE} such that a numeric is returned.
-#' @return By default, a numeric providing the expected primer coverage ratio. 
+#' @return By default, \code{get_cvg_ratio} returns a numeric providing 
+#' the expected primer coverage ratio.
 #' If \code{as.char} is \code{TRUE}, the output is provided as a
 #' percentage-formatted character vector. 
 #' The attributes \code{no_covered}, \code{no_templates}, 
 #' and \code{covered_templates} provide the number of covered templates, 
 #' the total number of templates, and the IDs of covered templates, respectively.
 #' @export
-#' @family Primers
 #' @examples
+#' 
 #' data(Ippolito)
+#' # Determine the overall coverage
 #' cvg.ratio <- get_cvg_ratio(primer.df, template.df)
-#' # determine the identitity coverage ratio 
+#' # Determine the identitity coverage ratio 
 #' cvg.ratio.0 <- get_cvg_ratio(primer.df, template.df, allowed.mismatches = 0)
-get_cvg_ratio <- function(primers, template.df, allowed.mismatches = NULL, 
+get_cvg_ratio <- function(primer.df, template.df, allowed.mismatches = NULL, 
                         cvg.definition = c("constrained", "basic"), 
                         mode.directionality = NULL, as.char = FALSE) {
-    if (length(primers) == 0 || nrow(primers) == 0) {
+    if (length(primer.df) == 0 || nrow(primer.df) == 0) {
         # no coverage if there's no input.
         return(0.0)
     }
-    if (!is(primers, "Primers")) {
+    if (!is(primer.df, "Primers")) {
         stop("Please input a primer data frame.")
     }
     if (!is(template.df, "Templates")) {
         stop("Please provide a valid template data frame.")
     }
-    if (!"Covered_Seqs" %in% colnames(primers) || length(template.df) == 0) {
+    if (!"Covered_Seqs" %in% colnames(primer.df) || length(template.df) == 0) {
         return(NA)
     }
     cvg.definition <- match.arg(cvg.definition)
     # check whether primers and templates correspond to one another
-    if (!check_correspondence(primers, template.df)) {
+    if (!check_correspondence(primer.df, template.df)) {
         msg <- paste0("Could not match all coverage events to the input template data frame.\n",
             "Please verify whether the primer coverage was actually computed for the input template data frame.")
         stop(msg)
     }
     if (length(mode.directionality) == 0) {
         # determine directionality
-        mode.directionality <- get.analysis.mode(primers)
+        mode.directionality <- get.analysis.mode(primer.df)
     } else {
         # check input mode
         if (!mode.directionality %in% c("fw", "rev", "both")) {
@@ -1989,9 +1913,9 @@ get_cvg_ratio <- function(primers, template.df, allowed.mismatches = NULL,
     }
     if (cvg.definition == "constrained" && length(allowed.mismatches) == 0) {
         # use the vanilla coverage definition: faster and doesn't require mismatch information
-        cvd <- get_covered.vanilla(primers, template.df, mode.directionality)
+        cvd <- get_covered.vanilla(primer.df, template.df, mode.directionality)
     } else {
-        cvg.data <- get_template_cvg_data(primers, template.df)
+        cvg.data <- get_template_cvg_data(primer.df, template.df)
         # select only coverage events from the selected cvg definition
         cvg.data <- cvg.data[cvg.data$Status == cvg.definition, ]
         # retrieve only the allowed coverage events

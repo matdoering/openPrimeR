@@ -215,28 +215,13 @@ add_cvg_to_workbook <- function(cvg.matrix, wb, start.row, start.col, is.first.e
     #setColWidths(wb, 1, cols=1, widths = 21) ## set column width for row names column
     return(wb)
 }
-#' Creation of a Coverage XLS Spreadsheet.
-#'
-#' Creation of an XLS spreadsheet providing an overview of the covered
-#' template sequences for each primer. Each cell in the spreadsheet
-#' indicates a coverage event between a primer and template using
-#' color codes. Identified coverage events are indicated by green, while
-#' primer-template pairs without coverage are indicated by red.
-#' In case that a primer binding condition (see \code{\link{CoverageConstraints}})
-#' was active when computing the coverage, the numeric value of the
-#' coverage condition is annotated for each cell.
-#'
-#' @param primer.df A \code{Primers} object containg primers
-#' with evaluated coverage.
-#' @param template.df A \code{Templates} object containing the templates
-#' corresponding to \code{primer.df}.
-#' @param filename A character vector providing the filename for storing the XLS file.
-#' @param settings A \code{DesignSettings} object providing
-#' the coverage conditions that are to be shown in the spreadsheet.
-#' @return Creates a spreadsheet visualizing the primer coverage
-#' and stores it under \code{filename}.
+
+#' @rdname Output
+#' @return \code{create_coverage_xls} stores information on the
+#' primer coverage in a spreadsheet.
 #' @export
 #' @examples
+#'
 #' data(Ippolito)
 #' filename <- tempfile("cvg_overview", fileext = ".xls")
 #' # Store coverage of a single primer in an XLS file:
@@ -245,7 +230,7 @@ add_cvg_to_workbook <- function(cvg.matrix, wb, start.row, start.col, is.first.e
 #' m <- match(cvd, template.df$Identifier)
 #' my.templates <- template.df[m,]
 #' create_coverage_xls(my.primers, my.templates, filename, settings)
-create_coverage_xls <- function(primer.df, template.df, filename, settings) {
+create_coverage_xls <- function(primer.df, template.df, fname, settings) {
     if (length(primer.df) == 0 || nrow(primer.df) == 0) {
         return(NULL)
     }
@@ -353,40 +338,19 @@ create_coverage_xls <- function(primer.df, template.df, filename, settings) {
     openxlsx::conditionalFormatting(wb, 1, cols = c, rows = r, rule = match.rule, style = coveredStyle)
     openxlsx::conditionalFormatting(wb, 1, cols = c, rows = r, rule = mismatch.rule, style = uncoveredStyle)
     #openxlsx::openXL(wb) # open temporary version for testing!
-    openxlsx::saveWorkbook(wb, filename, overwrite = TRUE) 
+    openxlsx::saveWorkbook(wb, fname, overwrite = TRUE) 
 }
 
-#' Creation of a Primer PDF Report.
-#' 
-#' Creates a PDF report for analyzed primer sets.
-#'
-#' @param primers To create a report for a single primer set, please provide
-#' an evaluated \code{Primers} object.
-#' For creating a report comparing multiple primer sets, please provide
-#' a list of \code{Primers} objects.
-#' @param templates If \code{primers} is a \code{Primers} object, \code{templates} should be a \code{Templates} object.
-#' If \code{primers} is a list of \code{Primers} objects, \code{templates}
-#' should be a list of \code{Templates} objects of the same length as \code{primers}.
-#' @param out.file A character vector giving the path to the file where the report should be stored.
-#' @param settings The \code{DesignSettings} object that was used for analyzing
-#' the input primers.
-#' @param sample.name An identifier for your analysis. By default ( 
-#' \code{NULL}), the sample identifier is selected from the
-#' \code{Run} column of the input templates.
-#' @param used.settings A named list (with fields \code{fw} and \code{rev}) containing the relaxed settings
-#' for designing forward/reverse primers. By default (\code{NULL}), 
-#' the relaxed settings are not shown in the report.
-#' @param ... \code{required.cvg} (optional, default: 1), the desired coverage ratio if \code{primers} is a single primer set.
-#' @return Creates a PDF file summarizing the results from analyzing one or 
-#' multiple sets of primers.
-#' @keywords Primers
+#' @rdname Output
+#' @return \code{create_report} Creates a PDF file summarizing the results
+#' from analyzing one or multiple sets of primers.
 #' @export
-#' @family primer functions
 #' @include primers.R templates.R
 #' @note
 #' Creating the report requires the external programs Pandoc (http://pandoc.org)
 #' and LaTeX (http://latex-project.org).
 #' @examples
+#' 
 #' setting.xml <- system.file("extdata", "settings", 
 #'                  "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
 #' settings <- read_settings(setting.xml)
@@ -401,7 +365,7 @@ create_coverage_xls <- function(primer.df, template.df, filename, settings) {
 #' out.file.comp <- tempfile("comparison_report", fileext = ".pdf")
 #' create_report(primer.data[sel.sets], template.data[sel.sets], out.file.comp, settings)
 setGeneric("create_report", 
-    function(primers, templates, out.file, settings, 
+    function(primers, templates, fname, settings, 
              sample.name = NULL, used.settings = NULL, ...) {
         standardGeneric("create_report")
 })
@@ -411,7 +375,7 @@ setGeneric("create_report",
 #'
 #' @param primers An evaluated \code{Primers} object.
 #' @param templates A \code{Templates} object.
-#' @param out.file A character vector giving the file to store the report in.
+#' @param fname A character vector giving the file to store the report in.
 #' @param settings A \code{DesignSettings} object.
 #' @param sample.name An identifier for your analysis.
 #' @param used.settings A named list (with fields "fw" and "rev") containing the forward/reverse used design settings.
@@ -422,7 +386,7 @@ setGeneric("create_report",
 #' Creating the report requires the external programs Pandoc (http://pandoc.org)
 #' and LaTeX (http://latex-project.org).
 setMethod("create_report", c("Primers", "Templates"), function(primers, templates, 
-             out.file, settings, sample.name, used.settings, required.cvg = 1) {
+             fname, settings, sample.name, used.settings, required.cvg = 1) {
     mode.directionality <- get.analysis.mode(primers)
     if (length(templates) == 0 || nrow(templates) == 0 ||
         !is(templates, "Templates")) {
@@ -457,7 +421,7 @@ setMethod("create_report", c("Primers", "Templates"), function(primers, template
                 "settings" = settings,
                 "used_settings" = used.settings,
                 "required_cvg" = required.cvg)
-    render_report(params, "report.Rmd", out.file)
+    render_report(params, "report.Rmd", fname)
     return()
 })
 #####
@@ -467,7 +431,7 @@ setMethod("create_report", c("Primers", "Templates"), function(primers, template
 #'
 #' @param primers A list with evaluated \code{Primers} objects.
 #' @param templates A list with \code{Templates} objects.
-#' @param out.file A character vector giving the file to store the report in.
+#' @param fname A character vector giving the file to store the report in.
 #' @param settings A \code{DesignSettings} object.
 #' @param sample.name An identifier for your analysis.
 #' @param used.settings A named list (with fields "fw" and "rev") containing the forward/reverse used design settings.
@@ -477,7 +441,7 @@ setMethod("create_report", c("Primers", "Templates"), function(primers, template
 #' Creating the report requires the external programs Pandoc (http://pandoc.org)
 #' and LateX (http://latex-project.org).
 setMethod("create_report", c("list", "list"), function(primers, templates, 
-             out.file, settings, 
+             fname, settings, 
              sample.name = NULL, 
              used.settings = NULL) {
     mode.directionality <- sapply(primers, function(x) get.analysis.mode(x))
@@ -508,7 +472,7 @@ setMethod("create_report", c("list", "list"), function(primers, templates,
     params <- list("primers" = primers, "templates" = templates,
                 "direction" = mode.directionality, "sample" = sample.name,
                 "settings" = settings)
-    render_report(params, "report_comparison.Rmd", out.file)
+    render_report(params, "report_comparison.Rmd", fname)
     return()
 })
 

@@ -1,41 +1,13 @@
-#' Class for Primer Design Settings.
+#' @rdname Settings
 #'
-#' The \code{DesignSettings} class encapsulates all settings 
-#' for designing and evaluating primer sets. 
-#' Upon loading an XML file, the \code{DesignSettings} class checks whether
-#' the defined constraints can be applied by identifying whether 
-#' the requirements for external programs are fulfilled. 
-#' If the requirements are not fulfilled, the affected constraints 
-#' are removed from the loaded \code{DesignSettings} object
-#' and a warning is issued.
-#' The loaded constraints are automatically ordered according to
-#' the option \emph{openPrimeR.constraint_order} such that 
-#' the runtime of the \code{\link{design_primers}} and \code{\link{filter_primers}}
-#' functions is optimized. 
-#'
-#' Note that the fields \code{Input_Constraints}, \code{Input_Constraint_Boundaries}, and \code{Coverage_Constraints} should 
+#' @details
+#' Note that for the \code{DesignSettings} class, the fields \code{Input_Constraints}, \code{Input_Constraint_Boundaries}, and \code{Coverage_Constraints} should 
 #' contain entries with at most two components using the fields \code{min} and/or \code{max}.
-#'
 #' The \code{Input_Constraint_Boundaries} should always be at least as general as the
 #' specified \code{Input_Constraints}.
 #'
-#' @slot Input_Constraints A \code{\link{ConstraintSettings}} object specifying the 
-#' desired target value ranges for primer properties. 
-#' @slot Input_Constraint_Boundaries A \code{\link{ConstraintSettings}} object specifying
-#' the limits for relaxing the constraints during the primer design procedure.
-#' This slot may contain the same fields as the \code{Input_Constraints} slot,
-#' but the specified desired ranges should be at least as general as
-#' those specified in the \code{Input_Constraints} slot.
-#' @slot Coverage_Constraints A \code{\link{CoverageConstraints}} object specifying
-#' the constraints for computing the primer coverage. 
-#' @slot PCR_conditions A \code{\link{PCR_Conditions}} object specifying the PCR-related settings. 
-#' @slot constraint_settings A \code{\link{ConstraintSettings}} object providing options 
-#' for the computation of individual physicochemical properties.
-#'
-#' @name DesignSettings-class
-#' @rdname DesignSettings-class
 #' @exportClass DesignSettings
-#' @return A \code{DesignSettings} object.
+#' @return The \code{DesignSettings} constructor defines a \code{DesignSettings} object.
 #' 
 #' @family settings functions
 #' @keywords Settings
@@ -47,6 +19,7 @@
 #' \code{\link{conOptions}} for accessing constraint options,
 #' \code{\link{PCR}} for accessing the PCR conditions.
 #' @examples
+#' 
 #' # Load a settings object
 #' filename <- system.file("extdata", "settings", 
 #'                  "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
@@ -202,6 +175,7 @@ setMethod("initialize", "DesignSettings",
             constraint.settings <- ConstraintSettings()   
         } else if (is(constraint.settings, "list")) {
             obj <- ConstraintSettings()
+            # TODO: check problems here
             constraints(obj) <- constraint.settings
             constraint.settings <- obj
         } else {
@@ -461,21 +435,13 @@ check_settings_validity <- function(object) {
 # GETTERS
 ############
 
-#' Getter/Setter for Constraints.
-#'
-#' Gets the active constraints of the provided
-#' \code{DesignSettings} object \code{x}.
-#'
-#' @name constraints
-#' @rdname constraints-methods
+#' @rdname Settings
 #' @exportMethod constraints
-#' @return Gets the list of constraints.
+#' @return \code{constraints} gets a list with the active constraint settings.
 #' @keywords Settings
-#' @family settings functions
 setGeneric("constraints", function(x) standardGeneric("constraints"))
 
-#' @rdname constraints-methods
-#' @aliases constraints,DesignSettings-method
+#' @rdname Settings
 setMethod("constraints", "DesignSettings", function(x) {
     sel <- names(constraints(x@Input_Constraints))
     #print("Constraint getter:")
@@ -483,28 +449,19 @@ setMethod("constraints", "DesignSettings", function(x) {
     constraints(x@Input_Constraints)[con_select(sel)]
 })
 
-#' @rdname constraints-methods
-#' @aliases constraints,DesignSettings-method
+#' @rdname Settings
 setMethod("constraints", c("AbstractConstraintSettings"), 
     function(x) {
         return(x@settings)    
     }
 )
 
-#' Getter/Setter for Coverage Constraints.
-#'
-#' Gets the coverage constraints of the provided
-#' \code{DesignSettings} object \code{x}.
-#' @name cvg_constraints
+#' @rdname Settings
 #' @exportMethod cvg_constraints
-#' @return Gets the list of coverage constraints.
-#' @rdname cvg_constraints-methods
-#' @keywords Settings
-#' @family settings functions
+#' @return \code{cvg_constraints} returns the list of active coverage constraints.
 setGeneric("cvg_constraints", function(x) standardGeneric("cvg_constraints"))
 
-#' @rdname cvg_constraints-methods
-#' @aliases cvg_constraints,DesignSettings-method
+#' @rdname Settings
 setMethod("cvg_constraints", "DesignSettings", function(x) {
     sel <- names(constraints(x@Coverage_Constraints))
     # select only the possible constraints from the settings (tool dependencies):
@@ -599,61 +556,35 @@ setMethod("optiLimits", "DesignSettings", function(x) {
     opti.cons
 })
 
-#' Getter/Setter for the PCR Conditions.
-#'
-#' Gets the PCR conditions that are defined in the provided
-#' \code{DesignSettings} object \code{x}.
-#'
-#' @name PCR
-#' @rdname PCR-methods
-#' @return Gets the list of PCR conditions.
+#' @rdname Settings
+#' @return \code{PCR} gets the list of PCR conditions defined in the
+#' provided \code{DesignSettings} object.
 #' @exportMethod PCR
-#' @family settings functions
-#' @keywords Settings
 setGeneric("PCR", function(x) standardGeneric("PCR"))
 
-#' @rdname PCR-methods
-#' @aliases PCR,DesignSettings-method
+#' @rdname Settings
 setMethod("PCR", "DesignSettings", function(x) {
     constraints(x@PCR_conditions)
 })
 
-#' Getter/Setter for Constraint Options.
-#'
-#' Gets the constraint settings of the provided 
-#' \code{DesignSettings} object \code{x}.
-#'
-#' @name conOptions
-#' @rdname conOptions-methods
+#' @rdname Settings
 #' @exportMethod conOptions
-#' @return Gets the constraint options list.
-#' @keywords Settings
-#' @family settings functions
+#' @return \code{conOptions} returns a list with constraint options.
 setGeneric("conOptions", function(x) standardGeneric("conOptions"))
 
-#' @rdname conOptions-methods
-#' @aliases conOptions,DesignSettings-method
+#' @rdname Settings
 setMethod("conOptions", "DesignSettings", 
     function(x) {
         constraints(x@constraint_settings)
     }
 )
 
-#' Getter/Setter for Constraint Limits.
-#'
-#' Gets the constraint limits that are defined in the provided 
-#' \code{DesignSettings} object \code{x}.
-#' 
-#' @name constraintLimits
-#' @rdname constraintLimits-methods
-#' @keywords Settings
-#' @return Gets the list of constraint limits.
+#' @rdname Settings
+#' @return \code{constraintLimits} gets the list of constraint limits.
 #' @exportMethod constraintLimits
-#' @family settings functions
 setGeneric("constraintLimits", function(x) standardGeneric("constraintLimits"))
 
-#' @rdname constraintLimits-methods
-#' @aliases constraintLimits,DesignSettings-method
+#' @rdname Settings
 setMethod("constraintLimits", "DesignSettings", 
 	function(x) {
         sel <- con_select(names(constraints(x@Input_Constraint_Boundaries)))
@@ -665,24 +596,15 @@ setMethod("constraintLimits", "DesignSettings",
 # SETTERS
 ###############
 
-#' Setter for Constraints.
-#'
-#' Sets the active constraints of the provided
-#' \code{DesignSettings} object \code{x}.
-#' 
+#' @rdname Settings
+#' @details
 #' For an overview of permissible constraints,
 #' please consider the \code{\link{ConstraintSettings}} documentation.
 #'
-#' @name constraints<-
-#' @rdname constraints-methods
 #' @exportMethod constraints<-
-#' @param x A \code{DesignSettings} object.
-#' @param value A list with constraint settings. Each list entry
-#' should have a permissible name and consist of at most two
-#' values providing the minimal and/or maximal allowed values, which
-#' have to be denominated via \code{min} and \code{max}. 
-#' @return Sets the list of constraints.
+#' @return \code{constraints<-} sets the list of constraints in a \code{DesignSettings} object.
 #' @examples
+#' 
 #' # Load some settings
 #' data(Ippolito)
 #' # View the active constraints
@@ -693,9 +615,9 @@ setMethod("constraintLimits", "DesignSettings",
 #' settings
 setGeneric("constraints<-", function(x, value) standardGeneric("constraints<-"))
 
-#' @rdname constraints-methods
-#' @aliases constraints,DesignSettings-method
+#' @rdname Settings
 setReplaceMethod("constraints", "DesignSettings", 
+    # NB: setReplaceMethod: second argument MUST be named 'value'
 	function(x, value) {
         # modify constraint limits if necessary
         # a) ensure that constraints are in the right order
@@ -716,8 +638,8 @@ setReplaceMethod("constraints", "DesignSettings",
 		x
 	}
 )
-#' @rdname constraints-methods
-#' @aliases constraints,DesignSettings-method
+
+#' @rdname Settings
 setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
     function(x, value) {
         m <- match(names(value), names(x@status))
@@ -740,24 +662,12 @@ setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
 )
 
 
-#' Setter for Coverage Constraints.
-#'
-#' Sets the coverage constraints of the provided
-#' \code{DesignSettings} object \code{x}.
-#' 
-#' @name cvg_constraints<-
-#' @rdname cvg_constraints-methods
+
+#' @rdname Settings
 #' @exportMethod cvg_constraints<-
-#' @param x A \code{DesignSettings} object.
-#' @param value A list with coverage constraints. Each
-#' list entry must have a permissible name and
-#' contain a numeric vector with at most two components
-#' describing the minimal and/or maximal required values that
-#' are to be indicated via \code{min} and \code{max}.
-#' The permissible contraint identifiers are documented in the
-#' \code{\link{CoverageConstraints}} class.
-#' @return Sets the list of coverage constraints.
+#' @return \code{cvg_constraints<-} sets the list of coverage constraints in the provided \code{DesignSettings} object.
 #' @examples
+#' 
 #' # Load some settings
 #' data(Ippolito)
 #' # View all active coverage constraints
@@ -768,8 +678,7 @@ setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
 #' settings
 setGeneric("cvg_constraints<-", function(x, value) standardGeneric("cvg_constraints<-"))
 
-#' @rdname cvg_constraints-methods
-#' @aliases cvg_constraints,DesignSettings-method
+#' @rdname Settings
 setReplaceMethod("cvg_constraints", "DesignSettings", 
 	function(x, value) {
 		constraints(x@Coverage_Constraints) <- value
@@ -777,19 +686,12 @@ setReplaceMethod("cvg_constraints", "DesignSettings",
 		x
 	}
 )
-#' Setter for Constraint Limits.
-#'
-#' Sets the constraint limits of the provided 
-#' \code{DesignSettings} object \code{x}.
-#'
-#' @rdname constraintLimits-methods
+#' @rdname Settings
 #' @exportMethod constraintLimits<-
-#' @param x A \code{DesignSettings} object whose constraint limits
-#' are to be modified.
-#' @param value A list with constraint boundaries. The permissible fields 
-#' of the list are provided in \code{\link{ConstraintSettings}}.
-#' @return Sets the list of constraint limits.
+#' @return \code{constraintLimits<-} sets the list of constraint limits in 
+#' the provided \code{DesignSettings} object.
 #' @examples
+#'
 #' # Load some settings
 #' data(Ippolito)
 #' # View the active constraint limits
@@ -800,8 +702,7 @@ setReplaceMethod("cvg_constraints", "DesignSettings",
 #' settings
 setGeneric("constraintLimits<-", function(x, value) standardGeneric("constraintLimits<-"))
 
-#' @rdname constraintLimits-methods
-#' @aliases constraintLimits,DesignSettings-method
+#' @rdname Settings
 setReplaceMethod("constraintLimits", "DesignSettings", 
 	function(x, value) {
         # modify the settings if necessary
@@ -817,20 +718,12 @@ setReplaceMethod("constraintLimits", "DesignSettings",
 	}
 )
 
-#' Setter for PCR Conditions.
-#'
-#' Sets the PCR conditions that are defined in the provided
-#' \code{DesignSettings} object \code{x}.
-#'
-#' @name PCR<-
-#' @rdname PCR-methods
+#' @rdname Settings
+#' @return \code{PCR<-} sets the constraint options in the provided
+#' \code{DesignSettings} object.
 #' @exportMethod PCR<-
-#' @param x A \code{DesignSettings} object.
-#' @param value A named list providing PCR conditions 
-#' The permissible fields of the list and their types
-#' are documented in the \code{\link{PCR_Conditions}} class.
-#' @return Sets the list of PCR conditions.
 #' @examples
+#' 
 #' # Load some settings
 #' data(Ippolito)
 #' # View the active PCR conditions
@@ -841,8 +734,7 @@ setReplaceMethod("constraintLimits", "DesignSettings",
 #' settings
 setGeneric("PCR<-", function(x, value) standardGeneric("PCR<-"))
 
-#' @rdname PCR-methods
-#' @aliases PCR,DesignSettings-method
+#' @rdname Settings
 setReplaceMethod("PCR", "DesignSettings", 
 	function(x, value) {
 		constraints(x@PCR_conditions) <- value
@@ -851,20 +743,11 @@ setReplaceMethod("PCR", "DesignSettings",
 	}
 )
 
-#' Setter for Constraint Options.
-#'
-#' Sets the constraint settings of the provided
-#' \code{DesignSettings} object \code{x}.
-#'
-#' @name conOptions<-
-#' @rdname conOptions-methods
+#' @rdname Settings
 #' @exportMethod conOptions<-
-#' @param x A \code{DesignSettings} object.
-#' @param value A list with constraint options. The permissible
-#' fields of the list and their types are documented in the 
-#' \code{\link{ConstraintOptions}} class.
-#' @return Sets the specified list of constraint options.
+#' @return \code{conOptions<-} sets the specified list of constraint options in the provided \code{DesignSettings} object.
 #' @examples
+#'
 #' # Load some settings
 #' data(Ippolito)
 #' # View the active constraint options
@@ -875,8 +758,7 @@ setReplaceMethod("PCR", "DesignSettings",
 #' settings
 setGeneric("conOptions<-", function(x, value) standardGeneric("conOptions<-"))
 
-#' @rdname conOptions-methods
-#' @aliases conOptions,DesignSettings-method
+#' @rdname Settings
 setReplaceMethod("conOptions", "DesignSettings", 
 	function(x, value) {
 		constraints(x@constraint_settings) <- value
@@ -928,40 +810,26 @@ parse.constraints <- function(xml_data) {
     return(result)
 }
 
-#' Loading of Analysis Settings.
-#'
-#' Loads primer analysis settings from an XML file.
-#'
-#' If \code{filename} is not provided,
+#' @rdname Input
+#' @details
+#' When loading a settings file with \code{read_settings}, 
+#' if \code{filename} is not provided,
 #' a default XMl settings file is loaded. Please review the 
 #' function's examples to learn more about the default settings. If you want
 #' to load custom settings, you can store a modified \code{DesignSettings}
 #' object as an XML file using \code{\link{write_settings}}.
 #'
-#' @param filename Path to a valid XML file containing the 
-#' primer analysis settings. By default, \code{filename} is set
-#' to all settings that are shipped with openPrimeR and the lexicographically
-#' first file is loaded.
-#' @param frontend Indicates whether settings shall be loaded for the Shiny frontend. 
-#' In this case no unit conversions for the PCR settings are performed.
-#' The default setting is \code{FALSE} such that the correct units are used.
-#' @return An object of class \code{DesignSettings}.
-#' @family settings functions
+#' @return \code{read_settings} returns an object of class \code{DesignSettings}.
 #' @export
 #' @examples
-#' # Select the available settings
-#' #' the available supplied settings by calling  
+#' 
+#' # Select available settings
 #' available.settings <- list.files(
 #'      system.file("extdata", "settings", package = "openPrimeR"), 
 #'      pattern = "*.xml", full.names = TRUE)
 #' # Select one of the settings and load them
 #' filename <- available.settings[1]
 #' settings <- read_settings(filename)
-#' # Modify, store, and read a settings object:
-#' constraints(settings)$gc_clamp <- c("min" = 0, "max" = 5)
-#' out.file <- tempfile("my_settings", fileext = ".xml")
-#' write_settings(settings, out.file)
-#' my_settings <- read_settings(out.file)
 read_settings <- function(filename = list.files(
                              system.file("extdata", "settings", package = "openPrimeR"), 
                              pattern = "*.xml", full.names = TRUE),
@@ -1176,26 +1044,21 @@ constraints.xml.format <- function(constraints, set.name) {
     return(result)
 }
 
-#' Storing Design Settings to Disk.
-#'
-#' Stores primer analysis settings to a file in XML format.
-#'
-#' @param settings A \code{DesignSettings} object to be stored to disk.
-#' @param filename A character vector specifying the location 
-#' where the settings should be stored as an XML file.
-#' @return Outputs the return status from closing the connection.
+#' @rdname Output
+#' @return \code{write_settings} returns the status from closing the connection to the output file.
 #' @export
-#' @keywords Settings
 #' @examples
+#' 
+#' # Store settings to disk
 #' xml <- settings.xml <- system.file("extdata", "settings", 
 #'        "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
 #' settings <- read_settings(xml)
 #' out.file <- tempfile("my_settings", fileext = ".xml")
 #' write_settings(settings, out.file)
-write_settings <- function(settings, filename) {
+write_settings <- function(settings, fname) {
     XML <- create.constraint.XML(constraints(settings), constraintLimits(settings), 
                                  cvg_constraints(settings), PCR(settings), conOptions(settings))
-    f <- file(filename)
+    f <- file(fname)
     write(XML, f)
     return(close(f))
 }
@@ -1826,3 +1689,30 @@ constraints_to_unit <- function(constraint, use.unit = TRUE,
     return(mod.con)
 }
 
+#' @rdname Settings
+#' @return \code{parallel_setup} returns \code{NULL}.
+#' @export
+#' @examples
+#' # Use two cores for parallel processing:
+#' parallel_setup(2)
+parallel_setup <- function(cores = NULL) {
+    doParallel.available <- requireNamespace("doParallel", quietly = TRUE)
+    if (doParallel.available) { # no parallel support for windows at the moment (unserialize errors if we don't do clusterexport/clustercall)
+        if (length(cores) == 0) {
+            avail.cores <- parallel::detectCores()
+            # use half the available cores at most
+            cores <- max(1, floor(avail.cores / 2))
+        } else {
+            if (!is(cores, "numeric")) {
+                stop("Please supply a numeric for 'cores'.")
+            }
+        }
+        cores <- min(floor(cores), parallel::detectCores()) # use at most all of the available cores
+        doParallel::registerDoParallel(cores = cores)
+        # also set mc.cores for 'mclapply'
+        options(mc.cores = cores)
+        message("The number of cores for was set to '", cores, "' by 'parallel_setup()'.")
+    } else {
+        warning("Please install 'doParallel' to use multiple cores.")
+    }
+}

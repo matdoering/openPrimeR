@@ -86,12 +86,11 @@ filter.primer.candidates <- function(primer.candidates, min.len) {
     return(primer.candidates)
 }
 
-#' Primer Degeneration Score.
-#'
-#' Determines the degeneration score of a sequence.
-#'
-#' The degeneration of an ambiguous sequence is defined as the number
-#' of unambiguous sequences that the ambiguous sequence represents.
+#' @rdname Scoring
+#' @details
+#' \code{score_degen} computes the degeneration of an ambiguous sequence
+#' by considering the number of unambiguous sequences that
+#' are represented by the the ambiguous sequence.
 #' Let a sequence \code{S} of length \code{n} be represented by a collection of sets such that
 #' \deqn{S = {s_1, s_2, \ldots, s_n}}
 #' where \eqn{s_i} indicates the set of unambiguous bases found
@@ -100,10 +99,8 @@ filter.primer.candidates <- function(primer.candidates, min.len) {
 #' \deqn{D = \prod_i{|s_i|}}
 #' where \eqn{|s_i|} provides the number of disambiguated bases at position \eqn{i}.
 #'
-#' @param seq A list of vectors containing individual characters of a nucleotide sequence.
-#' @param gap.char The gap character in the sequences.
-#' @return The number of unambiguous sequences represented by \code{seq}.
-#' @family primer functions
+#' @return \code{score_degen} finds the number of unambiguous sequences
+#' that are represented by \code{seq}.
 #' @export
 #' @examples
 #' # Compute degeneration for sequences with differing number of ambiguous bases

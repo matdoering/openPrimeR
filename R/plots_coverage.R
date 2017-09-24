@@ -455,37 +455,29 @@ get_template_cvg_data <- function(primer.df, template.df) {
     plot.df <- do.call(rbind, plot.data)
     return(plot.df)
 }
-#' Statistics on the Number of Coverage Events per Primer.
-#'
-#' Creates a table summarizing the coverage events
-#' of each primer according to the number of mismatches
-#' between primers and templates.
-#'
-#' Entries in numeric table columns
+
+#' @rdname CoverageStats
+#' @details
+#' For \code{get_cvg_stats_primer}, the cells corresponding
+#' to columns with numeric identifiers 
 #' indicate the percentage of coverage events occurring
 #' with a certain number of mismatches. For example
-#' column \emph{3} provides all coverage events
-#' with exactly three mismatches between primers and templates.
+#' column \emph{3} provides the number of coverage events
+#' where there are exactly three mismatches between primers and templates.
 #' The column \emph{Group_Coverage} provides a listing
 #' of the percentage of covered templates per group.
 #'
-#' @param primer.df A \code{Primers} object with evaluated coverage providing
-#' the set of primers for which the coverage statistics shall be computed.
-#' @param template.df A \code{Templates} object providing
-#' the template sequences for which the primer coverage
-#' has been computed.
-#' @param cvg.definition If \code{cvg.definition} is set to
-#' "constrained", the statistics for the expected
-#' coverage (after applying the coverage constraints) are retrieved.
-#' If \code{cvg.definition} is set to "basic", the coverage is determined 
-#' solely by string matching (i.e. without applying the coverage constraints).
-#' By default, \code{cvg.definition} is set to "constrained".
-#' @return A data frame listing the number of binding events
-#' broken down according to the number of expected mismatches between
-#' primers and templates.
+#' @return \code{get_cvg_stats_primer} returns a list with the following entries. \code{cvg_per_nbr_mismatches} contains a data frame listing 
+#' the number of binding events broken down according to the number
+#' of expected mismatches between primers and templates.
+#' \code{cvg_per_group} contains a data frame listing the the coverage
+#' of individual primers per group of templates.
+#'
 #' @export
 #' @examples
+#' 
 #' data(Ippolito)
+#' # Determine coverage stats per primer
 #' primer.cvg.stats <- get_cvg_stats_primer(primer.df, template.df)
 get_cvg_stats_primer <- function(primer.df, template.df,
                                 cvg.definition = c("constrained", "basic")) {
@@ -1460,38 +1452,14 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
     }
     return(p)
 }
-#' Coverage Ratios per Group of Templates.
-#'
-#' Retrieve statistics on covered templates, either for a single primer set
-#' or for multiple primer sets.
-#'
-#' @param primers To retrieve coverage statistics for a single primer set, 
-#' please provide an object of class \code{Primers} containing primers with evaluated coverage.
-#' To retrieve coverage statistics for multiple primer sets, pelase provide
-#' a list with evaluated \code{Primers} objects.
-#' @param templates If \code{primers} is an object of class \code{Primers},
-#' please provide an object of class \code{Templates} containing the
-#' template sequences targeted by \code{primers}. If \code{primers} is a list,
-#' \code{templates} should be a list of \code{Template} objects.
-#' @param for.viewing Whether the table should be formatted
-#' to be human-readable. By default, \code{for.viewing} is \code{FALSE}.
-#' @param total.percentages Whether group coverage percentages
-#' should be computed in relation to the total number of template sequences
-#' or in relation to the number of templates belonging to a specific group.
-#' By default, \code{total.percentages} is \code{FALSE} suc that the
-#' percentages are group-specific.
-#' @param allowed.mismatches The maximal allowed number of mismatches.
-#' By default, \code{allowed.mismatches} is set to \code{Inf} such that the number of mismatches is not restricted additionally.
-#' @param cvg.definition If \code{cvg.definition} is set to
-#' "constrained", the statistics for the expected
-#' coverage (after applying the coverage constraints) are retrieved.
-#' If \code{cvg.definition} is set to "basic", the coverage is determined 
-#' solely by string matching (i.e. without applying the coverage constraints).
-#' By default, \code{cvg.definition} is set to "constrained".
-#' @return Data frame whose entries provide the coverage of templates belonging to a specific group.
+
+#' @rdname CoverageStats
+#' @return \code{get_cvg_stats} returns a data frame whose entries provide 
+#' the coverage of templates per group of templates.
 #' @export
 #' @include primers.R templates.R
 #' @examples
+#' 
 #' # Coverage statistics for a single primer set
 #' data(Ippolito)
 #' cvg.stats <- get_cvg_stats(primer.df, template.df)

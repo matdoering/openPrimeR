@@ -10,35 +10,28 @@ penalize_primer <- function(deviations, alpha = 0.5) {
     score <- (alpha * abs.dev[max.idx]) + (1 - alpha) * sum(abs.dev)
     return(score)
 }
-#' Scoring of Primers.
-#'
-#' Computes scores for a set of primers based on the deviations
-#' of the primers from the constraints.
-#'
-#' The penalty of a primer is computed in the following way. Let 
-#' \code{d} be a vector indicating the absolute deviations from individual constraints
-#' and let \code{p} be the scalar penalty that is assigned to a primer. We define
+#' @rdname Scoring
+#' @details
+#' \code{score_primers} determines the penalty of a primer in the following way.
+#' Let \code{d} be a vector indicating the absolute deviations from 
+#' individual constraints and let \code{p} be the scalar penalty that
+#' is assigned to a primer. We define
 #' \deqn{p = \alpha \cdot \max_i d_i + \sum_i (1 - \alpha) \cdot d_i}
 #' such that for large values of \code{alpha} the maximal deviation 
-#' dominates giving rise to a local penalty (reflecting the largest absolute deviation) and for small 
-#' \code{alpha} the total deviation dominates giving rise to a global penalty 
+#' dominates giving rise to a local penalty (reflecting the largest
+#' absolute deviation) and for small \code{alpha} the total deviation
+#' dominates giving rise to a global penalty 
 #' (reflecting the sum of constraint deviations). 
-#' When \code{alpha} is 1 only the most extreme absolute deviation is considered and
-#' when \code{alpha} is 0 the sum of all absolute deviations is computed.
-#' @param primer.df A \code{Primers} object containing the primers
-#' that are to be scored.
-#' @param settings A \code{DesignSettings} object containing the
-#' settings that are evaluated when computing the deviation.
-#' @param active.constraints A character vector of constraint identifiers
-#' that are considered for scoring the primers.
-#' @param alpha A numeric that is used to determine the trade-off
-#' between the impact of the maximal observed deviation and the total
-#' deviation. At its default \code{alpha} is set to 0.5 such that
-#' the maximal deviation and the total deviation have an equal weight
-#' when computing the penalties.
-#' @return A data frame containing scores for the primers.
+#' When \code{alpha} is 1 only the most extreme absolute deviation is
+#' considered and when \code{alpha} is 0 the sum of all absolute 
+#' deviations is computed.
+#'
+#' @return \code{score_primers} returns a data frame containing
+#' scores for individual primers.
 #' @export
 #' @examples
+#'
+#' # Score the primers
 #' data(Ippolito)
 #' primer.scores <- score_primers(primer.df, settings)
 score_primers <- function(primer.df, settings, active.constraints = names(constraints(settings)), alpha = 0.5) {

@@ -147,13 +147,10 @@ optimal.primers.tree <- design_primers(template.df[1:2,], "both", settings,
 }
 }
 \seealso{
-Other primer functions: \code{\link{Primers-class}},
-  \code{\link{check_constraints}},
+Other primer functions: \code{\link{check_constraints}},
   \code{\link{check_restriction_sites}},
-  \code{\link{create_report}},
   \code{\link{filter_primers}},
   \code{\link{get_initial_primers}},
-  \code{\link{primer_significance}},
-  \code{\link{score_degen}}, \code{\link{write_primers}}
+  \code{\link{primer_significance}}
 }
 \keyword{Primers}

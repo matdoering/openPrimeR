@@ -5,15 +5,15 @@
 \alias{create_report,Primers,Templates-method}
 \title{Creation of a PDF report.}
 \usage{
-\S4method{create_report}{Primers,Templates}(primers, templates, out.file,
-  settings, sample.name, used.settings, required.cvg = 1)
+\S4method{create_report}{Primers,Templates}(primers, templates, fname, settings,
+  sample.name, used.settings, required.cvg = 1)
 }
 \arguments{
 \item{primers}{An evaluated \code{Primers} object.}
 
 \item{templates}{A \code{Templates} object.}
 
-\item{out.file}{A character vector giving the file to store the report in.}
+\item{fname}{A character vector giving the file to store the report in.}
 
 \item{settings}{A \code{DesignSettings} object.}
 

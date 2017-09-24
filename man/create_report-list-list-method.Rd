@@ -5,7 +5,7 @@
 \alias{create_report,list,list-method}
 \title{Creation of a PDF Report for Primer Comparison.}
 \usage{
-\S4method{create_report}{list,list}(primers, templates, out.file, settings,
+\S4method{create_report}{list,list}(primers, templates, fname, settings,
   sample.name = NULL, used.settings = NULL)
 }
 \arguments{
@@ -13,7 +13,7 @@
 
 \item{templates}{A list with \code{Templates} objects.}
 
-\item{out.file}{A character vector giving the file to store the report in.}
+\item{fname}{A character vector giving the file to store the report in.}
 
 \item{settings}{A \code{DesignSettings} object.}
 

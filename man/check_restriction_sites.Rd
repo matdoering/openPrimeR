@@ -57,12 +57,9 @@ Roberts, R.J., Vincze, T., Posfai, J., Macelis, D. (2010) REBASE–a database fo
 and modification: enzymes, genes and genomes. Nucl. Acids Res. 38: D234-D236. http://rebase.neb.com
 }
 \seealso{
-Other primer functions: \code{\link{Primers-class}},
-  \code{\link{check_constraints}},
-  \code{\link{create_report}},
+Other primer functions: \code{\link{check_constraints}},
   \code{\link{design_primers}},
   \code{\link{filter_primers}},
   \code{\link{get_initial_primers}},
-  \code{\link{primer_significance}},
-  \code{\link{score_degen}}, \code{\link{write_primers}}
+  \code{\link{primer_significance}}
 }

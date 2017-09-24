@@ -81,13 +81,10 @@ constraint.df <- check_constraints(primer.df, template.df,
 summary(constraint.df)
 }
 \seealso{
-Other primer functions: \code{\link{Primers-class}},
-  \code{\link{check_restriction_sites}},
-  \code{\link{create_report}},
+Other primer functions: \code{\link{check_restriction_sites}},
   \code{\link{design_primers}},
   \code{\link{filter_primers}},
   \code{\link{get_initial_primers}},
-  \code{\link{primer_significance}},
-  \code{\link{score_degen}}, \code{\link{write_primers}}
+  \code{\link{primer_significance}}
 }
 \keyword{Primers}

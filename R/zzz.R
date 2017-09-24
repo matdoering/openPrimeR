@@ -188,43 +188,7 @@ copy.melt.config <- function(melt.bin = NULL) {
     # do not provide any output, even if no var is assigned to this function: 
     invisible()
 }
-#' Setup the Parallel Backend.
-#'
-#' Registers the specified number of cores with the parallel backend.
-#'
-#' @param cores A numeric providing the number of cores to use. The default is \code{NULL}
-#' such that half the number of available cores are used.
-#' @return Returns \code{NULL}
-#' @export
-#' @examples
-#' # Use two cores for parallel processing:
-#' parallel_setup(2)
-parallel_setup <- function(cores = NULL) {
-    doParallel.available <- requireNamespace("doParallel", quietly = TRUE)
-	#is.win <- grepl("windows", .Platform$OS.type)
-    #if (is.win) {
-     #   warning("Parallel computations are not supported under Windows, sorry.")
-		#return(NULL)
-    #}
-    if (doParallel.available) { # no parallel support for windows at the moment (unserialize errors if we don't do clusterexport/clustercall)
-        if (length(cores) == 0) {
-            avail.cores <- parallel::detectCores()
-            # use half the available cores at most
-            cores <- max(1, floor(avail.cores / 2))
-        } else {
-            if (!is(cores, "numeric")) {
-                stop("Please supply a numeric for 'cores'.")
-            }
-        }
-        cores <- min(floor(cores), parallel::detectCores()) # use at most all of the available cores
-        doParallel::registerDoParallel(cores = cores)
-        # also set mc.cores for 'mclapply'
-        options(mc.cores = cores)
-        message("The number of cores for was set to '", cores, "' by 'parallel_setup()'.")
-    } else {
-        warning("Please install 'doParallel' to use multiple cores.")
-    }
-}
+
 # actions to be performed when attaching the package
 .onAttach <- function(libname, pkgname) {
     # add start up message

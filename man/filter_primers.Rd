@@ -44,13 +44,10 @@ filtered.df <- filter_primers(primer.df, template.df, settings,
                  active.constraints = c("gc_ratio"))
 }
 \seealso{
-Other primer functions: \code{\link{Primers-class}},
-  \code{\link{check_constraints}},
+Other primer functions: \code{\link{check_constraints}},
   \code{\link{check_restriction_sites}},
-  \code{\link{create_report}},
   \code{\link{design_primers}},
   \code{\link{get_initial_primers}},
-  \code{\link{primer_significance}},
-  \code{\link{score_degen}}, \code{\link{write_primers}}
+  \code{\link{primer_significance}}
 }
 \keyword{Primers}
