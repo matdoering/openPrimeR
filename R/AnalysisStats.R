@@ -1,7 +1,7 @@
-#' Coverage Statistics
+#' Primer Analysis Statistics.
 #'
-#' @rdname CoverageStats
-#' @name CoverageStats
+#' @rdname AnalysisStats
+#' @name AnalysisStats
 #'
 #' @description
 #' \describe{
@@ -13,6 +13,9 @@
 #' either for a single or multiple primer sets.}
 #' \item{\code{get_cvg_stats_primer}}{Creates a table summarizing the 
 #' coverage events of individual primers.}
+#' \item{\code{get_comparison_table}}{Creates an overview of the
+#' properties of multiple primer sets by providing
+#' the inter-quartile range of primer properties in bracket notation.}
 #' }
 #' 
 #' @param primer.df A \code{Primers} object containing the primers.
@@ -28,9 +31,10 @@
 #' @param as.char Whether the coverage ratio should
 #' be outputted as a percentage-formatted character vector. By default,
 #' \code{as.char} is set to \code{FALSE} such that a numeric is returned.
-#' @param primers To retrieve coverage statistics for a single primer set, 
-#' please provide an object of class \code{Primers} containing primers with evaluated coverage.
-#' To retrieve coverage statistics for multiple primer sets, pelase provide
+#' @param primers To retrieve statistics for a single primer set, 
+#' please provide an object of class \code{Primers} containing a set of
+#' evaluated primers.
+#' To retrieve statistics for multiple primer sets, pelase provide
 #' a list with evaluated \code{Primers} objects.
 #' @param templates If \code{primers} is an object of class \code{Primers},
 #' please provide an object of class \code{Templates} containing the
@@ -49,4 +53,9 @@
 #' If \code{cvg.definition} is set to "basic", the coverage is determined 
 #' solely by string matching (i.e. without applying the coverage constraints).
 #' By default, \code{cvg.definition} is set to "constrained".
+#' @param sample.name Either a single identifier or a character vector 
+#' of identifiers for every
+#' \code{Templates} object in \code{templates}.
+#' By default, \code{sample.name} is \code{NULL} such that the
+#' \code{Run} annotations in the provided \code{Templates} objects are used.
 NULL

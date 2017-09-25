@@ -643,13 +643,13 @@ read.sequences <- function(fasta.file, gap.character) {
     rownames(d) <- NULL
     return(d)
 }
-#' @rdname Templates
+#' @rdname TemplatesFunctions
 #' @return \code{update_template_cvg} returns an object of class 
 #' \code{Templates} with updated coverage columns.
 #' @export
 #' @examples
 #'
-#' Annotate the coverage of the templates
+#' # Annotate the coverage of the templates
 #' data(Ippolito)
 #' template.df <- update_template_cvg(template.df, primer.df)
 update_template_cvg <- function(template.df, primer.df, 
@@ -741,7 +741,7 @@ update_template_cvg <- function(template.df, primer.df,
     return(template.df)
 }
 
-#' @rdname Templates
+#' @rdname TemplatesFunctions
 #' @details
 #' When modifying binding regions with \code{adjust_binding_regions}, new
 #' binding intervals can be specified via \code{fw} and \code{rev}
@@ -853,7 +853,7 @@ update.individual.binding.region <- function(min, max, template.df, mode.directi
     }
     return(template.df)
 }
-#' @rdname Templates
+#' @rdname TemplatesFunctions
 #' @details
 #' Binding regions are defined using \code{assign_binding_regions}, where
 #' the arguments \code{fw} and \code{rev} provide data describing
@@ -1813,7 +1813,7 @@ update.binding.ranges.by.conservation <- function(template.df,
     return(new.templates)
 }
 
-#' @rdname Templates
+#' @rdname TemplatesFunctions
 #' @return \code{select_regions_by_conservation} returns a
 #' \code{Templates} object with adjusted binding regions.
 #' The attribute \code{entropies} gives a data frame with positional entropies

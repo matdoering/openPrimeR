@@ -456,15 +456,15 @@ get_template_cvg_data <- function(primer.df, template.df) {
     return(plot.df)
 }
 
-#' @rdname CoverageStats
+#' @rdname AnalysisStats
 #' @details
 #' For \code{get_cvg_stats_primer}, the cells corresponding
 #' to columns with numeric identifiers 
 #' indicate the percentage of coverage events occurring
 #' with a certain number of mismatches. For example
-#' column \emph{3} provides the number of coverage events
+#' column \code{3} provides the number of coverage events
 #' where there are exactly three mismatches between primers and templates.
-#' The column \emph{Group_Coverage} provides a listing
+#' The column \code{Group_Coverage} provides a listing
 #' of the percentage of covered templates per group.
 #'
 #' @return \code{get_cvg_stats_primer} returns a list with the following entries. \code{cvg_per_nbr_mismatches} contains a data frame listing 
@@ -1453,7 +1453,7 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
     return(p)
 }
 
-#' @rdname CoverageStats
+#' @rdname AnalysisStats
 #' @return \code{get_cvg_stats} returns a data frame whose entries provide 
 #' the coverage of templates per group of templates.
 #' @export

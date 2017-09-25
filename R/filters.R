@@ -34,29 +34,13 @@ filter.comparison.primers <- function(primers, templates, active.constraints,
     #print(length(result$templates))
     return(result)
 }
-#' Filter a Set of Primers.
-#'
-#' Filters a primer set according to the constraints specified via 
-#' \code{settings} and \code{active.constraints} such that all primers
-#' that do not fulfill the constraints are removed from \code{primer.df}.
-#'
-#' @param primer.df A \code{Primers} object containing the primers
-#' to be filtered.
-#' @param template.df A \code{Templates} object with the template sequences 
-#' that are to be covered by \code{primer.df}.
-#' @param settings A \code{DesignSettings} object specifying the parameters 
-#' for filtering the primers.
-#' @param active.constraints The constraints that are to be used for filtering
-#' primers. By default, \code{active.constraints} is set to \code{NULL} such that
-#' all active constraints are used. 
-#' @return A \code{Primers} object containing only those primers 
-#' fulfilling all specified constraints.
-#' @note Please note that some constraints can only be computed if additional software is installed,
-#' please see \code{\link{DesignSettings}} for an overview.
-#' @family primer functions
+
+#' @rdname PrimerEval
+#' @return \code{filter_primers} returns a \code{Primers} object containing
+#' only those primers fulfilling all specified constraints.
 #' @export
-#' @keywords Primers
 #' @examples
+#' 
 #' data(Ippolito)
 #' filename <- system.file("extdata", "settings", 
 #'              "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")

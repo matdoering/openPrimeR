@@ -1,4 +1,4 @@
-#' Data Sets
+#' Data Sets.
 #'
 #' @rdname Data
 #' @name Data

@@ -764,34 +764,21 @@ primer.coverage.for.groups <- function(primer.df, template.df, groups) {
     primer.df <- primer.df[, colnames(primer.df) %in% keep.cols]
     return(primer.df)
 }
-#' Optimal Primer Subsets. 
-#' 
-#' Determines subsets of the input primer set that 
-#' are optimal with regard to the number of covered template 
-#' sequences.
-#'
-#' The optimal subsets are identified by solving an integer-linear program.
+
+#' @rdname PrimerEval
+#' @details
+#' \code{subset_primer_set} determines optimal subsets of the input primer set
+#' by solving an integer-linear program.
 #' Since the quality of the primers (in terms of properties) is not taken into
 #' account when creating the subsets, this method should only be used
 #' for primer sets that are already of high quality. 
 #' 
-#' @param primer.df An objectc of class \code{Primers} providing the
-#' primers for which optimal subsets should be constructed.
-#' @param template.df An object of class \code{Templates} providing the
-#' template sequences that are targeted by \code{primer.df}.
-#' @param k The spacing between generated primer subset sizes. By default,
-#' \code{k} is set to 1 such that all primer subsets are constructed.
-#' @param groups The identifiers of template groups according to which 
-#' coverage should be determined. By default, \code{groups} is set to 
-#' \code{NULL} such that all all covered templates are considered.
-#' @param identifier An identifier for storing the primer set. By default,
-#' \code{identifier} is set to  \code{NULL}.
-#' @param cur.results.loc Directory for storing the results. By default,
-#' \code{cur.results.loc} is set to \code{NULL}, which means that
-#' no results are stored.
-#' @return A list with optimal primer subsets, each of class \code{Primers}.
+#' @return \code{subset_primer_set} returns a list with optimal primer subsets,
+#' each of class \code{Primers}.
 #' @export
 #' @examples
+#' 
+#' # Determine optimal primer subsets
 #' data(Ippolito)
 #' primer.subsets <- subset_primer_set(primer.df, template.df, k = 3)
 subset_primer_set <- function(primer.df, template.df, k = 1, groups = NULL, identifier = NULL, cur.results.loc = NULL) {

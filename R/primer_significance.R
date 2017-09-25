@@ -39,36 +39,27 @@ create_fulfilled_counts <- function(primer.df, eval.cols = NULL) {
     count.df <- cbind(count.df, failure.df)
     return(count.df)
 }
-#' Significance of a Primer Set.
-#'
-#' Uses Fisher's exact test to determine the significance
-#' of a primer set according to its ratio of fulfilled 
-#' constraints on the primer properties.
-#'
-#' The significance is computed by comparing
+
+#' @rdname PrimerEval
+#' @details
+#' \code{primer_significance} computes the significance by comparing
 #' the total count of fulfilled and failed constraints
 #' with the corresponding counts of primer sets from the literature.
 #' Significant p-values indicate primer sets whose rate of constraint 
 #' fulfillment is higher compared to the reference sets.
 #'
-#' @param primer.df An object of class \code{Primers} for which the
-#' significance of physicochemical properties shall be determined.
-#' @param set.name An identifier for the input primers. If \code{NULL},
-#' the run identifier is used.
-#' @param active.constraints Identifiers of the constraints contained in 
-#' \code{primer.df} to consider.
-#' By default (\code{NULL}) all constraints available in \code{primer.df}
-#' are considered for determining the significance.
-#' @return The p-value of the primer set according to Fisher's exact test.
+#' @return \code{primer_significance} returns a numeric providing
+#' the p-value of the primer set according to Fisher's exact test.
 #' The returned value has the following attributes: 
 #' \describe{
 #' \item{\code{test}}{The results of the significance test}
 #' \item{\code{tab}}{The confusion matrix for Fisher's exact test}
 #' \item{\code{constraints}}{The names of the considered constraints}
 #' }
-#' @family primer functions
 #' @export
 #' @examples
+#' 
+#' # Determine the significance of a primer set
 #' data(Ippolito)
 #' p.data <- primer_significance(primer.df, "Ippolito")
 #' attr(p.data,"tab") # the confusion matrix

@@ -720,58 +720,19 @@ update.constraint.values <- function(constraint.df, constraint.values) {
     }
     return(constraint.df)
 }
-#' Evaluation of Primer Constraints.
-#'
-#' Determines whether a set of primers
-#' fulfills the constraints on the properties of the primers.
-#' 
+#' @rdname PrimerEval
+#' @details
 #' When the optional argument
-#' \code{active.constraints} is supplied, only a subset of the constraints
+#' \code{active.constraints} is supplied to \code{check_constraints}, 
+#' only a subset of the constraints
 #' provided in \code{settings} is evaluated. Only constraints that
 #' are defined in \code{settings} can be computed. For a detailed
 #' description of all possible constraints and their options, please
 #' consider the \code{\link{ConstraintSettings}} documentation.
 #'
-#' @param primer.df A \code{Primers} object containing the primers
-#' whose properties are to be checked.
-#' @param template.df A \code{Templates} object containing the 
-#' template sequences corresponding to \code{primer.df}.
-#' @param settings A \code{DesignSettings} object containing the 
-#' constraints that are to be evaluated.
-#' @param active.constraints A subset of the constraint identifiers 
-#' provided by \code{settings} that are to be checked
-#' for fulfillment. By default \code{active.constraints} is \code{NULL} such that
-#' all constraints found in \code{settings} are evaluated. Otherwise,
-#' only the constraints specified via \code{active.constraints} 
-#' that are available in \code{settings} are considered.
-#' @param to.compute.constraints Constraints that are to be computed.
-#' By default, \code{to.compute.constraints} is set to \code{NULL} such that
-#' all \code{active.constraints} are computed. If \code{to.compute.constraints}
-#' is a subset of \code{active.constraints}, all constraints specified
-#' via \code{active.constraints} are evaluated for fulfillment,
-#' but only the constraints in \code{to.compute.constraints} are newly calculated.
-#' @param for.shiny Whether the output of the function shall be
-#' formatted as HTML. The default setting is \code{FALSE}.
-#' @param updateProgress Progress callback function for shiny. The defaut is
-#' \code{NULL} meaning that no progress is monitored via the Shiny interface.
-#' @return A \code{Primers} object that is augmented
-#' with columns indicating the results for each evaluated constraint.
-#' The \code{constraints_passed} column indicates whether all \code{active.constraints} were fulfilled.
-#' The \code{EVAL_*} columns indicate the fulfillment of primer-specific constraints.
-#' The \code{T_EVAL_*} columns indicate the fulfillment of template-specific
-#' (e.g. coverage-based) constraints.
-#' For the coverage computations, columns prefixed by \code{Basic_},
-#' indicate the results from string matching, while all other results
-#' (e.g. \code{primer_coverage}) indicate the expected coverage
-#' after applying the coverage constraints specified in \code{settings}.
-#' Columns prefixed by \code{Off_} indicate off-target binding results.
-#' @note Please note that some constraints can only be computed if additional software is installed,
-#' please see the documentation of
-#' \code{\link{DesignSettings}} for an overview.
 #' @export
-#' @keywords Primers
-#' @family primer functions
 #' @examples
+#' 
 #' data(Ippolito)
 #' settings.xml <- system.file("extdata", "settings", 
 #'                  "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")

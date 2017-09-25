@@ -1,50 +1,47 @@
-#' Overview of Primer Set Properties.
-#'
-#' Creates an overview of the properties of multiple primer sets by providing
-#' the inter-quartile range of primer properties in bracket notation.
-#'
-#' @param template.data List with \code{Template} objects corresponding
-#' to \code{primer.data}. 
-#' @param primer.data List with evaluated \code{Primers} objects whose properties
-#' are to be summarized.
-#' @param sample.name Either a single identifier or identifiers for every
-#' \code{Templates} object in \code{template.data}.
-#' By default, \code{sample.name} is \code{NULL} such that the
-#' \code{Run} annotations in the \code{Templates} objects provided
-#' by \code{template.data} are used.
-#' @return A data frame summarizing the properties of each primer set.
+#' @rdname AnalysisStats
+#' @return \code{get_comparison_table} returns a data frame summarizing
+#' the properties of the provided primer data sets.
 #' @export
 #' @examples
+#' 
+#' # Summarize the properties of multiple primer sets
 #' data(Comparison)
-#' tab <- get_comparison_table(template.data[1:3], primer.data[1:3], "IGH")
-get_comparison_table <- function(template.data, primer.data, sample.name = NULL) {
-    if (length(template.data) != 0) {
+#' tab <- get_comparison_table(template.data[1:3], primers[1:3], "IGH")
+get_comparison_table <- function(templates, primers, sample.name = NULL) {
+    if (is(templates, "Templates") && is(primers, "Primers")) {
+        templates <- list(templates)
+        primers <- list(primers)
+    } 
+    if (!is(templates, "list") || !is(primers, "list")) {
+        stop("'templates' and 'primers' should be lists.")
+    }
+    if (length(templates) != 0) {
         if (length(sample.name) == 0) {
-            sample.name <- sapply(template.data, function(x) unique(x$Run))
+            sample.name <- sapply(templates, function(x) unique(x$Run))
         } else if (length(sample.name) == 1) {
-            sample.name <- rep(sample.name, length(template.data))
-        } else if (length(sample.name) != length(template.data)) {
+            sample.name <- rep(sample.name, length(templates))
+        } else if (length(sample.name) != length(templates)) {
             stop("Incorrect number of sample names provided.")
         }
-        if (length(template.data) != length(primer.data)) {
+        if (length(templates) != length(primers)) {
             stop("Please ensure that you provide the same number of templates as primers.")
         }
     }
-    template.classes <- sapply(template.data, function(x) class(x))
+    template.classes <- sapply(templates, function(x) class(x))
     if (any(template.classes != "Templates")) {
         stop("Input templates should be a list with objects ",
              "of class 'Templates'.")
 
     }
-    primer.classes <- sapply(primer.data, function(x) class(x))
+    primer.classes <- sapply(primers, function(x) class(x))
     if (any(primer.classes != "Primers")) {
         stop("Input primers should be a list with objects ",
              "of class 'Primers'.")
     }
-    all.results <- vector("list", length(primer.data))
-    for (j in seq_along(primer.data)) {
-        primer.df <- primer.data[[j]]
-        lex.seq <- template.data[[j]]
+    all.results <- vector("list", length(primers))
+    for (j in seq_along(primers)) {
+        primer.df <- primers[[j]]
+        lex.seq <- templates[[j]]
         set.name <- unique(primer.df$Run)
         mode.directionality <- get.analysis.mode(primer.df)
         set.stats <- primer.set.parameter.stats(primer.df, mode.directionality, lex.seq)

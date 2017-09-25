@@ -1,7 +1,7 @@
-#' Template Functionalities
+#' Template Functionalities.
 #'
-#' @rdname Templates
-#' @name Templates
+#' @rdname TemplatesFunctions
+#' @name TemplatesFunctions
 #'
 #' @description
 #' \describe{

@@ -6,7 +6,7 @@
 \alias{Scoring}
 \alias{score_degen}
 \alias{score_primers}
-\title{Scoring functions}
+\title{Scoring Functions.}
 \usage{
 score_conservation(template.df, gap.char = "-", win.len = 30,
   by.group = TRUE)

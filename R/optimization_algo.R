@@ -74,16 +74,9 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
                         paste(sample.name, "_FINAL_optimized_primers.fasta", sep = "")))
     }
 }
-#' Design of Multiplex PCR Primers.
-#'
-#' Designs a primer set maximizing the number of covered templates using
-#' the smallest possible number of primers. The algorithm tries to ensure
-#' that the designed set of primers achieves a coverage ratio not lower than
-#' \code{required.cvg}. To this end, the constraints for designing
-#' primers may be relaxed.
-#'
-#' @section{1. Initialization}:
-#' The primer design algorithm consists
+#' @rdname PrimerDesign
+#' @details
+#' The primer design algorithm used by \code{design_primers} consists
 #' of three steps: primer initialization, filtering, and optimization.
 #' The method for initializing a set of candidate primers is determined
 #' via \code{init.algo}. If \code{init.algo} is set to \emph{naive}, primers
@@ -93,7 +86,6 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
 #' a degeneracy of at most \code{max.degen}. The tree-based initialization
 #' is recommended for related sequences.
 #'
-#' @section{2. Filtering}:
 #' The candidate primer set is filtered according to the constraints
 #' specified in the \code{settings} object. In some cases, it is necessary
 #' to relax the constraints in order to reach the desired \code{required.cvg}.
@@ -101,7 +93,6 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
 #' If you would like to skip the initialization and filtering stages,
 #' you can provide an evaluated \code{Primers} object via \code{primer.df}.
 #'
-#' @section{3. Optimization}:
 #' Optimizing a primer set entails finding the smallest subset of primers
 #' maximizing the coverage, which is done by solving the set cover problem.
 #' If melting temperature differences are a constraint,
@@ -114,44 +105,7 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
 #' greedy algorithm is shorter than the worst-case runtime of the ILP, 
 #' the greedy solution may yield larger primer sets than the ILP solution.
 #'
-#' @param template.df A \code{Templates} object containing the template
-#' sequences and target regions for designing primers.
-#' @param mode.directionality The template strand for which primers shall be designed.
-#' Primers can be designed either for forward strands ("fw"), 
-#' for reverse strands ("rev"), or for both strands ("both"). The default setting
-#' is "both".
-#' @param settings A \code{DesignSettings} object specifying the constraint settings for filtering and optimization.
-#' @param init.algo The algorithm to be used for initializing primers.
-#' If \code{init.algo} is "naive", then primers are constructed from substrings of the input template sequences.
-#' If \code{init.algo} is "tree", phylogenetic trees are used to form degenerate primers whose degeneracy is bounded by \code{max.degen}.
-#' This option requires an installation of MAFFT (see notes). The default \code{init.algo} is "naive".
-#' @param opti.algo The algorithm to be used for solving the primer set covering problem. 
-#' If \code{opti.algo} is "Greedy" a greedy algorithm is used to solve the 
-#' set cover problem. If \code{opti.algo} is "ILP" an integer linear 
-#' programming formulation is used. The default \code{opti.algo} is "Greedy".
-#' @param required.cvg The desired ratio of of covered template sequences. 
-#' If the target coverage ratio cannot be reached, the constraint settings
-#' are relaxed according to the the constraint limits in order to reach the target coverage. 
-#' The default \code{required.cvg} is set to 1, indicating that 100\% of the templates are to be covered.
-#' @param timeout Timeout in seconds. Only applicable when \code{opti.algo} is "ILP".
-#' The default is \code{Inf}, which does not limit the runtime.
-#' @param max.degen The maximal degeneracy of primer candidates. This setting is particularly
-#' relevant when \code{init.algo} is set to "tree". The default setting is \code{16}, which means
-#' that at most 4 maximally degenerate positions are allowed per primer.
-#' @param conservation Restrict the percentile of considered regions according to their conservation.
-#' Only applicable for the tree-based primer initialization. At the its
-#' default of 1, all available binding regions are considered.
-#' @param sample.name An identifier for the primer design task. The default setting is
-#' \code{NULL}, which means that the run identifier provided in \code{template.df} is used.
-#' @param cur.results.loc Directory for storing the results of the primer design procedure.
-#' The default setting is \code{NULL} such that no output is stored.
-#' @param primer.df An optional \code{Primers} object. If an evaluated \code{primer.df} is provided,
-#' the primer design procedure only optimizes \code{primer.df} and does not perform
-#' the initialization and filtering steps. The default is \code{NULL} such that
-#' primers are initialized and filtered from scratch.
-#' @param updateProgress Shiny progress callback function. The default is \code{NULL}
-#' such that no progress is logged.
-#' @return A list with the following fields:
+#' @return \code{design_primers} returns a list with the following fields:
 #' \describe{
 #' \item{\code{opti}:}{A \code{Primers} object providing the designed primer set.}
 #' \item{\code{used_constraints}:}{A list with \code{DesignSettings} objects
@@ -164,16 +118,9 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
 #' \item{\code{filtered}:}{A list with data providing information on the results
 #' of the filtering procedure.}
 #' } 
-#' @family primer functions
-#' @note Some constraints specified in the \code{settings} object
-#' can only be computed if additional software is installed,
-#' please see the documentation of \code{\link{DesignSettings}} for an overview of all possible settings and the \code{\link{ConstraintSettings}} documentation
-#' for an overview of all possible constraints.
-#' Usage of \code{init.algo = "tree"} requires an installation of
-#' the multiple alignment program MAFFT (http://mafft.cbrc.jp/alignment/software/).
 #' @export
-#' @keywords Primers
 #' @examples
+#' 
 #' # Define PCR settings and primer criteria
 #' data(Ippolito)
 #' # design only with minimal set of constraints

@@ -5,8 +5,8 @@
 \alias{adjust_binding_regions}
 \alias{assign_binding_regions}
 \alias{select_regions_by_conservation}
-\alias{Templates}
-\title{Template Functionalities}
+\alias{TemplatesFunctions}
+\title{Template Functionalities.}
 \usage{
 update_template_cvg(template.df, primer.df, mode.directionality = NULL)
 
@@ -126,7 +126,7 @@ for multiple alignments
 }
 \examples{
 
-Annotate the coverage of the templates
+# Annotate the coverage of the templates
 data(Ippolito)
 template.df <- update_template_cvg(template.df, primer.df)
 data(Ippolito)

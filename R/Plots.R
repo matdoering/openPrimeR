@@ -1,4 +1,4 @@
-#' Plotting Functions
+#' Plotting Functions.
 #'
 #' @rdname Plots
 #' @name Plots

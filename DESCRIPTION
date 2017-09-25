@@ -71,8 +71,8 @@ SystemRequirements: MAFFT (>= 7.305),
 biocViews: Software, Technology
 VignetteBuilder: knitr
 Collate: 
+    'AnalysisStats.R'
     'Comparison.R'
-    'CoverageStats.R'
     'Data.R'
     'templates.R'
     'primers.R'
@@ -82,6 +82,8 @@ Collate:
     'Ippolito.R'
     'Output.R'
     'Plots.R'
+    'PrimerDesign.R'
+    'PrimerEvaluation.R'
     'RefCoverage.R'
     'Scoring.R'
     'SettingsDoc.R'

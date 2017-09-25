@@ -15,7 +15,7 @@
 \alias{plot_primer}
 \alias{plot_template_cvg}
 \alias{plot_primer_cvg}
-\title{Plotting Functions}
+\title{Plotting Functions.}
 \usage{
 plot_conservation(entropy.df, alignments, template.df, gap.char = "-")
 

@@ -89,17 +89,11 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
     }
     return(list("fw" = cvg.fw, "rev" = cvg.rev))
 }
-#' Classification of the Difficulty of a Primer Design Task.
-#'
-#' Uses reference beta distributions of primer coverage ratios to
-#' classify a primer design task into the groups ranging from \emph{easy} 
-#' to \emph{hard}. For \emph{easy} tasks, it should
-#' not be a problem to design a small primer set. For
-#' \emph{hard} tasks, however, a small set of primers may not be
-#' achievable.
-#'
-#' The difficulty of a primer design task is evaluated by
-#' estimating the distribution of coverage ratios per primer
+
+#' @rdname PrimerDesign
+#' @details
+#' \code{classify_design_problem} determines the difficulty of a primer design 
+#' task by estimating the distribution of coverage ratios per primer
 #' by performing exact string matching with 
 #' primers of length \code{primer.length}, which are constructed
 #' by extracting template subsequences. Next, a beta distribution
@@ -116,21 +110,8 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 #' is based solely on perfect matching primers, the number of
 #' primers that would actually be required is typically less.
 #'
-#' @param template.df A \code{Templates} object providing
-#' the template sequences for which the difficulty of designing
-#' primers shall be estimated.
-#' @param mode.directionality The directionality of the
-#' primers that are to be designed. Either
-#' \code{fw} for forward primers, \code{rev} for reverse primers,
-#' or \code{both} for primers of both directions. By default,
-#' both directions are considered.
-#' @param primer.length A scalar numeric providing the 
-#' target length of the designed primers. The default length 
-#' of generated primers is set to \code{18}.
-#' @param primer.estimate Whether the number of required primers shall be estimated. By default (\code{FALSE}), the number of required primers is not estimated.
-#' @param required.cvg A scalar numeric in the range [0,1] providing the target coverage ratio for designing primers. 
-#' The \code{required.cvg} is used only when \code{primer.estimate} is set to \code{TRUE} such that a solution to the set cover problem is required.
-#' @return A list with the following fields:
+#' @return \code{classify_design_problem} returns a list with the 
+#' following fields:
 #' \describe{
 #' \item{\code{Classification}}{The estimated difficulty of the primer design task.}
 #' \item{\code{Class-Distances}}{The total variance distance of the fitted
@@ -144,6 +125,8 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 #' }
 #' @export
 #' @examples
+#'
+#' # Classify the difficulty of a primer design task
 #' data(Ippolito)
 #' design.estimate <- classify_design_problem(template.df[1:30,])
 #' # Estimate the number of required primers to amplify the first 5 templates
@@ -287,43 +270,15 @@ validate_primers <-  function(object) {
     }
 }
 
-#' Identification of Sequence Restriction Sites.
-#'
-#' Checks a set of primers for the presence of
-#' restriction sites. To reduce the number of possible restriction sites,
-#' only unambiguous restriction sites are taken into account and 
-#' only common (typically used) restriction sites are checked if a common
-#' restriction site can be found in a sequence.
-#'
-#' @param primer.df A \code{Primers} object containing the primer nucleotide
-#' sequences to be checked for restriction sites.
-#' @param template.df An object of class \code{Templates} containing
-#' the templates corresponding to \code{primer.df}.
-#' @param adapter.action The action to be performed when adapter sequences
-#' are found. Either "warn" to issue a warning about adapter sequences or
-#' "rm" to remove identified adapter sequences. Currently, only
-#' the default setting ("warn") is supported.
-#' @param selected Names of restriction sites that are to be checked.
-#' By default \code{selected} is \code{NULL} in which case all REBASE 
-#' restriction sites are taken into account.
-#' @param only.confident.calls Whether only confident calls
-#' of restriction sites are returned.
-#' All restriction site call is considered \emph{confident} if the restriction site
-#' is located in a region that does not match the template sequences.
-#' Note that this classification requires that the provided primers
-#' are somehow complementary to the provided templates.
-#' In contrast, non-confident restriction site calls are 
-#' based solely on the primer sequences and do not take the templates
-#' into account, resulting in more false positive calls of restriction sites.
-#' @param updateProgress A Shiny progress callback function. The default
-#' is \code{NULL} meaning that no progress is tracked via the Shiny app.
-#' @return A data frame with possible restriction sites found in every primer.
+#' @rdname PrimerEval
+#' @return \code{check_restriction_sites} returns a data frame 
+#' with possible restriction sites found in the primers.
 #' @references
 #' Roberts, R.J., Vincze, T., Posfai, J., Macelis, D. (2010) REBASE–a database for DNA restriction
 #' and modification: enzymes, genes and genomes. Nucl. Acids Res. 38: D234-D236. http://rebase.neb.com
 #' @export
-#' @family primer functions
 #' @examples
+#' 
 #' data(Ippolito)
 #' # Check the first primer for restriction sites with respect to the first 10 templates
 #' site.df <- check_restriction_sites(primer.df[1,], template.df[1:10])
@@ -1854,7 +1809,7 @@ get.analysis.mode <- function(primers) {
     return(mode)
 }
 
-#' @rdname CoverageStats
+#' @rdname AnalysisStats
 #' @details
 #' The manner in which \code{get_cvg_ratio} determines the coverage ratio 
 #' depends on the directionality of the input primers.
