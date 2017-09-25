@@ -1,4 +1,5 @@
 #' @rdname Data
+#' @name Data
 #' @name Comparison
 #' @usage data(Comparison)
 #'

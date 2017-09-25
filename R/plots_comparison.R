@@ -1,4 +1,5 @@
 #' @rdname AnalysisStats
+#' @name AnalysisStats
 #' @return \code{get_comparison_table} returns a data frame summarizing
 #' the properties of the provided primer data sets.
 #' @export

@@ -1,4 +1,5 @@
 #' @rdname Settings
+#' @name Settings
 #'
 #' @details
 #' Note that for the \code{DesignSettings} class, the fields \code{Input_Constraints}, \code{Input_Constraint_Boundaries}, and \code{Coverage_Constraints} should 
@@ -436,12 +437,14 @@ check_settings_validity <- function(object) {
 ############
 
 #' @rdname Settings
+#' @name Settings
 #' @exportMethod constraints
 #' @return \code{constraints} gets a list with the active constraint settings.
 #' @keywords Settings
 setGeneric("constraints", function(x) standardGeneric("constraints"))
 
 #' @rdname Settings
+#' @name Settings
 setMethod("constraints", "DesignSettings", function(x) {
     sel <- names(constraints(x@Input_Constraints))
     #print("Constraint getter:")
@@ -450,6 +453,7 @@ setMethod("constraints", "DesignSettings", function(x) {
 })
 
 #' @rdname Settings
+#' @name Settings
 setMethod("constraints", c("AbstractConstraintSettings"), 
     function(x) {
         return(x@settings)    
@@ -457,11 +461,13 @@ setMethod("constraints", c("AbstractConstraintSettings"),
 )
 
 #' @rdname Settings
+#' @name Settings
 #' @exportMethod cvg_constraints
 #' @return \code{cvg_constraints} returns the list of active coverage constraints.
 setGeneric("cvg_constraints", function(x) standardGeneric("cvg_constraints"))
 
 #' @rdname Settings
+#' @name Settings
 setMethod("cvg_constraints", "DesignSettings", function(x) {
     sel <- names(constraints(x@Coverage_Constraints))
     # select only the possible constraints from the settings (tool dependencies):
@@ -557,22 +563,26 @@ setMethod("optiLimits", "DesignSettings", function(x) {
 })
 
 #' @rdname Settings
+#' @name Settings
 #' @return \code{PCR} gets the list of PCR conditions defined in the
 #' provided \code{DesignSettings} object.
 #' @exportMethod PCR
 setGeneric("PCR", function(x) standardGeneric("PCR"))
 
 #' @rdname Settings
+#' @name Settings
 setMethod("PCR", "DesignSettings", function(x) {
     constraints(x@PCR_conditions)
 })
 
 #' @rdname Settings
+#' @name Settings
 #' @exportMethod conOptions
 #' @return \code{conOptions} returns a list with constraint options.
 setGeneric("conOptions", function(x) standardGeneric("conOptions"))
 
 #' @rdname Settings
+#' @name Settings
 setMethod("conOptions", "DesignSettings", 
     function(x) {
         constraints(x@constraint_settings)
@@ -580,11 +590,13 @@ setMethod("conOptions", "DesignSettings",
 )
 
 #' @rdname Settings
+#' @name Settings
 #' @return \code{constraintLimits} gets the list of constraint limits.
 #' @exportMethod constraintLimits
 setGeneric("constraintLimits", function(x) standardGeneric("constraintLimits"))
 
 #' @rdname Settings
+#' @name Settings
 setMethod("constraintLimits", "DesignSettings", 
 	function(x) {
         sel <- con_select(names(constraints(x@Input_Constraint_Boundaries)))
@@ -597,6 +609,7 @@ setMethod("constraintLimits", "DesignSettings",
 ###############
 
 #' @rdname Settings
+#' @name Settings
 #' @details
 #' For an overview of permissible constraints,
 #' please consider the \code{\link{ConstraintSettings}} documentation.
@@ -616,6 +629,7 @@ setMethod("constraintLimits", "DesignSettings",
 setGeneric("constraints<-", function(x, value) standardGeneric("constraints<-"))
 
 #' @rdname Settings
+#' @name Settings
 setReplaceMethod("constraints", "DesignSettings", 
     # NB: setReplaceMethod: second argument MUST be named 'value'
 	function(x, value) {
@@ -640,6 +654,7 @@ setReplaceMethod("constraints", "DesignSettings",
 )
 
 #' @rdname Settings
+#' @name Settings
 setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
     function(x, value) {
         m <- match(names(value), names(x@status))
@@ -664,6 +679,7 @@ setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
 
 
 #' @rdname Settings
+#' @name Settings
 #' @exportMethod cvg_constraints<-
 #' @return \code{cvg_constraints<-} sets the list of coverage constraints in the provided \code{DesignSettings} object.
 #' @examples
@@ -679,6 +695,7 @@ setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
 setGeneric("cvg_constraints<-", function(x, value) standardGeneric("cvg_constraints<-"))
 
 #' @rdname Settings
+#' @name Settings
 setReplaceMethod("cvg_constraints", "DesignSettings", 
 	function(x, value) {
 		constraints(x@Coverage_Constraints) <- value
@@ -687,6 +704,7 @@ setReplaceMethod("cvg_constraints", "DesignSettings",
 	}
 )
 #' @rdname Settings
+#' @name Settings
 #' @exportMethod constraintLimits<-
 #' @return \code{constraintLimits<-} sets the list of constraint limits in 
 #' the provided \code{DesignSettings} object.
@@ -703,6 +721,7 @@ setReplaceMethod("cvg_constraints", "DesignSettings",
 setGeneric("constraintLimits<-", function(x, value) standardGeneric("constraintLimits<-"))
 
 #' @rdname Settings
+#' @name Settings
 setReplaceMethod("constraintLimits", "DesignSettings", 
 	function(x, value) {
         # modify the settings if necessary
@@ -719,6 +738,7 @@ setReplaceMethod("constraintLimits", "DesignSettings",
 )
 
 #' @rdname Settings
+#' @name Settings
 #' @return \code{PCR<-} sets the constraint options in the provided
 #' \code{DesignSettings} object.
 #' @exportMethod PCR<-
@@ -735,6 +755,7 @@ setReplaceMethod("constraintLimits", "DesignSettings",
 setGeneric("PCR<-", function(x, value) standardGeneric("PCR<-"))
 
 #' @rdname Settings
+#' @name Settings
 setReplaceMethod("PCR", "DesignSettings", 
 	function(x, value) {
 		constraints(x@PCR_conditions) <- value
@@ -744,6 +765,7 @@ setReplaceMethod("PCR", "DesignSettings",
 )
 
 #' @rdname Settings
+#' @name Settings
 #' @exportMethod conOptions<-
 #' @return \code{conOptions<-} sets the specified list of constraint options in the provided \code{DesignSettings} object.
 #' @examples
@@ -759,6 +781,7 @@ setReplaceMethod("PCR", "DesignSettings",
 setGeneric("conOptions<-", function(x, value) standardGeneric("conOptions<-"))
 
 #' @rdname Settings
+#' @name Settings
 setReplaceMethod("conOptions", "DesignSettings", 
 	function(x, value) {
 		constraints(x@constraint_settings) <- value
@@ -811,6 +834,7 @@ parse.constraints <- function(xml_data) {
 }
 
 #' @rdname Input
+#' @name Input
 #' @details
 #' When loading a settings file with \code{read_settings}, 
 #' if \code{filename} is not provided,
@@ -1045,6 +1069,7 @@ constraints.xml.format <- function(constraints, set.name) {
 }
 
 #' @rdname Output
+#' @name Output
 #' @return \code{write_settings} returns the status from closing the connection to the output file.
 #' @export
 #' @examples
@@ -1690,6 +1715,7 @@ constraints_to_unit <- function(constraint, use.unit = TRUE,
 }
 
 #' @rdname Settings
+#' @name Settings
 #' @return \code{parallel_setup} returns \code{NULL}.
 #' @export
 #' @examples

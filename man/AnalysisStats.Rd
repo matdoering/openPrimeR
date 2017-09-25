@@ -3,10 +3,13 @@
 %   R/plots_comparison.R, R/plots_coverage.R
 \name{AnalysisStats}
 \alias{AnalysisStats}
+\alias{AnalysisStats}
 \alias{get_cvg_ratio}
+\alias{AnalysisStats}
 \alias{get_comparison_table}
+\alias{AnalysisStats}
 \alias{get_cvg_stats_primer}
-\alias{get_cvg_stats}
+\alias{AnalysisStats}
 \title{Primer Analysis Statistics.}
 \usage{
 get_cvg_ratio(primer.df, template.df, allowed.mismatches = NULL,

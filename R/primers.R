@@ -91,6 +91,7 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 }
 
 #' @rdname PrimerDesign
+#' @name PrimerDesign
 #' @details
 #' \code{classify_design_problem} determines the difficulty of a primer design 
 #' task by estimating the distribution of coverage ratios per primer
@@ -271,6 +272,7 @@ validate_primers <-  function(object) {
 }
 
 #' @rdname PrimerEval
+#' @name PrimerEval
 #' @return \code{check_restriction_sites} returns a data frame 
 #' with possible restriction sites found in the primers.
 #' @references
@@ -694,6 +696,7 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
     return(hit.out)
 }
 #' @rdname Input
+#' @name Input
 #' 
 #' @section Basic columns:
 #' In the following you can find a description of the most
@@ -791,6 +794,7 @@ setMethod("initialize", "Primers",
     }
 ) 
 #' @rdname Input
+#' @name Input
 #' @export
 Primers <- function(...) new("Primers", ...) 
 
@@ -1063,6 +1067,7 @@ update_primer_cvg <- function(primer.df, template.df, allowed.mismatches, cvg.de
 }
 
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_primer_binding_regions} returns a plot of the primer binding regions.
 #' @export
 #' @include templates.R
@@ -1314,6 +1319,7 @@ setMethod("plot_primer_binding_regions",
 })
 
 #' @rdname Input
+#' @name Input
 #' @details
 #' When loading primers via \code{read_primers}, the input arguments
 #' \code{fw.id}, \code{rev.id}, \code{merge.ambig}, and \code{max.degen} 
@@ -1762,6 +1768,7 @@ pair_primers <- function(primer.df, template.df) {
 }
 
 #' @rdname Output
+#' @name Output
 #' @return \code{write_primers} stores primers to disk.
 #' @export
 #' @examples
@@ -1810,6 +1817,7 @@ get.analysis.mode <- function(primers) {
 }
 
 #' @rdname AnalysisStats
+#' @name AnalysisStats
 #' @details
 #' The manner in which \code{get_cvg_ratio} determines the coverage ratio 
 #' depends on the directionality of the input primers.

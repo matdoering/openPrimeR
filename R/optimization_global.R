@@ -11,6 +11,7 @@ penalize_primer <- function(deviations, alpha = 0.5) {
     return(score)
 }
 #' @rdname Scoring
+#' @name Scoring
 #' @details
 #' \code{score_primers} determines the penalty of a primer in the following way.
 #' Let \code{d} be a vector indicating the absolute deviations from 

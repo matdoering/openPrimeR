@@ -45,6 +45,7 @@ validate_templates <-  function(object) {
 }
 
 #' @rdname Input
+#' @name Input
 #' @details
 #' In the following you can find a description
 #' of the most important columns that can be found
@@ -93,6 +94,7 @@ setMethod("show", "Templates", function(object) {
     my_show_df(asS3(object))
 })
 #' @rdname Input
+#' @name Input
 #' @export
 Templates <- function(...) new("Templates", ...) 
 
@@ -300,6 +302,7 @@ parse.header <- function(hdr, delim, hdr.str, id.column) {
 }
 
 #' @rdname Input
+#' @name Input
 #' @details
 #' When loading a FASTA file with \code{read_templates},
 #' the input arguments \code{hdr.structure}, \code{delim}, \code{id.column}, 
@@ -644,6 +647,7 @@ read.sequences <- function(fasta.file, gap.character) {
     return(d)
 }
 #' @rdname TemplatesFunctions
+#' @name TemplatesFunctions
 #' @return \code{update_template_cvg} returns an object of class 
 #' \code{Templates} with updated coverage columns.
 #' @export
@@ -742,6 +746,7 @@ update_template_cvg <- function(template.df, primer.df,
 }
 
 #' @rdname TemplatesFunctions
+#' @name TemplatesFunctions
 #' @details
 #' When modifying binding regions with \code{adjust_binding_regions}, new
 #' binding intervals can be specified via \code{fw} and \code{rev}
@@ -854,6 +859,7 @@ update.individual.binding.region <- function(min, max, template.df, mode.directi
     return(template.df)
 }
 #' @rdname TemplatesFunctions
+#' @name TemplatesFunctions
 #' @details
 #' Binding regions are defined using \code{assign_binding_regions}, where
 #' the arguments \code{fw} and \code{rev} provide data describing
@@ -1501,6 +1507,7 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
 }
 
 #' @rdname Output
+#' @name Output
 #' @return \code{write_templates} stores templates to \code{fname}.
 #' @export
 #' @examples
@@ -1526,6 +1533,7 @@ write_templates <- function(template.df, fname, ftype = c("FASTA", "CSV")) {
 }
 
 #' @rdname Scoring
+#' @name Scoring
 #' @return A list containing \code{Entropies} and \code{Alignments}.
 #' \code{Entropies} is a data frame with conservation scores. 
 #' Each column indicates a position in the alignment of template sequences
@@ -1605,6 +1613,7 @@ detect.gap.columns <- function(bins, gap.cutoff = 0.95, gap.char = "-") {
     return(mask.idx)
 }
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_conseration} returns a plot showing the degree of sequence conservation in the templates.
 #' @export
 #' @note Computing the conservation scores for using \code{plot_conservation} requires
@@ -1814,6 +1823,7 @@ update.binding.ranges.by.conservation <- function(template.df,
 }
 
 #' @rdname TemplatesFunctions
+#' @name TemplatesFunctions
 #' @return \code{select_regions_by_conservation} returns a
 #' \code{Templates} object with adjusted binding regions.
 #' The attribute \code{entropies} gives a data frame with positional entropies

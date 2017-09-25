@@ -87,6 +87,7 @@ filter.primer.candidates <- function(primer.candidates, min.len) {
 }
 
 #' @rdname Scoring
+#' @name Scoring
 #' @details
 #' \code{score_degen} computes the degeneration of an ambiguous sequence
 #' by considering the number of unambiguous sequences that

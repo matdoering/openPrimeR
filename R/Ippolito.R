@@ -1,5 +1,5 @@
 #' @rdname Data
-#' @name Ippolito
+#' @name Data
 #'
 #' @usage data(Ippolito)
 #'

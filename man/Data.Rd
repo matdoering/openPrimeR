@@ -2,19 +2,19 @@
 % Please edit documentation in R/Comparison.R, R/Data.R, R/Ippolito.R,
 %   R/RefCoverage.R, R/Tiller.R
 \docType{data}
-\name{Comparison}
-\alias{Comparison}
+\name{Data}
+\alias{Data}
 \alias{primer.data}
 \alias{template.data}
 \alias{Data}
-\alias{Ippolito}
+\alias{Data}
 \alias{template.df}
 \alias{primer.df}
 \alias{settings}
 \alias{RefCoverage}
 \alias{feature.matrix}
 \alias{ref.data}
-\alias{Tiller}
+\alias{Data}
 \alias{tiller.template.df}
 \alias{tiller.primer.df}
 \alias{tiller.settings}

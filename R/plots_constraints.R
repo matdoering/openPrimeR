@@ -460,6 +460,7 @@ dimerization.table <- function(dimer.data, deltaG.cutoff,
 }
 
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_constraint} returns a plot showing the distribution of primer properties.
 #' @export
 #' @include primers.R settings.R
@@ -571,6 +572,7 @@ setMethod("plot_constraint",
 })
 
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_constraint_fulfillment} returns a plot indicating the constraints that are fulfilled by the input primers.
 #' @export
 #' @include primers.R settings.R
@@ -740,6 +742,7 @@ setMethod("plot_constraint_fulfillment",
     return(p)
 })
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_cvg_constraints} returns a plot showing the distribution of the coverage constraint values.
 #' @export
 #' @include primers.R settings.R
@@ -858,6 +861,7 @@ setMethod("plot_cvg_constraints",
 })
 
 #' @rdname Plots
+#' @name Plots
 #' @details
 #' The deviations for \code{plot_constraint_deviation} are computed in the following way. Let the
 #' minimum and maximum allowed constraint values be given by

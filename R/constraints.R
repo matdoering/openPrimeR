@@ -15,6 +15,7 @@ AbstractConstraintSettings <- setClass("AbstractConstraintSettings",
 )
 
 #' @rdname Settings
+#' @name Settings
 #'
 #' @section primer_coverage:
 #' Computing the primer coverage involves identifying
@@ -268,6 +269,7 @@ check_constraint_settings_validity <- function(object) {
 }
 
 #' @rdname Settings
+#' @name Settings
 #' @return The \code{CoverageConstraints} constructor initializes a new
 #' \code{CoverageConstraints} object.
 #' @note
@@ -313,6 +315,7 @@ setMethod("initialize", "CoverageConstraints",
 })
 
 #' @rdname Settings
+#' @name Settings
 #' @return The \code{ConstraintOptions} constructor returns
 #' a new \code{ConstraintOptions} object.
 #' @export
@@ -351,6 +354,7 @@ setMethod("initialize", "ConstraintOptions",
 })
 
 #' @rdname Settings
+#' @name Settings
 #' @return The \code{PCR_Conditions} constructor defines a new \code{PCR_Conditions} object.
 #' @export
 #' @examples

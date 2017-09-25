@@ -766,6 +766,7 @@ primer.coverage.for.groups <- function(primer.df, template.df, groups) {
 }
 
 #' @rdname PrimerEval
+#' @name PrimerEval
 #' @details
 #' \code{subset_primer_set} determines optimal subsets of the input primer set
 #' by solving an integer-linear program.

@@ -1,4 +1,5 @@
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_cvg_vs_set_size} returns a plot of coverage vs set size.
 #' @export
 #' @examples
@@ -81,6 +82,7 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
 }
 
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_penalty_vs_set_size} returns a plot of constraint penalties
 #' vs primer set sizes.
 #' @export
@@ -457,6 +459,7 @@ get_template_cvg_data <- function(primer.df, template.df) {
 }
 
 #' @rdname AnalysisStats
+#' @name AnalysisStats
 #' @details
 #' For \code{get_cvg_stats_primer}, the cells corresponding
 #' to columns with numeric identifiers 
@@ -543,6 +546,7 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     return(out)
 }
 #' @rdname Plots
+#' @name Plots
 #' @details
 #' The \code{primer.subsets} argument for \code{plot_primer_subsets} can be computed using
 #' \code{\link{subset_primer_set}}. 
@@ -854,6 +858,7 @@ get_plot_primer_data <- function(primer.df, template.df, identifier = NULL, rela
     return(d)
 }
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_primer} plots the primer binding sites in the templates.
 #' @export
 #' @examples
@@ -1006,6 +1011,7 @@ plot.excluded.hist <- function(excluded.df, filtered.stats, template.df) {
 }
 
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_template_cvg} creates a plot showing the number of covered template sequences.
 #' @family templates
 #' @export
@@ -1454,6 +1460,7 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
 }
 
 #' @rdname AnalysisStats
+#' @name AnalysisStats
 #' @return \code{get_cvg_stats} returns a data frame whose entries provide 
 #' the coverage of templates per group of templates.
 #' @export
@@ -1637,6 +1644,7 @@ setMethod("get_cvg_stats", signature(primers = "list"),
     return(stat.df)
 })
 #' @rdname Plots
+#' @name Plots
 #' @return \code{plot_primer_cvg} creates a plot showing the coverage of individual primers.
 #' @export
 #' @include primers.R templates.R

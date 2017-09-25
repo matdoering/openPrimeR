@@ -75,6 +75,7 @@ write.out.primer.info <- function(opti.results.loc, optimal.primers.data,
     }
 }
 #' @rdname PrimerDesign
+#' @name PrimerDesign
 #' @details
 #' The primer design algorithm used by \code{design_primers} consists
 #' of three steps: primer initialization, filtering, and optimization.

@@ -2,13 +2,18 @@
 % Please edit documentation in R/templates.R, R/primers.R, R/Input.R,
 %   R/settings.R
 \docType{class}
-\name{Templates-class}
-\alias{Templates-class}
+\name{Input}
+\alias{Input}
+\alias{Input}
 \alias{Templates}
+\alias{Input}
 \alias{read_templates}
-\alias{Primers-class}
+\alias{Input}
+\alias{Input}
 \alias{Primers}
+\alias{Input}
 \alias{read_primers}
+\alias{Input}
 \alias{Input}
 \alias{read_settings}
 \title{Input Functionalities.}

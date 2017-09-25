@@ -721,6 +721,7 @@ update.constraint.values <- function(constraint.df, constraint.values) {
     return(constraint.df)
 }
 #' @rdname PrimerEval
+#' @name PrimerEval
 #' @details
 #' When the optional argument
 #' \code{active.constraints} is supplied to \code{check_constraints}, 

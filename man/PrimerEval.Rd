@@ -2,12 +2,17 @@
 % Please edit documentation in R/primers.R, R/PrimerEvaluation.R,
 %   R/constraints_eval.R, R/filters.R, R/optimization_ILP.R,
 %   R/primer_significance.R
-\name{check_restriction_sites}
+\name{PrimerEval}
+\alias{PrimerEval}
 \alias{check_restriction_sites}
 \alias{PrimerEval}
+\alias{PrimerEval}
 \alias{check_constraints}
+\alias{PrimerEval}
 \alias{filter_primers}
+\alias{PrimerEval}
 \alias{subset_primer_set}
+\alias{PrimerEval}
 \alias{primer_significance}
 \title{Primer Evaluation.}
 \usage{
