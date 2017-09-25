@@ -46,7 +46,7 @@ validate_templates <-  function(object) {
 
 #' @rdname Input
 #' @name Input
-#' @aliases Templates
+#' @aliases Templates-class
 #' @details
 #' In the following you can find a description
 #' of the most important columns that can be found
@@ -96,7 +96,7 @@ setMethod("show", "Templates", function(object) {
 })
 #' @rdname Input
 #' @name Input
-#' @aliases Templates
+#' @aliases Templates-class
 #' @export
 Templates <- function(...) new("Templates", ...) 
 

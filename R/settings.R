@@ -1,6 +1,6 @@
 #' @rdname Settings
 #' @name Settings
-#' @aliases DesignSettings
+#' @aliases DesignSettings-class
 #' @details
 #' Note that for the \code{DesignSettings} class, the fields \code{Input_Constraints}, \code{Input_Constraint_Boundaries}, and \code{Coverage_Constraints} should 
 #' contain entries with at most two components using the fields \code{min} and/or \code{max}.
@@ -438,7 +438,7 @@ check_settings_validity <- function(object) {
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints
+#' @aliases constraints-methods
 #' @exportMethod constraints
 #' @return \code{constraints} gets a list with the active constraint settings.
 #' @keywords Settings
@@ -446,7 +446,7 @@ setGeneric("constraints", function(x) standardGeneric("constraints"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints
+#' @aliases constraints,DesignSettings-method
 setMethod("constraints", "DesignSettings", function(x) {
     sel <- names(constraints(x@Input_Constraints))
     #print("Constraint getter:")
@@ -456,7 +456,7 @@ setMethod("constraints", "DesignSettings", function(x) {
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints
+#' @aliases constraints,AbstractConstraintSettings-method
 setMethod("constraints", c("AbstractConstraintSettings"), 
     function(x) {
         return(x@settings)    
@@ -465,14 +465,14 @@ setMethod("constraints", c("AbstractConstraintSettings"),
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases cvg_constraints
+#' @aliases cvg_constraints-methods
 #' @exportMethod cvg_constraints
 #' @return \code{cvg_constraints} returns the list of active coverage constraints.
 setGeneric("cvg_constraints", function(x) standardGeneric("cvg_constraints"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases cvg_constraints
+#' @aliases cvg_constraints,DesignSettings-method
 setMethod("cvg_constraints", "DesignSettings", function(x) {
     sel <- names(constraints(x@Coverage_Constraints))
     # select only the possible constraints from the settings (tool dependencies):
@@ -569,7 +569,7 @@ setMethod("optiLimits", "DesignSettings", function(x) {
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases PCR
+#' @aliases PCR-methods
 #' @return \code{PCR} gets the list of PCR conditions defined in the
 #' provided \code{DesignSettings} object.
 #' @exportMethod PCR
@@ -577,7 +577,7 @@ setGeneric("PCR", function(x) standardGeneric("PCR"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases PCR
+#' @aliases PCR,DesignSettings-method
 setMethod("PCR", "DesignSettings", function(x) {
     constraints(x@PCR_conditions)
 })
@@ -591,7 +591,7 @@ setGeneric("conOptions", function(x) standardGeneric("conOptions"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases conOptions
+#' @aliases conOptions,DesignSettings-method
 setMethod("conOptions", "DesignSettings", 
     function(x) {
         constraints(x@constraint_settings)
@@ -600,14 +600,14 @@ setMethod("conOptions", "DesignSettings",
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraintLimits
+#' @aliases constraintLimits-methods
 #' @return \code{constraintLimits} gets the list of constraint limits.
 #' @exportMethod constraintLimits
 setGeneric("constraintLimits", function(x) standardGeneric("constraintLimits"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraintLimits
+#' @aliases constraintLimits,DesignSettings-method
 setMethod("constraintLimits", "DesignSettings", 
 	function(x) {
         sel <- con_select(names(constraints(x@Input_Constraint_Boundaries)))
@@ -642,7 +642,7 @@ setGeneric("constraints<-", function(x, value) standardGeneric("constraints<-"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints<-
+#' @aliases constraints<-,DesignSettings-method
 setReplaceMethod("constraints", "DesignSettings", 
     # NB: setReplaceMethod: second argument MUST be named 'value'
 	function(x, value) {
@@ -668,7 +668,7 @@ setReplaceMethod("constraints", "DesignSettings",
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints<-
+#' @aliases constraints<-,AbstractConstraintSettings-method
 setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
     function(x, value) {
         m <- match(names(value), names(x@status))
@@ -711,7 +711,7 @@ setGeneric("cvg_constraints<-", function(x, value) standardGeneric("cvg_constrai
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases cvg_constraints<-
+#' @aliases cvg_constraints<-,DesignSettings-method
 setReplaceMethod("cvg_constraints", "DesignSettings", 
 	function(x, value) {
 		constraints(x@Coverage_Constraints) <- value
@@ -739,7 +739,7 @@ setGeneric("constraintLimits<-", function(x, value) standardGeneric("constraintL
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraintLimits<-
+#' @aliases constraintLimits<-,DesignSettings-method
 setReplaceMethod("constraintLimits", "DesignSettings", 
 	function(x, value) {
         # modify the settings if necessary
@@ -775,7 +775,7 @@ setGeneric("PCR<-", function(x, value) standardGeneric("PCR<-"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases PCR<-
+#' @aliases PCR<-,DesignSettings-method
 setReplaceMethod("PCR", "DesignSettings", 
 	function(x, value) {
 		constraints(x@PCR_conditions) <- value
@@ -803,7 +803,7 @@ setGeneric("conOptions<-", function(x, value) standardGeneric("conOptions<-"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases conOptions<-
+#' @aliases conOptions<-,DesignSettings-method
 setReplaceMethod("conOptions", "DesignSettings", 
 	function(x, value) {
 		constraints(x@constraint_settings) <- value

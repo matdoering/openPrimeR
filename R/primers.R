@@ -699,7 +699,7 @@ check_restriction_sites_single <- function(primer.seqs, template.seqs, adapter.a
 }
 #' @rdname Input
 #' @name Input
-#' @aliases Primers
+#' @aliases Primers-class
 #' @section Basic columns:
 #' In the following you can find a description of the most
 #' important columns that can be found in objects of class \code{Primers}. 
@@ -797,6 +797,7 @@ setMethod("initialize", "Primers",
 ) 
 #' @rdname Input
 #' @name Input
+#' @aliases Primers-class
 #' @export
 Primers <- function(...) new("Primers", ...) 
 
