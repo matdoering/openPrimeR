@@ -19,17 +19,17 @@
 \alias{DesignSettings}
 \alias{DesignSettings-class}
 \alias{Settings}
-\alias{constraints-methods}
+\alias{constraints}
 \alias{Settings}
 \alias{constraints,DesignSettings-method}
 \alias{Settings}
 \alias{constraints,AbstractConstraintSettings-method}
 \alias{Settings}
-\alias{cvg_constraints-methods}
+\alias{cvg_constraints}
 \alias{Settings}
 \alias{cvg_constraints,DesignSettings-method}
 \alias{Settings}
-\alias{PCR-methods}
+\alias{PCR}
 \alias{Settings}
 \alias{PCR,DesignSettings-method}
 \alias{Settings}
@@ -37,15 +37,15 @@
 \alias{Settings}
 \alias{conOptions,DesignSettings-method}
 \alias{Settings}
-\alias{constraintLimits-methods}
+\alias{constraintLimits}
 \alias{Settings}
 \alias{constraintLimits,DesignSettings-method}
 \alias{Settings}
 \alias{constraints<-}
 \alias{Settings}
-\alias{constraints<-,DesignSettings-method}
+\alias{constraints<-,DesignSettings,list-method}
 \alias{Settings}
-\alias{constraints<-,AbstractConstraintSettings-method}
+\alias{constraints<-,AbstractConstraintSettings,list-method}
 \alias{Settings}
 \alias{cvg_constraints<-}
 \alias{Settings}
@@ -90,7 +90,7 @@ constraintLimits(x)
 
 constraints(x) <- value
 
-\S4method{constraints}{DesignSettings,ANY}(x) <- value
+\S4method{constraints}{DesignSettings,list}(x) <- value
 
 \S4method{constraints}{AbstractConstraintSettings,list}(x) <- value
 

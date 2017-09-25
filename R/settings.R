@@ -438,7 +438,7 @@ check_settings_validity <- function(object) {
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints-methods
+#' @aliases constraints
 #' @exportMethod constraints
 #' @return \code{constraints} gets a list with the active constraint settings.
 #' @keywords Settings
@@ -465,7 +465,7 @@ setMethod("constraints", c("AbstractConstraintSettings"),
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases cvg_constraints-methods
+#' @aliases cvg_constraints
 #' @exportMethod cvg_constraints
 #' @return \code{cvg_constraints} returns the list of active coverage constraints.
 setGeneric("cvg_constraints", function(x) standardGeneric("cvg_constraints"))
@@ -569,7 +569,7 @@ setMethod("optiLimits", "DesignSettings", function(x) {
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases PCR-methods
+#' @aliases PCR
 #' @return \code{PCR} gets the list of PCR conditions defined in the
 #' provided \code{DesignSettings} object.
 #' @exportMethod PCR
@@ -600,7 +600,7 @@ setMethod("conOptions", "DesignSettings",
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraintLimits-methods
+#' @aliases constraintLimits
 #' @return \code{constraintLimits} gets the list of constraint limits.
 #' @exportMethod constraintLimits
 setGeneric("constraintLimits", function(x) standardGeneric("constraintLimits"))
@@ -642,8 +642,8 @@ setGeneric("constraints<-", function(x, value) standardGeneric("constraints<-"))
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints<-,DesignSettings-method
-setReplaceMethod("constraints", "DesignSettings", 
+#' @aliases constraints<-,DesignSettings,list-method
+setReplaceMethod("constraints", c("DesignSettings", "list"), 
     # NB: setReplaceMethod: second argument MUST be named 'value'
 	function(x, value) {
         # modify constraint limits if necessary
@@ -668,7 +668,7 @@ setReplaceMethod("constraints", "DesignSettings",
 
 #' @rdname Settings
 #' @name Settings
-#' @aliases constraints<-,AbstractConstraintSettings-method
+#' @aliases constraints<-,AbstractConstraintSettings,list-method
 setReplaceMethod("constraints", c("AbstractConstraintSettings", "list"),
     function(x, value) {
         m <- match(names(value), names(x@status))
