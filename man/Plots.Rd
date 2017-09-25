@@ -5,11 +5,16 @@
 \alias{Plots}
 \alias{plot_conservation}
 \alias{Plots}
+\alias{plot_primer_binding_regions}
 \alias{Plots}
 \alias{Plots}
+\alias{plot_constraint}
 \alias{Plots}
+\alias{plot_constraint_fulfillment}
 \alias{Plots}
+\alias{plot_cvg_constraints}
 \alias{Plots}
+\alias{plot_constraint_deviation}
 \alias{Plots}
 \alias{plot_cvg_vs_set_size}
 \alias{Plots}
@@ -19,7 +24,9 @@
 \alias{Plots}
 \alias{plot_primer}
 \alias{Plots}
+\alias{plot_template_cvg}
 \alias{Plots}
+\alias{plot_primer_cvg}
 \title{Plotting Functions.}
 \usage{
 plot_conservation(entropy.df, alignments, template.df, gap.char = "-")

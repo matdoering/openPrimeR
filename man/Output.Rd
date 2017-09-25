@@ -9,6 +9,7 @@
 \alias{Output}
 \alias{create_coverage_xls}
 \alias{Output}
+\alias{create_report}
 \alias{Output}
 \alias{Output}
 \alias{write_settings}

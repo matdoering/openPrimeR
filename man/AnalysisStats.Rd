@@ -10,6 +10,7 @@
 \alias{AnalysisStats}
 \alias{get_cvg_stats_primer}
 \alias{AnalysisStats}
+\alias{get_cvg_stats}
 \title{Primer Analysis Statistics.}
 \usage{
 get_cvg_ratio(primer.df, template.df, allowed.mismatches = NULL,

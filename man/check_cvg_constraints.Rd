@@ -37,6 +37,6 @@ fulfill the required constraints.
 }
 \note{
 Please note that some constraints can only be computed if additional software is installed,
-please see \code{\link{DesignSettings-class}} for an overview.
+please see \code{\link{DesignSettings}} for an overview.
 }
 \keyword{internal}

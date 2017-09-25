@@ -1,5 +1,6 @@
 #' @rdname Data
 #' @name Data
+#' @aliases Tiller
 #'
 #' @usage data(Tiller)
 #'

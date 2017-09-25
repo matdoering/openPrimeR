@@ -37,6 +37,7 @@ filter.comparison.primers <- function(primers, templates, active.constraints,
 
 #' @rdname PrimerEval
 #' @name PrimerEval
+#' @aliases filter_primers
 #' @return \code{filter_primers} returns a \code{Primers} object containing
 #' only those primers fulfilling all specified constraints.
 #' @export

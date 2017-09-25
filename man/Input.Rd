@@ -4,11 +4,13 @@
 \docType{class}
 \name{Input}
 \alias{Input}
+\alias{Templates}
 \alias{Input}
 \alias{Templates}
 \alias{Input}
 \alias{read_templates}
 \alias{Input}
+\alias{Primers}
 \alias{Input}
 \alias{Primers}
 \alias{Input}

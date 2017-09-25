@@ -218,6 +218,7 @@ add_cvg_to_workbook <- function(cvg.matrix, wb, start.row, start.col, is.first.e
 
 #' @rdname Output
 #' @name Output
+#' @aliases create_coverage_xls
 #' @return \code{create_coverage_xls} stores information on the
 #' primer coverage in a spreadsheet.
 #' @export
@@ -344,6 +345,7 @@ create_coverage_xls <- function(primer.df, template.df, fname, settings) {
 
 #' @rdname Output
 #' @name Output
+#' @aliases create_report
 #' @return \code{create_report} Creates a PDF file summarizing the results
 #' from analyzing one or multiple sets of primers.
 #' @export

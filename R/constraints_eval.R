@@ -722,6 +722,7 @@ update.constraint.values <- function(constraint.df, constraint.values) {
 }
 #' @rdname PrimerEval
 #' @name PrimerEval
+#' @aliases check_constraints
 #' @details
 #' When the optional argument
 #' \code{active.constraints} is supplied to \code{check_constraints}, 
@@ -819,7 +820,7 @@ check_constraints <- function(primer.df, template.df, settings,
 #' @param updateProgress Progress callback function for shiny.
 #' @return A \code{Primers} object with with columns for each constraint in \code{active.constraints}. 
 #' @note Please note that some constraints can only be computed if additional software is installed,
-#' please see \code{\link{DesignSettings-class}} for an overview.
+#' please see \code{\link{DesignSettings}} for an overview.
 #' @keywords internal
 check_cvg_constraints <- function(primer.df, template.df, settings,
                                   active.constraints = names(cvg_constraints(settings)),

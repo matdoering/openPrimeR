@@ -42,6 +42,7 @@ create_fulfilled_counts <- function(primer.df, eval.cols = NULL) {
 
 #' @rdname PrimerEval
 #' @name PrimerEval
+#' @aliases primer_significance
 #' @details
 #' \code{primer_significance} computes the significance by comparing
 #' the total count of fulfilled and failed constraints

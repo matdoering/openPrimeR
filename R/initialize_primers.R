@@ -249,6 +249,7 @@ create.primers.naive <- function(seqs, seq.IDs, seq.groups, l.s, e.s, primer.len
 }
 #' @rdname PrimerDesign
 #' @name PrimerDesign
+#' @aliases get_initial_primers
 #' @return \code{get_initial_primers} returns a data frame 
 #' with candidate primers for optimization.
 #' @export 

@@ -15,9 +15,7 @@
 \alias{feature.matrix}
 \alias{ref.data}
 \alias{Data}
-\alias{tiller.template.df}
-\alias{tiller.primer.df}
-\alias{tiller.settings}
+\alias{Tiller}
 \title{Data Sets.}
 \format{For the \code{RefCoverage} data set, the \code{feature.matrix} data frame contains the properties
 of the primer set from Tiller et al. as well as a primer set
