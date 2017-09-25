@@ -138,7 +138,7 @@ cvg.ratio.0 <- get_cvg_ratio(primer.df, template.df, allowed.mismatches = 0)
 
 # Summarize the properties of multiple primer sets
 data(Comparison)
-tab <- get_comparison_table(template.data[1:3], primers[1:3], "IGH")
+tab <- get_comparison_table(template.data[1:3], primer.data[1:3], "IGH")
 
 data(Ippolito)
 # Determine coverage stats per primer

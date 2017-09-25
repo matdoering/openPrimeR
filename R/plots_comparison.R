@@ -6,7 +6,7 @@
 #' 
 #' # Summarize the properties of multiple primer sets
 #' data(Comparison)
-#' tab <- get_comparison_table(template.data[1:3], primers[1:3], "IGH")
+#' tab <- get_comparison_table(template.data[1:3], primer.data[1:3], "IGH")
 get_comparison_table <- function(templates, primers, sample.name = NULL) {
     if (is(templates, "Templates") && is(primers, "Primers")) {
         templates <- list(templates)
