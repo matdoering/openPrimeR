@@ -747,7 +747,6 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
                                                                     initial.opti.constraints, "melting_temp_diff")$melting_temp_diff
                         Tm.brackets <- create.Tm.brackets(new.filtered.df, template.df, settings, target.temps)
                         new.filtered.df <- Tm.brackets$primers
-                        # something goes wrong in get_max_set_coverage i think ..
                         max.cvg <- get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality)
                     }
             }
@@ -827,9 +826,13 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         # keep only temperature primer sets with cvg >= target cvg
         Tm.cvg.vals <- unlist(get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality, max.only = FALSE))
         set.keep.idx <- which(Tm.cvg.vals >= target.cvg)
-        # get melting temperature range of primers to keep
-        Tm.df <- Tm.brackets$df[set.keep.idx, ]
-        if (length(Tm.df) != 0 && nrow(Tm.df) != 0) {
+        if (length(set.keep.idx) != 0) {
+            print("Sets to keep:")
+            print(set.keep.idx)
+            # get melting temperature range of primers to keep
+            Tm.df <- Tm.brackets$df[set.keep.idx, ]
+            print("Tm.df:")
+            print(Tm.df)
             # only remove additional primers if any set fulfills the criterion
             min.Tm <- min(Tm.df[,"min_Tm"])
             max.Tm <- max(Tm.df[,"max_Tm"])

@@ -25,9 +25,12 @@ highlight.mismatch <- function(seq, mm.seq) {
             warning("Sequence lengths do not agree. Mutation analysis might be incorrect.")
         }
         idx <- which(s != mm)
-        # find identical stop codons:
-        stop.idx <- intersect(which(s == "*"), which(mm == "*"))
-        idx <- c(idx, stop.idx)
+        ####################
+        # dont search for identical stop codons anymore, leads to problems
+        # if the input seq already contains stop codons (no coverage possible)
+        #stop.idx <- intersect(which(s == "*"), which(mm == "*"))
+        #idx <- c(idx, stop.idx)
+        ##############################
         pos[[i]] <- idx
         if (length(idx) > 0) {
             s[idx] <- toupper(s[idx])
