@@ -5,9 +5,11 @@ test_that("Stop codon filter", {
     data(Ippolito)
     template.df <- template.df[1:3,]
     # reading frame: aga|tac|...
+    # note: third seq has already a stop codon at 'taa' -> coverage events
+    # with 'taa' are ok!
     template.df$InputSequence <- c("agatacacccccccccccccc",
                                    "agatacagattacagattaca",
-                                   "agataaagattacagattaca")
+                                   "agataaagattacagattaca") 
     template.df <- assign_binding_regions(template.df, fw = c(1,14), rev = c(1,5))
     stop.codons <- c("TAG", "TAA", "TGA")
     # first primer has gaTAGa: should bind to 1st, 2nd, 3rd with stop codon
@@ -35,11 +37,11 @@ test_that("Stop codon filter", {
     cvg_constraints(settings) <- list("stop_codon" = c("min" = 0, "max" = 0))
     constraint.df <- suppressWarnings(check_constraints(primer.df, template.df, settings,
                         active.constraints = "primer_coverage"))
+    # all primers can bind the third template with 1 mismatch:
+    # binding is ok since 'taa' is already a stop codon in the template
+    # and no additional stop codon is introduced!
     expect_that(constraint.df$primer_coverage,
-                equals(c(0, 0, 0), tolerance = 0.0))
-    # ensure that specificity is also updated after filtering for stop codons
-    expect_that(constraint.df$primer_specificity,
-                equals(c(0, 0, 0), tolerance = 0.01))
+                equals(c(1, 1, 1), tolerance = 0.0))
 }) 
 test_that("Free energy filter", {
     # check whether binding events are filtered correctly according to their free energies

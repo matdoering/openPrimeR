@@ -720,9 +720,9 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         #message(paste("Relaxation run: ", while.count, sep = ""))
         gain.df <- build.gain.df(new.excluded.df, filters(settings), filterLimits(settings), relax.df)
         ######################
-        print("#########")
-        print(gain.df)
-        print("#########")
+        #print("#########")
+        #print(gain.df)
+        #print("#########")
         #print("Melting temperatures of excluded seqs: ")
         #print(new.excluded.df$melting_temp)
         ########################
@@ -827,12 +827,12 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         Tm.cvg.vals <- unlist(get_max_set_coverage(new.filtered.df, template.df, Tm.brackets, settings, mode.directionality, max.only = FALSE))
         set.keep.idx <- which(Tm.cvg.vals >= target.cvg)
         if (length(set.keep.idx) != 0) {
-            print("Sets to keep:")
-            print(set.keep.idx)
+            #print("Sets to keep:")
+            #print(set.keep.idx)
             # get melting temperature range of primers to keep
             Tm.df <- Tm.brackets$df[set.keep.idx, ]
-            print("Tm.df:")
-            print(Tm.df)
+            #print("Tm.df:")
+            #print(Tm.df)
             # only remove additional primers if any set fulfills the criterion
             min.Tm <- min(Tm.df[,"min_Tm"])
             max.Tm <- max(Tm.df[,"max_Tm"])

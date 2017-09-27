@@ -15,6 +15,8 @@
 #' @keywords internal
 highlight.mismatch <- function(seq, mm.seq) {
     # search for introduced mutations / stop codons
+    #print(seq)
+    #print(mm.seq)
     mutation.types <- vector("list", length(seq))
     nbr.mismatches <- rep(NA, length(seq))
     pos <- vector("list", length(seq))  # mismatch posis
@@ -43,6 +45,8 @@ highlight.mismatch <- function(seq, mm.seq) {
             # no AA mutation found -> silent genomic mutation
             mutation.types[[i]] <- "silent"
         } else {
+            #print("muts:")
+            #print(mm[idx])
             stop.idx <- which(mm[idx] == "*")
             substitution.idx <- setdiff(idx, stop.idx)
             if (length(stop.idx) != 0) {
