@@ -336,10 +336,10 @@ view.primers.report <- function(primer.df, template.df) {
     #print(mm.values)
     #print("MM values:")
     mm.rep <- string.to.IQR(mm.values)
-    # TODO: integrate value columns when merging primers in 'view.primers()'
-    if ("Sequence" %in% colnames(out.df)) {
-        # TODO: for both, the size of the primer data frame is reduced
-        # and we haven't defined the values of the merged columns!!!
+    if ("Sequence" %in% colnames(out.df)) { 
+        # TODO: Integrate value columns when merging primers in 'view.primers()'
+        # for both, the size of the primer data frame is reduced
+        # .. and we haven't defined the values of the merged columns ..
         # -> number of mismatches is NA at the moment, also, we don't show more than 4 columns in the report anyway.
         out.df$Mismatches <- mm.rep
     }
@@ -351,7 +351,8 @@ view.primers.report <- function(primer.df, template.df) {
     col.names[col.names == "Relative Binding Range (rev)"] <- "Position (fw)"
     col.names[col.names == "Self Dimer"] <- "$\\text{Self Dimer} \\Delta\\text{G}$"
     col.names[col.names == "Cross Dimer"] <- "$\\text{Cross Dimer } \\Delta\\text{G}$"
-    # sequence can either be in 'Sequence' or in 'Forward' and 'Reverse' for 'both', right? TODO. test report for 'both'.
+    # nb: if only one direction was analyzed, the primer sequence resides
+    # in 'Sequence'. Otherwise we still have the 'Forward' and 'Reverse' columns.
     out.df[col.names == "Sequence"] <- format.seqs.tex(out.df$Sequence)
     out.df[col.names == "Forward"] <- format.seqs.tex(out.df$Forward)
     out.df[col.names == "Reverse"] <- format.seqs.tex(out.df$Reverse)

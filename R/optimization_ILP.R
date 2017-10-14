@@ -400,7 +400,6 @@ solve.ILP <- function(cur.D, cur.G, cur.settings, cur.cvg.matrix,
         return.val <- solve(ILP)  # presolve can also (even when only 'rows' is active, remove variables from the model)
         original.dim <- dim(ILP)  # keep original.dim updated 
         if (return.val == 0) {
-            # ILP never selects all primers, why? it should to reach cvg of all templates ..!  TODO
             vars <- get.ILP.vars(ILP, original.dim) 
             primer.idx <- which(vars[seq_len(nrow(primer.df))] > 0.5)
             cur.cvg <- get_cvg_ratio(primer.df[primer.idx,], template.df)
@@ -525,10 +524,13 @@ optimize.ILP <- function(primer.df, template.df, settings, primer_conc,
             stop("DeltaG constraint/limit was active but values were not specified.")
         }
         message("Computing cross dimers. This may take a while ...")
+        # nb: G matrix is computed for the smallest annealing temperature only
+        # computing for every Ta would be more accurate but would
+        # require more computation time
         G.df <- compute.all.cross.dimers(primer.df, primer_conc, na_salt_conc, 
                             mg_salt_conc, k_salt_conc, tris_salt_conc, 
                             min(Tm.brackets$df$annealing_temp),
-                            no.structures = TRUE) # TODO: compute G matrix for every Tm bracket at some point, think about how we can relax the matrix then?
+                            no.structures = TRUE)
         G.matrix <- create.G.matrix(primer.df, G.df)  # min deltaG values of cross-dimerization conformations for every pair of primers
         # load G matrix for debugging: G.matrix <-
         # read.csv(file.path(diagnostic.location, 'G_matrix.csv'))
@@ -555,7 +557,7 @@ optimize.ILP <- function(primer.df, template.df, settings, primer_conc,
     Tm.settings <- Tm.data$settings # relaxed settings
     ######### 
     i <- NULL
-    #for (i in seq_along(target.temps)) { # TODO: for debug
+
     ILP.df <- foreach(i = seq_along(target.temps), .combine = my_rbind) %dopar% {
             target.temp <- target.temps[i]
             Tm.set <- Tm.sets[[i]]

@@ -176,7 +176,6 @@ setMethod("initialize", "DesignSettings",
             constraint.settings <- ConstraintSettings()   
         } else if (is(constraint.settings, "list")) {
             obj <- ConstraintSettings()
-            # TODO: check problems here
             constraints(obj) <- constraint.settings
             constraint.settings <- obj
         } else {
@@ -1516,7 +1515,6 @@ get.static.tool.info <- function() {
     purposes["Selenium"] <- "IMGT queries"
     purposes["Pandoc"] <- "PDF reports"
     purposes["PhantomJS"] <- "IMGT queries"
-    # complete purposes, TODO
     tool.ex <- blank
     tool.ex["MELTING"] <- "melting-batch"
     tool.ex["ViennaRNA"] <- "RNAfold"

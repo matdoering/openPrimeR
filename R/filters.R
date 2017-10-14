@@ -385,8 +385,8 @@ cascaded.filter <- function(primer.df, template.df, settings, mode.directionalit
 #' @return A Templates data frame containing the missing templates.
 #' @keywords internal
 get.missing.df <- function(filtered.df, template.df, Tm.brackets, settings, mode.directionality) {
-    # TODO: missing should be based on the temperature primer sets and not all primers together ..!! TODO
-    # build df of templates we still haven't covered
+    # NB: this could also be done for individual temperature sets instead
+    # of all primers in one go
     if (!"Covered_Seqs" %in% colnames(filtered.df)) {
         covered.idx <- NULL
     } else {
@@ -709,7 +709,6 @@ relax.constraints <- function(settings, filtered.df, excluded.df, stat.df, templ
         }
         while.count <- while.count + 1
         # improve coverage as long as we haven't reached the target
-        target.cvg <- required.cvg # TODO: change to feasible coverage if we have all the coverage values computed...
         if ("Covered_Seqs" %in% colnames(new.filtered.df)) {
             prev.cvg <- unique(unlist(strsplit(new.filtered.df$Covered_Seqs, split = ",")))
         } else {

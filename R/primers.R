@@ -221,7 +221,6 @@ classify_design_problem <- function(template.df,
 }
 greedy.primers <- function(binding.df, template.df, required.cvg = 1) {
     # lower bound on the number of required primers
-    # greedy takes quite some time ... improve code TODO
     o <- order(binding.df$Coverage_Ratio, decreasing = TRUE)
     binding.df <- binding.df[o,]
     selected.primers <- NULL

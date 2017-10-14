@@ -1787,11 +1787,11 @@ update.binding.ranges.by.conservation <- function(template.df,
                                         groups = template.df$Group) 
     primer.ranges <- parallel::mclapply(seq_along(bins), 
         function(x) select.primer.region.by.conservation(primer.range[primer.range$Group == names(bins)[x], ], 
-            entropy.df[x,], 0.1, bins[[x]]) # select top 10% within the allowed region
+            entropy.df[x,], 0.1, bins[[x]], gap.char) # select top 10% within the allowed region
     )
     # annotate ranges with groups
     for (i in seq_along(primer.ranges)) {
-        primer.ranges[[i]] <- cbind(Group = names(bins)[i], primer.ranges[[i]]) # TODO error
+        primer.ranges[[i]] <- cbind(Group = names(bins)[i], primer.ranges[[i]]) # there was an error here ..
     }
     ranges <- do.call(rbind, primer.ranges)
     # select range with smallest entropy for every group

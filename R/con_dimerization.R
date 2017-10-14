@@ -75,7 +75,6 @@ get.cross.dimers <- function(primers.1, primers.2, ions,
         return(NULL)
     }
     combis <- combis[idx, ]
-    # TODO: for asymmetric, this shouldn't work .. o_O
     # for each possible cross-dimer use the minimal annealing temp of the pairs
     use.Ta <- unlist(lapply(seq_len(nrow(combis)), function(x)
                     min(annealing.temp[combis[x,1]], annealing.temp[combis[x,2]])))
@@ -644,7 +643,7 @@ prepare.dimer.seqs <- function(s1, s2) {
                             rep(x, nrow(ambig.options[[x]]))
                 })# index for original sequences
     combis.ori <- data.frame(Idx1 = unlist(combis.ori), Idx2 = unlist(combis.ori))
-    combis <- cbind(combis.ori, combis.ambig) # TODO: there was a bug here when cbinding for a large set (> 20 mio entries, different number of elements ...)
+    combis <- cbind(combis.ori, combis.ambig) # TODO: there was a bug here when cbinding for a large set (> 20 mio entries, different number of elements ...), check what happens for global design
     s1 <- CharacterList(s1)
     s2 <- CharacterList(s2)
     # suppress warning that number of columns don't match

@@ -468,7 +468,7 @@ compute.constraints <- function(primer.df, mode.directionality = c("fw", "rev", 
             detail <- "Off-targets: free energy of annealing"
             updateProgress(1/length(active.constraints), detail, "inc")
         }
-        deltaG_ABs <- get.duplex.energies(primer.df, template.df, annealing.temp, settings, mode = "off_target") # TODO: off target nbr is wrong ..
+        deltaG_ABs <- get.duplex.energies(primer.df, template.df, annealing.temp, settings, mode = "off_target")
         deltaG.string <- string.rep(deltaG_ABs)
         constraint.values$off_annealing_DeltaG <- deltaG.string
     }
@@ -802,6 +802,59 @@ check_constraints <- function(primer.df, template.df, settings,
     constraint.df$constraints_passed <- constraint.pass
     return(constraint.df)
 }
+#' Batch Procedure for Evaluating Primer Sets.
+#' 
+#' @param primer.data A list of objects of class \code{Primers}.
+#' @param template.data A list of objects of class \code{Templates}
+#' corresponding to \code{primer.data}.
+#' @param settings An object of class \code{DesignSettings}.
+#' @param active.constraints A character vector providing identifiers
+#' of constraints to be considered.
+#' @param to.compute.constraints A character vector providing identifiers
+#' of constraints to be computed.
+#' @param for.shiny A logical indicating whether the results are
+#' indicated for the Shiny app or not.
+#' @param updateProgress A callback function to track progress in the Shiny app.
+#' @return A list with objects of class \code{Primers}.
+#' @keywords internal
+#' @examples
+#' data(Comparison)
+#' eval.data <- check_constraints_comparison(primer.data[1:2], template.data[1:2], settings)
+check_constraints_comparison <- function(primer.data, template.data, settings,
+    active.constraints = names(constraints(settings)),
+    to.compute.constraints = active.constraints, 
+    for.shiny = FALSE, updateProgress = NULL) {
+   
+    # TODO: could provide this function in the pkg as an exported function by making 'check_constraints' a generic function
+    # check input types
+    primers.ok <- sapply(primer.data, function(x) is(x, "Primers"))
+    if (any(!primers.ok)) {
+        stop("Not all 'primer.data' elements were of class 'Primers'.")
+    }
+    templates.ok <- sapply(template.data, function(x) is(x, "Templates"))
+    if (any(!templates.ok)) {
+        stop("Not all 'template.data.data' elements were of class 'Templates'.")
+    }
+    if (length(primer.data) != length(template.data)) {
+        stop("Number of primer and template sets didn't correspond!")
+    }
+    for (i in seq_along(primer.data)) {
+        if (is.function(updateProgress)) {
+            detail <- paste0("Evaluating set ", i)
+            updateProgress(1/length(primer.data), detail, "inc")
+        }        
+        primer.df <- primer.data[[i]]
+        template.df <- template.data[[i]]
+        primer.df <- check_constraints(primer.df, template.df, settings, 
+                    active.constraints = names(constraints(settings)),
+                    to.compute.constraints = active.constraints, 
+                    for.shiny = for.shiny, updateProgress = NULL)
+        primer.data[[i]] <- primer.df
+
+    }
+    return(primer.data)
+}
+
 #' Evaluation of Coverage Constraints.
 #'
 #' Computes the biochemical properties specified in the

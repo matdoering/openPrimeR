@@ -45,29 +45,14 @@ comp <- function(seq, forceToLower = TRUE, ambiguous = FALSE) {
 #'
 #' @param seqs A vector of strings.
 #'
-#' @return lists containing the disambiguated input sequences
+#' @return A list containing the disambiguated input sequences.
 #' @keywords internal
 convert.from.iupac <- function(seqs) {
     if (length(seqs) == 0) {
         return(NULL)
     }
-    # TODO: replace with DECIPHER's function, is much faster
-    #warning("DEPRECATD: replace with DECIPHER::Disambiguate for speedup")
-    gapped.codemap <- IUPAC_CODE_MAP
-    gapped.codemap["-"] <- "-"
-    s <- strsplit(seqs, split = "")
-    i <- NULL # define iteration variable
-    result <- foreach(i = seq_along(seqs), .combine = c) %dopar% {
-        if (seqs[i] == "") {
-            list(seqs[i])
-        } else {
-            conv <- sapply(s[[i]], function(x) gapped.codemap[toupper(x)])
-            # determine all combinations
-            C <- sapply(conv, function(x) strsplit(x, split = ""))
-            combis <- expand.grid(C)
-            combi.str <- list(apply(combis, 1, function(x) tolower(paste(x, collapse = ""))))
-        }
-    }
+    degen.seqs <- DECIPHER::Disambiguate(DNAStringSet(seqs))
+    result <- lapply(degen.seqs, function(x) tolower(as.character(x)))
     return(result)
 }
 

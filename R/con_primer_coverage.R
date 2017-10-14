@@ -272,10 +272,14 @@ update.cvg.data <- function(filtered.df, sel, template.df, mode = c("on_target",
     }
     # recompute summary statistics: Coverage_Ratio, primer_coverage
     if (mode == "on_target") {
-        # TODO: need to update mean annealing DeltaG as well?
         if ("primer_coverage" %in% colnames(updated.df)) {
             updated.df$primer_coverage <- sapply(sel, length)
             updated.df$Coverage_Ratio <- updated.df$primer_coverage/nrow(template.df)
+            if ("annealing_DeltaG" %in% colnames(updated.df)) {
+                mean.DeltaG <- unlist(lapply(strsplit(updated.df$annealing_DeltaG, split = ","), function(x) mean(as.numeric(x))))
+                mean.DeltaG[is.nan(mean.DeltaG)] <- 0
+                updated.df$mean_annealing_DeltaG <- mean.DeltaG
+            }
         }
         # update mean efficiency
         if ("primer_efficiency" %in% colnames(updated.df) && "primer_efficiency" %in% active.constraints) {

@@ -301,10 +301,11 @@ score.conservation <- function(primer.range, ali.entropy) {
 #' Only regions with a conservation of at least \code{conservation}
 #' are considered for the initialization of primers.
 #' @param bin \code{DNABin} alignment of templates.
+#' @param gap.char The character for alignment gaps.
 #' @return Updated primer regions according to the desired conservation.
 #' @keywords internal
 select.primer.region.by.conservation <- function(primer.range, ali.entropy, 
-                                                conservation, bin) {
+                                                conservation, bin, gap.char = "-") {
     # conservation: select only the top percent (ratio) of alignments 100% ->
     # consider all sub-alignments
     if (conservation == 1) {
@@ -317,9 +318,8 @@ select.primer.region.by.conservation <- function(primer.range, ali.entropy,
     primer.candidates <- lapply(seq_len(nrow(primer.range)), function(x) bin[, primer.range[x, 
         "Start"]:primer.range[x, "End"]])  # sub-alignment
     # don't consider regions that are basically only gaps
-    gap.char <- "-" # TODO as input
     # determine the gap positions in every possible binding region
-    gap.idx <- detect.gap.columns(primer.candidates, gap.cutoff = 0.95, gap.char = gap.char) # TODO: improve the speed of gap detection
+    gap.idx <- detect.gap.columns(primer.candidates, gap.cutoff = 0.95, gap.char = gap.char) # NB: could improve the speed of gap detection
     # select only regions without major gap columns
     allowed.gaps <- 0
     sel.idx <- NULL

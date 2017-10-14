@@ -288,7 +288,7 @@ call.melt.single <- function(primers, complements, out.file, primer_conc, na_sal
         scientific = FALSE), salt.cmd, #" -tan :", tandem.mm.file, 
         " ", out.file, sep = "")
     #message(melt.cmd)
-    system(melt.cmd, ignore.stdout = TRUE)  # don't igore stdout for debugging TODO, set to TRUE for debugging
+    system(melt.cmd, ignore.stdout = TRUE)  # don't igore stdout for debugging
     # read results
     result.file <- paste(out.file, ".results.csv", sep = "")
     raw.data <- readChar(result.file, file.info(result.file)$size)

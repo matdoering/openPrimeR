@@ -95,7 +95,7 @@ check.tool.function <- function(frontend = FALSE) {
     }
     # check for ViennaRNA version
     if (available.tools["ViennaRNA"]) {
-        # check version
+        # need to require a specific version (2.4.1) of viennaRNA for support of the used commands
         version <- system2("RNAfold", "--version", stdout = TRUE, stderr = TRUE)
         if (length(attr(version, "status")) == 0) {
             # the command worked -> check the version string
@@ -197,7 +197,8 @@ copy.melt.config <- function(melt.bin = NULL) {
         tool.df <- build.tool.overview(available.tools)
         out <- paste0("There are missing/non-functioning external tools.\n",
                 "To use the full potential of openPrimeR, please make sure\n",
-                "that all of the listed tools are installed:\n")
+                "that the required versions of the speciied tools are\n 
+                installed and that they are functional:\n")
         idx <- which(!available.tools)
         tools <- paste0("o ", names(available.tools)[idx], 
               " (", tool.df$URL[match(names(available.tools[idx]), tool.df$Tool)], ")", 
