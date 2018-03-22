@@ -265,12 +265,7 @@ optimal.primers <- design_primers(template.df[1:2,], mode.directionality = "fw",
                                   settings = design.settings)
 ```
 
-`optimal.primers` is a list in which the optimal primers are stored in `optimal.primers$opti` and the corresponding filtered primers are stored in `optimal.primers$filtered`. The optimal primer sets for all evaluated melting temperatures are stored in `optimal.primers$all_results`. We can use the `summary()` function to get an overview of the properties of the designed primers:
-
-```{r view_designed_primers, message = FALSE, warning = FALSE}
-# Create an overview of the optimal primers
-print(summary(optimal.primers$opti))
-```
+`optimal.primers` is a list in which the optimal primers are stored in `optimal.primers$opti` and the corresponding filtered primers are stored in `optimal.primers$filtered`. The optimal primer sets for all evaluated melting temperatures are stored in `optimal.primers$all_results`. 
 
 The primer design function can be customized in many ways. The `init.algo` argument can be used to specify how the initial set of primers is generated. By default, this is done by extracting substrings from the template sequences ('naive'). A tree-based initialization strategy producing degenerate primers can be activated by setting `init.algo` to 'tree', which is favorable for related template sequences.
 
