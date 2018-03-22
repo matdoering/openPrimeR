@@ -18,15 +18,13 @@ test_that("primer_filtering_constraints", {
     active.constraints <- c("primer_length", "gc_clamp", "gc_ratio", 
                             "no_runs", "no_repeats", 
                             "primer_coverage", "primer_specificity")
-    #constraint.df <- check_constraints(primer.df, template.df, settings)
     filter.result <- suppressWarnings(cascaded.filter.quick(primer.df, template.df, settings,
                         to.compute.constraints = active.constraints))
     excluded.df <- filter.result$excluded
     # filtered by primer length:
     filter.reasons <- rep(NA, nrow(primer.df))
     filter.reasons[1:2] <- "primer_length"
-    filter.reasons[3:6] <- "gc_clamp"
-    filter.reasons[7] <- "gc_ratio"
+    filter.reasons[3:7] <- "gc_clamp"
     filter.reasons[8] <- "primer_specificity"
     expect_equal(filter.reasons, excluded.df$Exclusion_Reason)
 })
@@ -71,6 +69,7 @@ test_that("primer_initialization_naive", {
         binding.pos.e <- hits[hit.len.idx] + (match.len[hit.len.idx] - 1) # end of binding
         expect_gte(min(binding.pos.s), allowed.fw[1])
         expect_lte(max(binding.pos.e), allowed.fw[2])
+    }
     }
     # check for "any" positions
     primers <- create.initial.primer.set(template.df, primer.lengths, 
@@ -184,4 +183,3 @@ test_that("full_design_function", {
     opti.set <- optimal.primers.ILP$opti
     expect_gte(as.numeric(get_cvg_ratio(opti.set, template.df)), 0.2)
 })
-
