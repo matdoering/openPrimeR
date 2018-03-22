@@ -70,7 +70,6 @@ test_that("primer_initialization_naive", {
         expect_gte(min(binding.pos.s), allowed.fw[1])
         expect_lte(max(binding.pos.e), allowed.fw[2])
     }
-    }
     # check for "any" positions
     primers <- create.initial.primer.set(template.df, primer.lengths, 
                 mode.directionality = "fw", "test", allowed.region.definition = "any",
