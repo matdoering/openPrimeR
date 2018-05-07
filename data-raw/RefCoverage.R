@@ -250,11 +250,15 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
     augmented.df$Run <- unique(primer.df$Run)
     return(augmented.df)
 }
-devtools::load_all("src/openPrimeR")
+devtools::load_all() # load openPrimeR package
 ######
 # get reference coverage data frame:
 ######
 xls.file <- system.file("data-raw", "PCR_ref_data.xlsx", package = "openPrimeR")
+# load templates
+template.df <- read_templates(system.file("inst", "extdata", "IMGT_data", "templates", "Homo_sapiens_IGH_functional_exon_exp.fasta", package = "openPrimeR"))
+template.df <- assign_binding_regions(template.df, fw = system.file("inst", "extdata", "IMGT_data", "templates", "Homo_sapiens_IGH_functional_leader_exp.fasta", package = "openPrimeR"), rev = NULL)
+
 ref.data <- get_ref_data (xls.file)
 ######
 # get feature matrix for supervised learning
