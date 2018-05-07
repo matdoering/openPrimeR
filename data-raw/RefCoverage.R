@@ -160,7 +160,7 @@ color.to.class <- function(ref.df) {
         out <- rep("Amplified", length(color))
         idx <- which(color %in% fail.colors) # red-colored -> not amplified
         if (length(idx) != 0) {
-            out[idx] <- "Uncovered"
+            out[idx] <- "Unamplified"
         }
         return(out)
     }
@@ -182,8 +182,8 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
                         primer_efficiency = unique(substitute(primer_efficiency)),
                         annealing_DeltaG = unique(substitute(annealing_DeltaG)),
                         Position_3terminus = min(substitute(Position_3terminus)),
-                        All_mismatches = paste(substitute(Position_3prime), collapse = ","),
-                        Binding_Pos_Start = uniqueubstitute(Binding_Position_Start_fw))
+                        All_mismatches = paste(substitute(Position_3prime), collapse = ","))
+                        #Binding_Pos_Start = unique(substitute(Binding_Position_Start_fw)))
     # add some primer features
     m <- match(df$Primer, primer.df$ID)
     df$Primer_Sequence <- primer.df$Forward[m]
