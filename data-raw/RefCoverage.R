@@ -187,11 +187,10 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
     # add some primer features
     m <- match(df$Primer, primer.df$ID)
     df$Primer_Sequence <- primer.df$Forward[m]
-    df$Terminal_Dinucleotide <- substr(primer.df$Forward[m], nchar(primer.df$Forward[m]) - 1, nchar(primer.df$Forward[m]))S
+    df$Terminal_Dinucleotide <- substr(primer.df$Forward[m], nchar(primer.df$Forward[m]) - 1, nchar(primer.df$Forward[m]))
     # add some template features; TODO: need to adjust prepare_mm_plot to output the binding stretch or binding position in the templates
     m <- match(df$Template, template.df$ID)
     template.seqs <- template.df$Sequence[m]
-
     # add 3' hexamer mismatch features: 1 if mismatch, 0 if not, per position in the 3' hexamer
     hexa.df <- data.frame(matrix(rep(0, 6 * nrow(df)), nrow = nrow(df), ncol = 6))
     colnames(hexa.df) <- paste0("Mismatch_pos_", seq(6, 1)) # changed labels for considering position starting in the sequence direction 
