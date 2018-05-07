@@ -90,10 +90,10 @@ get_learning_matrix <- function(ref.data) {
     # create tool data for Tiller / openPrimeR:
     # selected reduced template set, for which experimental annotation exists
     template.file <- fasta.file <- system.file("extdata", "IMGT_data", "templates", 
-                                                "Homo_sapiens_IGH_functional_exon.fasta", 
+                                                "Homo_sapiens_IGH_functional_exon_exp.fasta", 
                                                 package = "openPrimeR")
     leader.file <- system.file("extdata", "IMGT_data", "templates",
-                              "Homo_sapiens_IGH_functional_leader.fasta", 
+                              "Homo_sapiens_IGH_functional_leader_exp.fasta", 
                               package = "openPrimeR")
     hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
     # load templates
@@ -157,7 +157,7 @@ color.to.class <- function(ref.df) {
     orange <- "ed7d31"
     fail.colors  <- c(red, orange)
     conv <- function(color) {
-        out <- rep("Covered", length(color))
+        out <- rep("Amplified", length(color))
         idx <- which(color %in% fail.colors) # red-colored -> not amplified
         if (length(idx) != 0) {
             out[idx] <- "Uncovered"
@@ -182,7 +182,15 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
                         primer_efficiency = unique(substitute(primer_efficiency)),
                         annealing_DeltaG = unique(substitute(annealing_DeltaG)),
                         Position_3terminus = min(substitute(Position_3terminus)),
-                        All_mismatches = paste(substitute(Position_3prime), collapse = ","))
+                        All_mismatches = paste(substitute(Position_3prime), collapse = ","),
+                        Binding_Pos_Start = uniqueubstitute(Binding_Position_Start_fw))
+    # add some primer features
+    m <- match(df$Primer, primer.df$ID)
+    df$Primer_Sequence <- primer.df$Forward[m]
+    df$Terminal_Dinucleotide <- substr(primer.df$Forward[m], nchar(primer.df$Forward[m]) - 1, nchar(primer.df$Forward[m]))S
+    # add some template features; TODO: need to adjust prepare_mm_plot to output the binding stretch or binding position in the templates
+    m <- match(df$Template, template.df$ID)
+    template.seqs <- template.df$Sequence[m]
 
     # add 3' hexamer mismatch features: 1 if mismatch, 0 if not, per position in the 3' hexamer
     hexa.df <- data.frame(matrix(rep(0, 6 * nrow(df)), nrow = nrow(df), ncol = 6))
@@ -212,8 +220,8 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
     # exclude from ref cvg the templates that are not in template.df!!!!
     my.m <- c(TRUE, sapply(colnames(ref.cvg)[-1], function(x) length(grep(x, template.df$ID, fixed = TRUE)) != 0))
     ref.cvg <- ref.cvg[, my.m]
-    # TODO:: treatment of replicates -> include all / keep consensus / something else? for now: only assign consensus
-    ref.cvg.consensus <- plyr::ddply(ref.cvg, "Primer", plyr::catcolwise(function(x) ifelse(all(x == "Covered"), "Covered", "Uncovered")))
+    # treatment of replicates -> only assign consensus
+    ref.cvg.consensus <- plyr::ddply(ref.cvg, "Primer", plyr::catcolwise(function(x) ifelse(length(which(x == "Amplified")) >= length(which(x == "Unamplified")), "Amplified", "Unamplified")))
     # convert from wide to long format
     ref.cvg.matrix <- reshape2::melt(ref.cvg.consensus, "Primer", value.name = "Experimental_Coverage", variable.name = "Template")
     # assign labels to the learning data
@@ -237,7 +245,7 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
     augmented.df <- merge(combi.df, feature.df, by = "Primer")
     # store info about primer set in rownames
     rownames(augmented.df) <- paste0(rownames(augmented.df), "_", unique(primer.df$Run))
-    augmented.df$Experimental_Coverage <- factor(augmented.df$Experimental_Coverage, levels = c("Uncovered", "Covered"))
+    augmented.df$Experimental_Coverage <- factor(augmented.df$Experimental_Coverage, levels = c("Unamplified", "Amplified"))
     # add run
     augmented.df$Run <- unique(primer.df$Run)
     return(augmented.df)
