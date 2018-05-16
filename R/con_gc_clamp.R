@@ -36,9 +36,9 @@ evaluate.GC.clamp <- function(y) {
             }
         })
         # for disambiguated seqs: take the shortest GC clamp found in any seq
-         # reason: if we want to have a gc clamp, we dont want to have an ambig
-         # seq that represents a seq that actually doesn't have a gc clamp
-       gc.counts <- unlist(lapply(seq_along(hits), 
+        # reason: if we want to have a gc clamp, we dont want to have an ambig
+        # seq that represents a seq that actually doesn't have a gc clamp
+        gc.counts <- unlist(lapply(seq_along(hits), 
                    function(x) consecutive.GC.count(hits[[x]], nchar(tails)[x])))
         gc.count <- 0
         if (any(gc.counts > 3)) {
@@ -63,18 +63,15 @@ evaluate.GC.clamp <- function(y) {
 #' @keywords internal
 consecutive.GC.count <- function(y, len) {
     if (!any(y %in% len)) {
-        # no gc clamp because no G/C at the end of primer (len pos)
+        # no gc clamp because no G/C at the termianl primer pos
         return(0)  
     }
     diffs <- rle(diff(y))
-    sel <- which(diffs$values == 1)
-    if (length(sel) == 0) {
-        # no consecutive region found -> just a single G/C
+    # select the last consecutive element
+    sel <- length(diffs$values)
+    if (diffs$values[sel] != 1) {
         return(1)
-    } else {
-        # select the last consecutive element
-        sel <- tail(sel, n = 1)
-        count <- diffs$lengths[sel] + 1  # x diffs correspond to x+1 numbers
-        return(count)
     }
+    count <- diffs$lengths[sel] + 1  # x diffs correspond to x+1 numbers
+    return(count)
 }
