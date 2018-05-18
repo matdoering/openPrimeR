@@ -158,16 +158,10 @@ create.ref.dists <- function() {
 }
 get_model_formula <- function() {
     # formula used for creating coverage model
-    # use only 3' hexamer mutation position
-    return(Experimental_Coverage ~ Position_3terminusLocal + annealing_DeltaG)
-}
-get_model_formula_log <- function() {
-    # formula used for creating coverage model
-    # log2 transformation: ensure that long primers are not overrated!
-    return(Experimental_Coverage ~ log2(Position_3terminus) + annealing_DeltaG)
+    return(Experimental_Coverage ~ annealing_DeltaG + Position_3terminusLocal + annealing_DeltaG * Position_3terminusLocal)
 }
 get.train.idx <- function(feature.matrix) {
-    # sample from training set to keep the data more balanced: terminal mismatch pos & low DeltaG are overrepresented! -> sample by deltaG for stratification
+    # sample from training set to keep the data more balanced
     deltaG.cuts <- -c(0, 5, 9, 13, Inf) 
     strat <- cut(feature.matrix$annealing_DeltaG, deltaG.cuts)
     strat.types <- unique(strat)
@@ -194,18 +188,18 @@ get.train.idx <- function(feature.matrix) {
 }
 create.cvg.model <- function(feature.matrix) {
     # create model for predicting coverage
-    train.idx <- get.train.idx(feature.matrix) # remove bias from training data
-    cvg.model <- glm(get_model_formula(), family = "binomial", data = feature.matrix[train.idx,])
+    #train.idx <- get.train.idx(feature.matrix) # remove bias from training data
+    cvg.model <- glm(get_model_formula(), family = "binomial", data = feature.matrix) #[train.idx,])
     return(cvg.model)
 }
 create.FPR.table <- function(feature.matrix) {
     # perform 10 repeats of 5-fold cross-validation using logistic regression models
     library(caret)
     library(e1071)
-    train.idx <- get.train.idx(feature.matrix) # remove bias from training data
+    #train.idx <- get.train.idx(feature.matrix)
     ctrl <- trainControl(method = "repeatedcv", number = 5, repeats = 10, savePredictions = TRUE, classProbs = TRUE)
     model <- train(get_model_formula(), data = feature.matrix, method = "glm", 
-                family="binomial", trControl = ctrl, tuneLength = 5, subset = train.idx)
+                family="binomial", trControl = ctrl, tuneLength = 5) #, subset = train.idx)
     # retrieve all fold-predictions (coverage probabilities) across all repetitions
     cutoffs <- seq(0, 1, 0.0001)
     n.pos <- length(which(model$pred$obs == "Covered"))
@@ -263,7 +257,7 @@ cvg.ref.dists <- create.ref.dists()
 #######
 # build supervised model for predicting primer coverage:
 #######
-load(RefCoverage) # load ref.data and feature.matrix
+data(RefCoverage) # load ref.data and feature.matrix
 CVG_MODEL <- create.cvg.model(feature.matrix)
 FPR_TABLE <- create.FPR.table(feature.matrix)
 ########

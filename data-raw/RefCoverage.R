@@ -145,10 +145,9 @@ get_learning_matrix <- function(ref.data) {
     # add prior knowledge to positions representation (only consider 3' hexamer)
     pos.mod[is.na(pos.mod) | pos.mod >= 7] <- 7 # no mismatch in 3' hexamer
     pos.mode <- abs(pos.mod - 7)
-    # check:
-    #feature.matrix$Position_3terminus[pos.mode == 0]
     feature.matrix$Position_3terminusLocal <- pos.mode
     feature.matrix$Position_3terminus[is.na(feature.matrix$Position_3terminus)] <- max(feature.matrix$Position_3terminus, na.rm = TRUE) + 1
+    feature.matrix$Number_of_mismatches_hexamer <- feature.matrix$Mismatch_pos_1 +  feature.matrix$Mismatch_pos_2 +  feature.matrix$Mismatch_pos_3 +  feature.matrix$Mismatch_pos_4 +  feature.matrix$Mismatch_pos_5 +  feature.matrix$Mismatch_pos_6
     return(feature.matrix)
 }
 color.to.class <- function(ref.df) {
@@ -269,5 +268,4 @@ feature.matrix <- get_learning_matrix(ref.data)
 #########
 # Store the reference data, feature matrix:
 #########
-out.loc <- file.path(system.file("data",  package = "openPrimeR"), "RefCoverage.rda")
 save(ref.data, feature.matrix, file = out.loc, compress = "xz")
