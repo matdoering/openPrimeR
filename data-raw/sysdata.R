@@ -202,18 +202,18 @@ create.FPR.table <- function(feature.matrix) {
                 family="binomial", trControl = ctrl, tuneLength = 5) #, subset = train.idx)
     # retrieve all fold-predictions (coverage probabilities) across all repetitions
     cutoffs <- seq(0, 1, 0.0001)
-    n.pos <- length(which(model$pred$obs == "Covered"))
-    n.neg <- length(which(model$pred$obs == "Uncovered"))
+    n.pos <- length(which(model$pred$obs == "Amplified"))
+    n.neg <- length(which(model$pred$obs == "Unamplified"))
     FPR.data <- lapply(cutoffs, function(x) {
-        print(x)
-        cut.pred <- factor(ifelse(model$pred$Covered > x, "Covered", "Uncovered"), levels = c("Uncovered", "Covered"))
-        tpr <- length(which(model$pred$obs == "Covered" & cut.pred == "Covered")) / n.pos
-        fpr <- length(which(model$pred$obs == "Uncovered" & cut.pred == "Covered")) / n.neg
+        #print(x)
+        cut.pred <- factor(ifelse(model$pred$Amplified > x, "Amplified", "Unamplified"), levels = c("Unamplified", "Amplified"))
+        tpr <- length(which(model$pred$obs == "Amplified" & cut.pred == "Amplified")) / n.pos
+        fpr <- length(which(model$pred$obs == "Unamplified" & cut.pred == "Amplified")) / n.neg
         data.frame(Cutoff = x, FPR = fpr, TPR = tpr)
     })
     FPR.df <- do.call(rbind, FPR.data)
     # verify:
-    # FPR.df[500,]
+    print(FPR.df[500,])
     return(FPR.df)
 }
 #########
@@ -279,4 +279,4 @@ devtools::use_data(REF.pass.counts,  # p-value: pass counts for constraint fulfi
                    CVG_MODEL, # logistic model for predicting coveragee
                    FPR_TABLE, # conversion table from coverage-probabililties to FPR
                    internal = TRUE, 
-                   pkg = "src/openPrimeR", overwrite = TRUE)
+                   overwrite = TRUE) #, pkg = "openPrimeR")
