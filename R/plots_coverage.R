@@ -531,7 +531,8 @@ get_cvg_stats_primer <- function(primer.df, template.df,
     ########
     count.df <- ddply(df, c("Primer", "Group"), summarize,
                             Coverage = length(unique(substitute(Template))),
-                            CoverageRatio = length(unique(substitute(Template)))/ length(which(template.df$Group == unique(substitute(Group)))))
+                            CoverageRatio = length(unique(substitute(Template))))
+    count.df$CoverageRatio <- count.df$CoverageRatio / unlist(lapply(count.df$Group, function(x) length(which(template.df$Group == x))))
     # create table entry: value + percentage
     count.df$TabEntry <- paste0(count.df$Coverage, " (", 
                             paste0(round(count.df$CoverageRatio * 100, 1), "%"), ")")
