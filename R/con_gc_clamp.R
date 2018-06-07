@@ -69,6 +69,9 @@ consecutive.GC.count <- function(y, len) {
     diffs <- rle(diff(y))
     # select the last consecutive element
     sel <- length(diffs$values)
+    if (sel == 0) {
+        return(1)
+    }
     if (diffs$values[sel] != 1) {
         return(1)
     }
