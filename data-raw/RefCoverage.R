@@ -179,7 +179,8 @@ get_learning_matrix <- function(ref.data, template.df, tiller.location, open.loc
     feature.matrix$Number_of_mismatches_hexamer <- feature.matrix$Mismatch_pos_1 +  feature.matrix$Mismatch_pos_2 +  
                                                     feature.matrix$Mismatch_pos_3 +  feature.matrix$Mismatch_pos_4 +  
                                                     feature.matrix$Mismatch_pos_5 +  feature.matrix$Mismatch_pos_6
-    return(feature.matrix)
+    result <- list("feature_matrix" = feature.matrix, "primer_data" = tool.data)
+    return(result)
 }
 
 get_learning_matrix_old <- function(ref.data) {
@@ -345,7 +346,7 @@ cvg.folders <- c(file.path(cvg.folder, "Tiller"), file.path(cvg.folder, "openPri
 ref.data <- get_ref_data(cvg.folders)
 #save(ref.data, file = out.loc, compress = "xz")
 # load templates
-template.file <- file.path(cvg.folder, "IGHV_templates.fasta") # NB: use these templates to assign coverage!!! (TODO: check leader ... other file from christoph?)
+template.file <- file.path(cvg.folder, "IGHV_templates.fasta") 
 # define 5' UTR + leader as allowed binding region
 allowed.file <- file.path(cvg.folder, "IGHV_allowed_region.fasta")
 template.df <- read_templates(template.file, c("GROUP"), delim = "|") 
@@ -358,12 +359,14 @@ open.location <- file.path(cvg.folder,"openPrimeR2017.fasta")
 ######
 # get feature matrix for supervised learning
 #####
-feature.matrix <- get_learning_matrix(ref.data, template.df, tiller.location, open.location)
+feature.matrix.data <- get_learning_matrix(ref.data, template.df, tiller.location, open.location)
+feature.matrix <- feature.matrix.data$feature_matrix
+primer.data <- feature.matrix.data$primer_data
 out.loc <- file.path(system.file("data",  package = "openPrimeR"), "RefCoverage.rda")
 #########
 # Store the reference data, feature matrix:
 #########
-save(ref.data, feature.matrix, file = out.loc, compress = "xz")
+save(ref.data, feature.matrix, primer.data, file = out.loc, compress = "xz")
 ############
 if (FALSE) {
     # old code:
