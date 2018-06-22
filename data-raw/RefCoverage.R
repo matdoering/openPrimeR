@@ -1,4 +1,4 @@
-##########
+#########
 # Create the feature matrix for supervised learning using the experimentally determined coverage
 #######
 
@@ -52,7 +52,69 @@ get.color.df <- function(xls.file, sheet.idx, nbr.rows) {
 	colnames(col.df) <- cnames
 	return(col.df)
 }
-get_ref_data <- function(xls.file) {
+get_ref_data <- function(cvg.folders) {
+    #############################
+    consensus.fun <- function(x) {
+        count1 <- length(which(x == 1))
+        count0 <- length(which(x == 0))
+        if (count1 > count0) {
+            return(1)
+        } else {
+            return(0)
+        }
+    }
+    agreement.rate <- function(x) {
+        count1 <- length(which(x == 1))
+        count0 <- length(which(x == 0))
+        majority <- ifelse(count1 > count0, 1, 0)
+        agreement.rate <- length(which(x == majority)) /length(x)
+        return(agreement.rate)
+    }
+    library(plyr)
+    library(reshape2)
+    library(ggplot2)
+    ignore.cols <- c("Evaluator", "experiment")
+    ref.calls <- vector("list", length(cvg.folders))
+    for (i in seq_along(cvg.folders)) { # primer sets
+        csvs <- list.files(cvg.folders[i], full.names = TRUE)
+        set.name <- basename(cvg.folders[i])
+        ref.results <- vector("list", length(csvs))
+        for (j in seq_along(csvs)) { # reviewer results
+            csv <- read.csv(csvs[j], check.names = FALSE)
+            csv.j <- csv[, !colnames(csv) %in% ignore.cols]
+            # determine consensus across individual experiments
+            res <- ddply(csv.j, c("Primer"), numcolwise(consensus.fun))
+            res <- cbind("Evaluator" = unique(csv$Evaluator), res)
+            ref.results[[j]] <- res
+        }
+        cvg.matrix <- do.call(rbind, ref.results)
+        cvg.matrix.j <- cvg.matrix[, !colnames(cvg.matrix) %in% ignore.cols]
+        # compute agreement rate per primer template for all the reviewers from this
+        agree.df <- ddply(cvg.matrix.j, c("Primer"), numcolwise(agreement.rate))
+        plot.df <- melt(agree.df, variable.name = "Template", value.name = "Agreement")
+        # plot 
+        p <- ggplot() + geom_boxplot(data = plot.df, aes(x = Primer, y = Agreement))
+        ggsave(paste0("agreement_", set.name, ".png"), p)
+        ref.summary <- ddply(cvg.matrix.j, c("Primer"), numcolwise(consensus.fun))
+        ref.calls[[i]] <- ref.summary
+    }
+    # gather results for Tiller and openPrimeR in a data frame
+    result.df <- do.call(rbind, ref.calls)
+    # convert to machine-readable format
+    res <- melt(result.df, variable.name = "Template", value.name = "Experimental_Coverage")
+    res$Experimental_Coverage <- factor(ifelse(res$Experimental_Coverage == 1, "Amplified", "Unamplified"), levels = c("Unamplified", "Amplified"))
+    return(res)
+}
+get_tool_primer_data <- function(primer.location, template.df, cur.settings) {
+    # load primers
+    primer.df <- openPrimeR::read_primers(primer.location, "_fw", "_rev")
+    primer.df$ID <- factor(gsub("_fw", "", as.character(primer.df$ID)))
+    primer.df <- openPrimeR::check_constraints(primer.df, template.df, cur.settings)
+    template.df <- openPrimeR::update_template_cvg(template.df, primer.df)
+    out <- list("Primers" = primer.df, "Templates" = template.df)
+    return(out)
+}
+get_ref_data_old <- function(xls.file) {
     message("This function should be run on Windows for correct xls parsing ...")
     # turn color xls to labeled R data frame with colors indicating amplification (red: no, green: yes)
     tiller.ref.df <- get.color.df(xls.file, 1,13)
@@ -75,15 +137,52 @@ get_ref_data <- function(xls.file) {
     }
     return(ref.data)
 }
-get_tool_primer_data <- function(primer.location, template.df, cur.settings) {
-    # load primers
-    primer.df <- openPrimeR::read_primers(primer.location, "_fw", "_rev")
-    primer.df <- openPrimeR::check_constraints(primer.df, template.df, cur.settings)
-    template.df <- openPrimeR::update_template_cvg(template.df, primer.df)
-    out <- list("Primers" = primer.df, "Templates" = template.df)
-    return(out)
+get_learning_matrix <- function(ref.data, template.df, tiller.location, open.location) {
+    # primer set to use for calibration:
+    mode.directionality <- "fw"
+    # create tool data for Tiller / openPrimeR:
+    filename <- system.file("extdata", "settings", 
+                "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
+    settings <- openPrimeR::read_settings(filename)
+    # prevent other binding events:
+    conOptions(settings)$allowed_other_binding_ratio <- 0.0
+    # allow input nbr of mismatches
+    conOptions(settings)$allowed_mismatches <- 12
+    # require only intersection with target region
+    conOptions(settings)$allowed_region_definition <- "any"
+    # compute data
+    # activate all 'interesting' cvg constraints as features, but don't filter! (set boundaries high)
+    cvg_constraints(settings) <- list("annealing_DeltaG" = c("max" = 0), "primer_efficiency" = c("max" = 1),
+                                      "terminal_mismatch_pos" = c("min" = 0))
+    tiller.settings <- settings
+    PCR(tiller.settings)$annealing_temp <- 57
+    tiller.data <- get_tool_primer_data(tiller.location, template.df, tiller.settings)
+    open.settings <- settings
+    PCR(open.settings)$annealing_temp <- 55
+    open.data <- get_tool_primer_data(open.location, template.df, open.settings)
+    tool.data <- list("Tiller" = tiller.data, "openPrimeR" = open.data)
+    feature.data <- vector("list", length(tool.data))
+    for (i in seq_along(tool.data)) {
+        ident <- names(tool.data)[i]
+        primer.df <- tool.data[[i]]$Primers
+        template.df <- tool.data[[i]]$Templates
+        data.matrix <- prepare_learning_data(primer.df, template.df, ref.data, settings, cvg.type = "basic")
+        feature.data[[i]] <- data.matrix
+    }
+    feature.matrix <- do.call(rbind, feature.data)
+    # encode mismatches locally: hexamer encoding
+    pos.mod <- feature.matrix$Position_3terminus 
+    pos.mod[is.na(pos.mod) | pos.mod >= 7] <- 7 # no mismatch in 3' hexamer
+    pos.mod <- abs(pos.mod - 7)
+    feature.matrix$Position_3terminusLocal <- pos.mod
+    #feature.matrix$Position_3terminus[is.na(feature.matrix$Position_3terminus)] <- max(feature.matrix$Position_3terminus, na.rm = TRUE) + 1
+    feature.matrix$Number_of_mismatches_hexamer <- feature.matrix$Mismatch_pos_1 +  feature.matrix$Mismatch_pos_2 +  
+                                                    feature.matrix$Mismatch_pos_3 +  feature.matrix$Mismatch_pos_4 +  
+                                                    feature.matrix$Mismatch_pos_5 +  feature.matrix$Mismatch_pos_6
+    return(feature.matrix)
 }
-get_learning_matrix <- function(ref.data) {
+
+get_learning_matrix_old <- function(ref.data) {
     data(Ippolito) # load templates
     # primer set to use for calibration:
     mode.directionality <- "fw"
@@ -104,7 +203,6 @@ get_learning_matrix <- function(ref.data) {
     template.df <- adjust_binding_regions(template.df, c(-max(template.df$Allowed_End_fw_initial - template.df$Allowed_Start_fw_initial), 0), c(-50,1)) 
     m <- match(colnames(ref.data[[1]]), template.df$ID)
     my.templates <- template.df[m[!is.na(m)],]
-    # do the same analysis with the annealing coverage definition!
     tiller.location <- system.file("extdata", "IMGT_data", "primers", "IGHV", 
                             "Tiller2008_1st.fasta", package = "openPrimeR")
     open.location <- system.file("extdata", "IMGT_data", "primers", "IGHV", 
@@ -170,7 +268,7 @@ color.to.class <- function(ref.df) {
     return(df)
 }
 
-prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg.type = c("constrained", "basic")) {
+prepare_learning_data <- function(primer.df, template.df, ref.data, settings, cvg.type = c("constrained", "basic")) {
     #######
     # prepare tool results for learning:
     #######
@@ -183,7 +281,8 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
                         primer_efficiency = unique(substitute(primer_efficiency)),
                         annealing_DeltaG = unique(substitute(annealing_DeltaG)),
                         Position_3terminus = min(substitute(Position_3terminus)),
-                        All_mismatches = paste(substitute(Position_3prime), collapse = ","))
+                        All_mismatches = paste(substitute(Position_3prime), collapse = ","),# mismatches relative to the 3' end (pos 1 indicates 3' terminus)
+                        Worst_Case_MismatchLocal = paste(substitute(Position_3terminusLocal), collapse = ","))  # worst case mismatches where 1 -> first pos in 3' hexamer, 6 -> 3' terminus
                         #Binding_Pos_Start = unique(substitute(Binding_Position_Start_fw)))
     # add some primer features
     m <- match(df$Primer, primer.df$ID)
@@ -192,40 +291,29 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
     # add some template features; TODO: need to adjust prepare_mm_plot to output the binding stretch or binding position in the templates
     m <- match(df$Template, template.df$ID)
     template.seqs <- template.df$Sequence[m]
-    # add 3' hexamer mismatch features: 1 if mismatch, 0 if not, per position in the 3' hexamer
+    # add 3' hexamer mismatch features: 1 if mismatch, 0 if not, per position in the 3' hexamer: 
+    # pos 1 -> first position in 3' hexamer, pos6: last position in 3' hexamer (<=> 3' terminus)
     hexa.df <- data.frame(matrix(rep(0, 6 * nrow(df)), nrow = nrow(df), ncol = 6))
-    colnames(hexa.df) <- paste0("Mismatch_pos_", seq(6, 1)) # changed labels for considering position starting in the sequence direction 
-    #colnames(hexa.df) <- paste0("Mismatch_pos_", seq(1, 6)) # changed labels for considering position starting in the sequence direction 
+    colnames(hexa.df) <- paste0("Mismatch_pos_", seq(1, 6)) # changed labels for considering position starting in the sequence direction 
     mm <- lapply(strsplit(df$All_mismatches, split = ","), function(x) ifelse(x == "NA", NA, as.numeric(x)))
     for (i in seq_along(mm)) {
         cur.mm <- mm[[i]]
         if (!is.na(cur.mm[1])) {
             sel <- which(cur.mm <= 6)
             if (length(sel) != 0) {
-                hexa.mm <- cur.mm[sel]
+                hexa.mm <- abs(cur.mm[sel] - 7)
                 hexa.df[i, hexa.mm] <- 1
             }
         }
     }
-    # take position from the end or just the position in the order of the seq?
-    hexa.df <- hexa.df[, rev(seq_len(ncol(hexa.df)))]
     # determine count of hexamer mismatches
     hexa.counts <- apply(hexa.df, 1, sum)
     df <- cbind(df, hexa.df, "Hexamer_Mismatch_Count" = hexa.counts)
     #######
     # prepare experimental data 
     #########
-    # turn colors to cvg class:
-    ref.cvg <- cbind("Primer" = ref.cvg$Primer, color.to.class(ref.cvg[, 2:(ncol(ref.cvg))]))
-    # exclude from ref cvg the templates that are not in template.df!!!!
-    my.m <- c(TRUE, sapply(colnames(ref.cvg)[-1], function(x) length(grep(x, template.df$ID, fixed = TRUE)) != 0))
-    ref.cvg <- ref.cvg[, my.m]
-    # treatment of replicates -> only assign consensus
-    ref.cvg.consensus <- plyr::ddply(ref.cvg, "Primer", plyr::catcolwise(function(x) ifelse(length(which(x == "Amplified")) >= length(which(x == "Unamplified")), "Amplified", "Unamplified")))
-    # convert from wide to long format
-    ref.cvg.matrix <- reshape2::melt(ref.cvg.consensus, "Primer", value.name = "Experimental_Coverage", variable.name = "Template")
     # assign labels to the learning data
-    combi.df <- merge(df, ref.cvg.matrix, by=c("Primer","Template")) # NA's match
+    combi.df <- merge(df, ref.data, by=c("Primer","Template")) # NA's match
     if (nrow(combi.df) != nrow(df)) {
         warning("combi.df excluded some obsevations; probably because number of allowed mismatches was too low when evaluating the primer coverage -> set it higher for creating a full training set.")
         print(paste("Obs. in tool data frame: ", nrow(df)))
@@ -251,23 +339,41 @@ prepare_learning_data <- function(primer.df, template.df, ref.cvg, settings, cvg
     return(augmented.df)
 }
 devtools::load_all("src/openPrimeR") # load openPrimeR package
-######
-# get reference coverage data frame:
-######
-xls.file <- system.file("data-raw", "PCR_ref_data.xlsx", package = "openPrimeR")
+# get reference coverage for primer sets
+cvg.folder <- system.file("data-raw", "coverage_data", package = "openPrimeR")
+cvg.folders <- c(file.path(cvg.folder, "Tiller"), file.path(cvg.folder, "openPrimeR"))
+ref.data <- get_ref_data(cvg.folders)
+#save(ref.data, file = out.loc, compress = "xz")
 # load templates
-hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
-template.df <- read_templates(system.file("inst", "extdata", "IMGT_data", "templates", "Homo_sapiens_IGH_functional_exon_exp.fasta", package = "openPrimeR"), hdr.structure, "|", "GROUP", rm.keywords = "partial")
-template.df <- assign_binding_regions(template.df, fw = system.file("inst", "extdata", "IMGT_data", "templates", "Homo_sapiens_IGH_functional_leader_exp.fasta", package = "openPrimeR"), rev = NULL)
-ref.data <- get_ref_data (xls.file)
-out.loc <- file.path(system.file("data",  package = "openPrimeR"), "RefCoverage.rda")
-save(ref.data, file = out.loc, compress = "xz")
-
+template.file <- file.path(cvg.folder, "IGHV_templates.fasta") # NB: use these templates to assign coverage!!! (TODO: check leader ... other file from christoph?)
+# define 5' UTR + leader as allowed binding region
+allowed.file <- file.path(cvg.folder, "IGHV_allowed_region.fasta")
+template.df <- read_templates(template.file, c("GROUP"), delim = "|") 
+template.df <- assign_binding_regions(template.df, fw = allowed.file, rev = NULL)
+# extend forward binding region by one position in order to set coverage definition where any overlap with binding region is tolerated (ensure that primers bind at the start position at the latest)
+template.df <- adjust_binding_regions(template.df, c(-max(template.df$Allowed_End_fw_initial - template.df$Allowed_Start_fw_initial), 0), c(-50,1)) 
+# load primers from adjusted paths due to adapted filenames fitting for reference primer IDs
+tiller.location <- file.path(cvg.folder, "Tiller2008_1st.fasta")
+open.location <- file.path(cvg.folder,"openPrimeR2017.fasta")
 ######
 # get feature matrix for supervised learning
 #####
-feature.matrix <- get_learning_matrix(ref.data)
+feature.matrix <- get_learning_matrix(ref.data, template.df, tiller.location, open.location)
+out.loc <- file.path(system.file("data",  package = "openPrimeR"), "RefCoverage.rda")
 #########
 # Store the reference data, feature matrix:
 #########
 save(ref.data, feature.matrix, file = out.loc, compress = "xz")
+############
+if (FALSE) {
+    # old code:
+    xls.file <- system.file("data-raw", "PCR_ref_data.xlsx", package = "openPrimeR")
+    hdr.structure <- c("ACCESSION", "GROUP", "SPECIES", "FUNCTION")
+    template.df <- read_templates(system.file("extdata", "IMGT_data", "templates", 
+                                                    "Homo_sapiens_IGH_functional_exon_exp.fasta", 
+                                                    package = "openPrimeR"), hdr.structure, "|")
+    template.df <- assign_binding_regions(template.df, fw = system.file("inst", "extdata", "IMGT_data", "templates", "Homo_sapiens_IGH_functional_leader_exp.fasta", package = "openPrimeR"), rev = NULL)
+    ref.data <- get_ref_data (xls.file)
+    feature.matrix <- get_learning_matrix(ref.data)
+}
+

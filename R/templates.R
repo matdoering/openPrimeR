@@ -1415,8 +1415,14 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
     }
     direction <- match.arg(direction)
     # match leader sequences to lex seqs
-    # substring here is a necessary hack for mapping IMGT leaders to seqs
-    idx <- lapply(lex.seq$Header, function(x) grep(substring(x, 1, 30), l.seq$Header, fixed = TRUE))  # hit from exon seqs to leaders
+    # try to match accurately:
+    idx <- lapply(lex.seq$Header, function(x) match(x, l.seq$Header))  # hit from seqs to leaders
+    any.missing <- any(unlist(lapply(idx, function(x) is.na(x))))
+    if (any.missing) {
+        # could not match template header to leader headers, try approximate matching
+        # NB: substring here is a necessary hack for mapping IMGT leaders to seqs
+        idx <- lapply(lex.seq$Header, function(x) grep(substring(x, 1, 30), l.seq$Header, fixed = TRUE))
+    }
     # ensure that each template has a unique leader
     hit.len <- sapply(idx, length)
     nbr.of.hits <- sum(hit.len)
