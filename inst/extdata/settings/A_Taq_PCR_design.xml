@@ -98,7 +98,7 @@
 </constraint>
 <constraint>
 <name>melting_temp_range</name>
-<values>min=50,max=75</values>
+<values>min=50,max=70</values>
 </constraint>
 </constraint_set>
 <constraint_set>
@@ -155,7 +155,7 @@
 <name>constraint_settings</name>
 <constraint>
 <name>allowed_mismatches</name>
-<values>7</values>
+<values>3</values>
 </constraint>
 <constraint>
 <name>allowed_other_binding_ratio</name>
