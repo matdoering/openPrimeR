@@ -106,6 +106,35 @@ explore.dists <- function(template.data, k = 18) {
         dev.off()
     }
 }
+plot.ref.dists <- function() {
+    library(distrEx)
+    ref.dist <- list("plain(Easily~Feasible):~beta(1,10)" = Beta(1, 10),
+                     "plain(Feasible):~beta(0.8,20)" = Beta(0.8, 20), 
+                    "plain(Hardly~Feasible):~beta(0.6,40)" = Beta(0.60, 40), 
+                    "plain(Unfeasible):~beta(0.3,200)" = Beta(0.3, 200))
+    results <- vector("list", length(ref.dist))
+    distribution_rep <- list()
+    for (i in seq_along(ref.dist)) {
+        dist <- ref.dist[[i]]
+        p1 <- dist@param@shape1
+        p2 <- dist@param@shape2
+        s <- rbeta(10000, shape1 = p1, shape2 = p2)
+        res <- data.frame("Distribution" = factor(names(ref.dist)[i]),
+                          "x" = s)
+        results[[i]] <- res
+        distribution_rep[[names(ref.dist)[i]]] <- expression(beta(p1, p2))
+        
+    }
+    df <- do.call(rbind, results)
+    library(ggplot2)
+    ggplot(df) + geom_histogram(aes(x = x)) + facet_wrap(~Distribution,
+        labeller = label_parsed) + 
+      #Distribution = distribution_rep)) + 
+        labs(x = "Coverage Ratio", y = "Number of Samples") +
+        scale_x_continuous(labels=scales::percent)
+    ggsave("beta_distribution.pdf")
+
+}
 #' Creation of Reference Coverage Ratio Distributions.
 #'
 #' Creates reference coverage ratio distributions in order to classify
