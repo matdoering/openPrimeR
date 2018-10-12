@@ -50,12 +50,12 @@ design_primers_global_single <- function(template.df, settings, mode.directional
     penalty.df <- score_primers(primer.df, settings, active.constraints = score.constraints)
     penalties <- penalty.df$Penalty[match(primer.df$ID, penalty.df$ID)]
     primer.df$Penalty <- penalties
-    if (length(cur.results.loc != 0)) {
-        png(file.path(cur.results.loc, paste0("design_penalties_", sample.name, ".png")))
-        hist(penalties)
-        dev.off()
-        save(primer.df, file = file.path(cur.results.loc, paste0("eval_primers_", sample.name, ".Rdata")))
-    }
+    #if (length(cur.results.loc != 0)) {
+        #png(file.path(cur.results.loc, paste0("design_penalties_", sample.name, ".png")))
+        #hist(penalties)
+        #dev.off()
+        #save(primer.df, file = file.path(cur.results.loc, paste0("eval_primers_", sample.name, ".Rdata")))
+    #}
     #load(file.path("data", "global_primers.Rdata"))
     # C) Optimize (NB: consider melting_temp_diff, cross_dimerization)!
     # build dimerization matrix

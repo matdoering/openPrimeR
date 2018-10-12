@@ -1363,7 +1363,8 @@ plot_template_cvg_comparison_unstratified <- function(primers, templates, highli
         ylab("Coverage") +
         scale_fill_manual(values = colors) + 
         # add coverage above bars:
-        geom_text(aes(label = substitute(Label)),
+        geom_text(aes(label = plot.df$Label),
+        #geom_text(aes(label = substitute(Label)),
                     size = 5, 
                     position = position_stack(vjust = 0.5),
                     check_overlap = FALSE)
@@ -1385,11 +1386,10 @@ plot_template_cvg_comparison_unstratified <- function(primers, templates, highli
 #' @param primers List with primer data frames.
 #' @param templates List with template data frames.
 #' @param highlight.set Primer sets to be highlighted.
-#' @param show.percentages Whether to show the total coverage percentage above the bars.
 #' @return A plot for comparing primer coverage.
 #' @keywords internal
 plot_template_cvg_comparison_mismatch <- function(primers, templates, 
-            highlight.set = NULL, show.percentages = FALSE) {
+            highlight.set = NULL) {
 
     if (length(primers) == 0 || length(templates) == 0) {
         return(NULL)
@@ -1427,17 +1427,6 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
     }
     pal <- getOption("openPrimeR.plot_colors")["Group"] # the RColorBrewer palette to use
     colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(plot.df$Group)))
-    # add label for top of the bars (the first group) 
-    labels <- rep(NA, nrow(plot.df))
-    for (i in seq_along(levels(plot.df$Run))) {
-        run <- levels(plot.df$Run)[i]
-        idx <- which(plot.df$Run == run)
-        cur.data <- plot.df[idx,]
-        res <- ddply(cur.data, c("Maximal_mismatches"), summarize, Label = sum(substitute(Coverage_Ratio)))$Label
-        out.idx <- which(plot.df$Run == run & plot.df$Group == levels(plot.df$Group)[1])
-        labels[out.idx] <- res
-    }
-    plot.df$Label <- ifelse(is.na(labels), "", paste0(round(labels * 100, 1), "%"))
     p <- ggplot(plot.df, aes_string(x = "Run", y = "Coverage_Ratio", fill = "Group", group = "Group")) + 
         geom_bar(stat = "identity") + 
         facet_wrap(~Maximal_mismatches,
@@ -1448,13 +1437,6 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
         ggtitle(title) +
         ylab("Coverage") +
         scale_fill_manual(values = colors)
-        # add coverage above bars:
-    if (show.percentages) {
-        p <- p + geom_text(aes(label = substitute(Label)),
-                    size = 3, 
-                    position = position_stack(vjust = 0.5),
-                    check_overlap = FALSE)
-    }
     if (length(highlight.set) != 0) {
         # highlight selected sets
         sel <- levels(plot.df$Run) %in% highlight.set
