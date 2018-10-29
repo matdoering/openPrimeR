@@ -215,6 +215,11 @@ copy.melt.config <- function(melt.bin = NULL) {
     # register parallel backend if not registered already
     if (foreach.available && !getDoParRegistered()) { 
         default.nbr.cores <- 2
-		parallel_setup(default.nbr.cores)
+        if (Sys.info()["sysname"] != "Windows") {
+            # do not call parallel_setup for windows machines
+            # it seems that registering parallel workers leads to
+            # firewall issues -> TIMEOUT when loading the package
+		    parallel_setup(default.nbr.cores)
+        }
     }
 }
