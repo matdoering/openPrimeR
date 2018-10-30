@@ -157,7 +157,7 @@ compute.dimer.matrix <- function(G, deltaG.cutoff = -7) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param annealing.temp The PCR annealing temperature.
 #' @param for.shiny Whether the output is to be formatted for HTML.
 #' @param no.structures Whether dimerization structures shall be outputted.
@@ -231,7 +231,7 @@ select.min.cross.idx <- function(deltaG, primers) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param annealing.temp The PCR annealing temperature.
 #' @param check.idx Indices of primers for checking cross-dimerization.
 #' @param for.shiny Whether to format for HTML output.
@@ -287,7 +287,7 @@ compute.all.cross.dimers.unfiltered <- function(primer.df, primer_conc, na_salt_
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param annealing.temp The PCR annealing temperature.
 #' @param results (optional) Cross dimer data frame (unfiltered)
 #' @param check.idx Indices of primers for checking cross-dimerization.
@@ -416,7 +416,7 @@ view.dimer.df <- function(dimers, type = c("Self", "Cross")) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param annealing.temp The PCR annealing temperature.
 #' @param for.shiny Whether to format the table for HTML output.
 #' @param no.structures Whether dimerization structures shall be outputted.
@@ -451,7 +451,7 @@ compute.all.self.dimers.frontend <- function(primer.df, primer_conc, na_salt_con
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param annealing.temp The PCR annealing temperature.
 #' @param for.shiny Whether to format the table for HTML output.
 #' @param no.structures Whether to compute structures of dimers.

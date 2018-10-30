@@ -62,7 +62,7 @@ convert.temperature <- function(temp, temp.scale = c("K", "C")) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param primer_conc Primer concentration.
 #'
 #' @return The melting temperature for the input sequences.
@@ -121,7 +121,7 @@ compute.empiric.melting.temp <- function(primer.df) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param mode.directionality Direction of primers
 #' @return Data frame with melting temperature info for the input primers.
 #' @keywords internal
@@ -177,7 +177,7 @@ compute.melting.temps.thermo <- function(primer.df, primer_conc, na_salt_conc, m
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param mode.directionality Direction of primers
 #' @return Data frame with melting temperature info for the input primers.
 #' @keywords internal
@@ -241,7 +241,7 @@ get.melting.temp.diff <- function(Tm.fw, Tm.rev) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param ID identifiers of the input primers
 #' @return Melting temperature data frame. 
 #' @keywords internal
@@ -361,7 +361,7 @@ call.melt.single <- function(primers, complements, out.file, primer_conc, na_sal
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @return Melting temperature data frame. 
 #' @keywords internal
 #' @references Le Novère N. (2001). MELTING, computing the 
@@ -473,7 +473,7 @@ call.melt <- function(primers, complements, primer_conc, na_salt_conc, mg_salt_c
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @return The sodium-equivalent concentration of the input ion concentrations.
 #' @references
 #' Record, M. Thomas. "Effects of Na+ and Mg++ ions on the helix–coil transition of DNA." 
@@ -489,7 +489,7 @@ compute.sodium.equivalent.conc <- function(na_salt_conc, mg_salt_conc, k_salt_co
     tris_salt_conc) {
     # beta: correction factor from Peyret (2000)
     beta <- 3.3
-    na_salt_eq <- beta * sqrt(mg_salt_conc) + na_salt_conc + k_salt_conc + tris_salt_conc/2  # sodium equivalent concentration
+    na_salt_eq <- beta * sqrt(mg_salt_conc) + na_salt_conc + k_salt_conc + tris_salt_conc / 2 # sodium equivalent concentration
     return(na_salt_eq)
 }
 

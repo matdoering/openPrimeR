@@ -15,7 +15,7 @@
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param primer_conc Primer concentration.
 #' @return The optimal annealing temperature.
 #' @keywords internal
@@ -77,7 +77,7 @@ annealing.temp.rule.of.thumb <- function(melting.temp) {
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param primer_conc Primer concentration.
 #'
 #' @return The recommended annealing temperature.
@@ -110,7 +110,7 @@ compute.covered.Ta <- function(primer.df, mode.directionality = c("fw", "rev", "
 #' @param na_salt_conc Sodium ion concentration.
 #' @param mg_salt_conc Magensium ion concentration.
 #' @param k_salt_conc Potassium ion concentration.
-#' @param tris_salt_conc Tris ion concentration.
+#' @param tris_salt_conc Tris buffer concentration.
 #' @param primer_conc Primer concentration.
 #'
 #' @return All annealing temperatures for given binding events.

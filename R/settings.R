@@ -1247,7 +1247,7 @@ listToXml <- function(item, tag) {
 #' @param Na_concentration Sodium ion concentration.
 #' @param Mg_concentration Magensium ion concentration.
 #' @param K_concentration Potassium ion concentration.
-#' @param Tris_concentration Tris ion concentration.
+#' @param Tris_concentration Tris buffer concentration.
 #' @param primer_concentration Primer concentration.
 #' @param template_concentration Template concentration.
 #' @return List with all PCR settings.
@@ -1698,7 +1698,7 @@ constraints_to_unit <- function(constraint, use.unit = TRUE,
         Na_concentration = "[Na\\textsuperscript{+}] [M]",
         Mg_concentration = "[Mg\\textsuperscript{2+}] [M]",
         K_concentration = "[K\\textsuperscript{+}] [M]",
-        Tris_concentration = "[Tris\\textsuperscript{2+}] [M]",
+        Tris_concentration = "[Tris buffer] [M]",
         primer_concentration = "[Primer] [M]",
         template_concentration = "[Template] [M]",
         annealing_temp = "Annealing temperature [\\textdegree C]"

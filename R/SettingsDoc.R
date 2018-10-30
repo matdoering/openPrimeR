@@ -104,8 +104,7 @@
 #' \item{\code{Na_concentration}:}{The molar concentration of monovalent sodium ions.}
 #' \item{\code{Mg_concentration}:}{The molar concentration of divalent magnesium ions.}
 #' \item{\code{K_concentration}:}{The molar concentration of monovalent potassium ions.}
-#' \item{\code{Tris_concentration}:}{The molar concentration of divalent Tris(hydroxymethyl)-aminomethan ions.
-#' Note that the Tris ion concentration is about half the buffer concentration.}
+#' \item{\code{Tris_concentration}:}{The molar concentration of the Tris(hydroxymethyl)-aminomethan buffer.}
 #' \item{\code{primer_concentration}:}{The molar concentration of the PCR primers.}
 #' \item{\code{template_concentration}:}{The molar concentration of the PCR templates.}
 #' }
