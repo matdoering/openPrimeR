@@ -1098,7 +1098,7 @@ constraints.xml.format <- function(constraints, set.name) {
 #' @examples
 #' 
 #' # Store settings to disk
-#' xml <- settings.xml <- system.file("extdata", "settings", 
+#' xml <- system.file("extdata", "settings", 
 #'        "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
 #' settings <- read_settings(xml)
 #' out.file <- tempfile("my_settings", fileext = ".xml")
@@ -1465,6 +1465,12 @@ create.options.table <- function(other.settings,
 create.PCR.table <- function(other.settings, 
                     format.type = c("backend", "shiny", "report")) {
     format.type <- match.arg(format.type)
+    # hide Tris setting if it is 0
+    if ("Tris_concentration" %in% names(other.settings)) {
+        if (other.settings$Tris_concentration == 0) {
+            other.settings <- other.settings[which(names(other.settings) != "Tris_concentration")]
+        }
+    }
     df <- create.other.table(other.settings, c("Condition", "Setting"), format.type)
 
     rownames(df) <- NULL

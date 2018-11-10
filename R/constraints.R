@@ -260,6 +260,11 @@ check_constraint_settings_validity <- function(object) {
                 msg <- paste0("Incorrect class for PCR setting: should have been numeric.")
                 errors <- c(errors, msg)
             }
+            # warn about Tris if != 0 due to MELTING bug
+            if ("Tris_concentration" %in% names(constraints(object))
+                && constraints(object)$Tris_concentration != 0) {
+                    warning("Tris_concentration should remain at 0 since melting temperature estimate is unstable otherwise.")
+            }
         }
     } 
     if (length(errors) == 0) {
@@ -375,7 +380,7 @@ PCR_Conditions <- setClass("PCR_Conditions", contains="AbstractConstraintSetting
         # set mandatory options to TRUE
         option.status <- c("use_taq_polymerase" = TRUE, "annealing_temp" = FALSE,
                         "Na_concentration" = TRUE, "Mg_concentration" = TRUE,
-                        "K_concentration" = TRUE, "Tris_concentration" = TRUE,
+                        "K_concentration" = TRUE, "Tris_concentration" = FALSE,
                         "primer_concentration" = TRUE, "template_concentration" = TRUE,
                         "cycles" = FALSE)
         option.status
