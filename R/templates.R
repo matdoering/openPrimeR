@@ -345,7 +345,7 @@ parse.header <- function(hdr, delim, hdr.str, id.column) {
 #' template.data <- read_templates(mixed.files)
 read_templates <- function(fname, hdr.structure = NULL, delim = NULL, id.column = NULL, 
                            rm.keywords = NULL, remove.duplicates = FALSE, fw.region = c(1,30), 
-                           rev.region = c(1,30), gap.char = "-", run = NULL) {
+                           rev.region = NULL, gap.char = "-", run = NULL) {
 
     if (length(fname) > 1) {
         template.df <- read_templates_multiple(fname, 
@@ -433,7 +433,7 @@ read_templates_csv <- function(fname) {
 #' @param remove.duplicates Whether duplicate sequence shall be removed.
 #' @param fw.region The positional interval from the template 5' end specifying the 
 #' binding sites for forward primers.
-#' @param rev.region The positional interval from the template 3' end specifying
+#' @param rev.region The positional interval from the template 5' end specifying
 #' the binding sites for reverse primers.
 #' @param gap.character The character in the input file representing gaps.
 #' Gaps are automatically removed upon input.
@@ -442,7 +442,7 @@ read_templates_csv <- function(fname) {
 #' @keywords internal
 read_templates_single <- function(template.file, hdr.structure = NULL, delim = NULL, id.column = NULL, 
                            rm.keywords = NULL, remove.duplicates = FALSE, fw.region = c(1,30), 
-                           rev.region = c(1,30), gap.character = "-", run = NULL) {
+                           rev.region = NULL, gap.character = "-", run = NULL) {
     template.df <- try(read_templates_fasta(template.file, hdr.structure, 
                        delim, id.column, rm.keywords, remove.duplicates, 
                        fw.region, rev.region, gap.character, run), silent = TRUE)
@@ -491,7 +491,7 @@ read_templates_single <- function(template.file, hdr.structure = NULL, delim = N
 #' @param remove.duplicates Whether duplicate sequence shall be removed.
 #' @param fw.region The positional interval from the template 5' end specifying the 
 #' binding sites for forward primers.
-#' @param rev.region The positional interval from the template 3' end specifying
+#' @param rev.region The positional interval from the template 5' end specifying
 #' the binding sites for reverse primers.
 #' @param gap.character The character in the input file representing gaps.
 #' Gaps are automatically removed upon input.
@@ -500,7 +500,7 @@ read_templates_single <- function(template.file, hdr.structure = NULL, delim = N
 #' @keywords internal
 read_templates_multiple <- function(filenames,  hdr.structure = NULL, delim = NULL, id.column = NULL, 
                            rm.keywords = NULL, remove.duplicates = FALSE, fw.region = c(1,30), 
-                           rev.region = c(1,30), gap.character = "-", run = NULL) {
+                           rev.region = NULL, gap.character = "-", run = NULL) {
     data <- lapply(filenames, function(x) read_templates_single(x,
             hdr.structure = hdr.structure, delim = delim, 
             id.column = id.column, rm.keywords = rm.keywords,
@@ -525,7 +525,7 @@ read_templates_multiple <- function(filenames,  hdr.structure = NULL, delim = NU
 #' @param remove.duplicates Whether duplicate sequence shall be removed.
 #' @param fw.region The positional interval from the template 5' end specifying the 
 #' binding sites for forward primers.
-#' @param rev.region The positional interval from the template 3' end specifying
+#' @param rev.region The positional interval from the template 5' end specifying
 #' the binding sites for reverse primers.
 #' @param gap.character The character in the input file representing gaps.
 #' Gaps are automatically removed upon input.
@@ -539,7 +539,7 @@ read_templates_multiple <- function(filenames,  hdr.structure = NULL, delim = NU
 #' template.df <- read_templates(fasta.file, hdr.structure, "|", "GROUP")
 read_templates_fasta <- function(fasta.file, hdr.structure = NULL, delim = NULL, id.column = NULL, 
                            rm.keywords = NULL, remove.duplicates = FALSE, fw.region = c(1,30), 
-                           rev.region = c(1,30), gap.character = "-", run = NULL) {
+                           rev.region = NULL, gap.character = "-", run = NULL) {
     allowed.nts <- c(tolower(names(IUPAC_CODE_MAP)), gap.character)
     seqs <- my.read.fasta(fasta.file, allowed.nts)
     if (is.null(seqs)) {
@@ -616,6 +616,10 @@ read_templates_fasta <- function(fasta.file, hdr.structure = NULL, delim = NULL,
     }
     # add default binding regions:
     d$Sequence <- ungap_sequence(d$InputSequence, gap.character)
+    if (length(rev.region) == 0) {
+        # set rev region to last 30 bases by default if not specified otherwise
+        rev.region <- c(nchar(d$Sequence) - 29, nchar(d$Sequence))
+    }
     default.leaders <- create.uniform.leaders(fw.region, rev.region, d, gap.character)
     d <- cbind(d, default.leaders)
     d$Run <- run
@@ -878,9 +882,8 @@ update.individual.binding.region <- function(min, max, template.df, mode.directi
 #'
 #' To specify uniform binding regions,
 #' \code{fw} and \code{rev} should be numeric intervals indicating the allowed
-#' binding range for primers in the templates. The \code{fw} interval is 
-#' specified with respect to the 5' end, while the \code{rev} interval is
-#' specified with respect to the template 3' end.
+#' binding range for primers in the templates. Both intervals are specified
+#' with respect to the 5' end.
 #' If \code{optimize.region} is \code{TRUE}, the input binding region is
 #' adjusted such that regions forming secondary structures are avoided.
 #'
@@ -1079,12 +1082,13 @@ retrieve.leader.region <- function(template.df, direction = c("fw", "rev"), star
         start <- rep(start, nrow(template.df))
         end <- rep(end, nrow(template.df))
     } # otherwise: regions are already ok in the input.
-    if (direction == "rev") {
-        # get reverse start and ends in absolute values:
-        ori.start <- start
-        start <- nchar(template.df$InputSequence) - end + 1
-        end <- nchar(template.df$InputSequence) - ori.start + 1
-    }
+    # not necessary anymore: rev region is not relative to 3' end anymore
+    #if (direction == "rev") {
+        ## get reverse start and ends in absolute values:
+        #ori.start <- start
+        #start <- nchar(template.df$InputSequence) - end + 1
+        #end <- nchar(template.df$InputSequence) - ori.start + 1
+    #}
     # store start/end in possibly gappy input
     ali.start <- start
     ali.end <- end
@@ -1249,8 +1253,15 @@ create.uniform.leaders <- function(fw.interval, rev.interval, template.df, gap.c
 #' @keywords internal
 add.uniform.leaders.to.seqs <- function(lex.seq, leaders) {
     result <- lex.seq
+    if ("TemplateIdentifier" %in% colnames(leaders)) {
+        # need to map from leader annotation to templates
+        m <- match(leaders$TemplateIdentifier, lex.seq$Identifier)
+    } else {
+        # leader annotation is not a subset of the templates
+        m <- seq_len(nrow(leaders))
+    }
     for (i in colnames(leaders)) {
-        result[, i] <- leaders[, i]
+        result[m, i] <- leaders[, i]
     }
     return(result)
 }
@@ -1485,7 +1496,7 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
         template.df$InputSequence[x]))
     leader.idx <- NULL
     if (direction == "fw") {
-        # always the take match we find
+        # always take the first match we find
         leader.idx <- rep(1, length(leader.pos))
     } else {
         # always take the last match we find
@@ -1506,6 +1517,7 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
         my.warning("LeadersNotFound", warn.msg)
     }
     final.df <- retrieve.leader.region(template.df, direction, leader.s, leader.e, gap.char) # retrieve leader region: overwrites values of other directions
+    final.df <- cbind(final.df, "TemplateIdentifier" = template.df$Identifier)
     if (FALSE) {
         if (any(leader.s.ok)) {
         # set allowed region start/end
