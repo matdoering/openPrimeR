@@ -878,9 +878,11 @@ update.individual.binding.region <- function(min, max, template.df, mode.directi
 #'
 #' To specify uniform binding regions,
 #' \code{fw} and \code{rev} should be numeric intervals indicating the allowed
-#' binding range for primers in the templates. The \code{fw} interval is 
-#' specified with respect to the 5' end, while the \code{rev} interval is
-#' specified with respect to the template 3' end.
+#' binding range for primers in the templates. Setting the forward interval
+#' to (1,30) indicates that the first 30 bases should be used for forward primers
+#' and specifying the reverse interval to (1,30) indicates that the last
+#' 30 bases should be used for reverse primer binding.
+#'
 #' If \code{optimize.region} is \code{TRUE}, the input binding region is
 #' adjusted such that regions forming secondary structures are avoided.
 #'
@@ -1216,11 +1218,15 @@ create.uniform.leaders <- function(fw.interval, rev.interval, template.df, gap.c
         if (fw.interval[1] > fw.interval[2]) {
             stop("Forward binding region was no proper interval.")
         }
+    } else if (length(fw.interval) > 0) {
+        stop("Forward binding region was no proper interval.")
     }
     if (length(rev.interval) == 2) {
         if (rev.interval[1] > rev.interval[2]) {
             stop("Reverse binding region was no proper interval.")
         }
+    } else if (length(rev.interval) > 1) {
+        stop("Reverse binding region was no proper interval.")
     }
     fw.leaders <- retrieve.leader.region(template.df, "fw", fw.interval[1], fw.interval[2], gap.char)
     rev.leaders <- retrieve.leader.region(template.df, "rev", rev.interval[1], rev.interval[2], gap.char)
@@ -1249,8 +1255,15 @@ create.uniform.leaders <- function(fw.interval, rev.interval, template.df, gap.c
 #' @keywords internal
 add.uniform.leaders.to.seqs <- function(lex.seq, leaders) {
     result <- lex.seq
+    if ("TemplateIdentifier" %in% colnames(leaders)) {
+        # need to map from leader annotation to templates
+        m <- match(leaders$TemplateIdentifier, lex.seq$Identifier)
+    } else {
+        # leader annotation is not a subset of the templates
+        m <- seq_len(nrow(leaders))
+    }
     for (i in colnames(leaders)) {
-        result[, i] <- leaders[, i]
+        result[m, i] <- leaders[, i]
     }
     return(result)
 }
@@ -1485,7 +1498,7 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
         template.df$InputSequence[x]))
     leader.idx <- NULL
     if (direction == "fw") {
-        # always the take match we find
+        # always take the first match we find
         leader.idx <- rep(1, length(leader.pos))
     } else {
         # always take the last match we find
@@ -1506,6 +1519,7 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
         my.warning("LeadersNotFound", warn.msg)
     }
     final.df <- retrieve.leader.region(template.df, direction, leader.s, leader.e, gap.char) # retrieve leader region: overwrites values of other directions
+    final.df <- cbind(final.df, "TemplateIdentifier" = template.df$Identifier)
     if (FALSE) {
         if (any(leader.s.ok)) {
         # set allowed region start/end
