@@ -18,7 +18,7 @@ Description: An implementation of methods for designing, evaluating,
     are selected. A Shiny app providing a user interface for the functionalities
     of this package is provided by the 'openPrimeRui' package.
 Depends:
-    R (>= 3.4.0)
+    R (>= 4.0)
 License: GPL-2
 Encoding: UTF-8
 RoxygenNote: 6.0.1
@@ -69,7 +69,7 @@ SystemRequirements: MAFFT (>= 7.305),
     ViennaRNA (>= 2.4.1),
     MELTING (>= 5.1.1),
     Pandoc (>= 1.12.3)
-biocViews: Software, Technology
+biocViews: Software, Technology, Coverage, MultipleComparison
 VignetteBuilder: knitr
 Collate: 
     'AnalysisStats.R'

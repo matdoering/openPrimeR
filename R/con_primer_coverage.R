@@ -1261,7 +1261,7 @@ get_feature_matrix <- function(primer.df, template.df, mode = c("on_target", "of
                         Number_of_mismatches = min(substitute(Number_of_mismatches)),
                         Position_3terminus = min(substitute(Position_3terminus)),
                         Position_3terminusLocal = max(substitute(Position_3terminusLocal)))
-    if (length(df) != 0 && nrow(df) != 0 && (any(is.na(df$annealing_DeltaG) || is.na(df$Position_3terminusLocal)))) {
+    if (length(df) != 0 && nrow(df) != 0 && (any(is.na(df$annealing_DeltaG) | is.na(df$Position_3terminusLocal)))) {
         warning("Some values of the coverage model feature matrix were NA; this shouldn't happen!")
     }
     return(df)

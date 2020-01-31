@@ -171,7 +171,7 @@ check.abstract.constraint <- function(settings) {
 #' Determines whether the constraints are allowed/known.
 #'
 #' @param object An \code{AbstractConstraintSettings} object.
-#' @return Error messages in case of errors, otherwise \code{TRUE}.
+#' @return \code{TRUE} if the constraint settings are valid, \code{FALSE} otherwise.
 #' @keywords internal
 check_constraint_settings_validity <- function(object) {
     # store errors here:
@@ -191,7 +191,7 @@ check_constraint_settings_validity <- function(object) {
     }
     # possible constraints should always stay the same:
     if (length(names(object@status)) == 0 || 
-    names(ref.object@status) != names(object@status)) {
+    any(names(ref.object@status) != names(object@status))) {
         m <- match(names(object@status), names(ref.object@status))
         idx <- which(is.na(m))
         error <- paste0("'status' was modified from the default.",
@@ -267,11 +267,7 @@ check_constraint_settings_validity <- function(object) {
             }
         }
     } 
-    if (length(errors) == 0) {
-        return(TRUE)
-    } else {
-        return(errors)
-    }
+    return (length(errors) == 0)
 }
 
 #' @rdname Settings

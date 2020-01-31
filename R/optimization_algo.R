@@ -144,6 +144,7 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
      primer.df = NULL, updateProgress = NULL) {
   
     # never allow any binding outside the target region for designing
+    init.algo <- match.arg(init.algo)
     if (init.algo == "tree" && !check.tool.function()["MAFFT"]) {
         stop("If you would like to use the tree-based primer initialization strategy, please install MAFFT (http://mafft.cbrc.jp/alignment/software/) first.")
     }
@@ -151,7 +152,6 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
     conOptions(settings)$allowed_other_binding_ratio <- 0
     mode.directionality <- match.arg(mode.directionality)
     opti.algo <- match.arg(opti.algo)
-    init.algo <- match.arg(init.algo)
     if (length(settings) == 0 || !is(settings, "DesignSettings")) {
         stop("Please provide a DesignSettings object.")
     }

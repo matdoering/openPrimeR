@@ -1073,7 +1073,7 @@ eval.constraints <- function(constraint.df, constraint.settings, active.constrai
         #message(paste("evaluating constraint: ", active.constraint, sep = ""))
         constraint.idx <- value.idx[[i]]
         constraints <- constraint.settings[[active.constraint]]
-        if (is.null(names(constraints)) || !names(constraints) %in% c("min", "max")) {
+        if (any(is.null(names(constraints)) | !names(constraints) %in% c("min", "max"))) {
             msg <- paste("Constraint did not have a proper annotation of min/max setting: ", active.constraint, sep = "")
             stop(msg)
         }
