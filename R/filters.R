@@ -397,9 +397,9 @@ get.missing.df <- function(filtered.df, template.df, Tm.brackets, settings, mode
     # determine primer candidates that can still improve the coverage
     missing.idx <- NULL
     if (length(covered.idx) == 0) {
-        missing.idx <- 1:nrow(template.df)
+        missing.idx <- seq_len(nrow(template.df))
     } else {
-        to.cover <- 1:nrow(template.df)
+        to.cover <- seq_len(nrow(template.df))
         # consider all uncovered templates from all temperature sets:
         missing.idx <- unique(unlist(lapply(covered.idx, function(x) setdiff(to.cover, x))))
     }

@@ -1225,7 +1225,7 @@ listToXml <- function(item, tag) {
     } else {
         # node with child nodes
         xml <- XML::xmlNode(tag)
-        for (i in 1:length(item)) {
+        for (i in seq_along(item)) {
             if (names(item)[i] != ".attrs") {
                 xml <- XML::append.xmlNode(xml, listToXml(item[[i]], names(item)[i]))
             }

@@ -714,38 +714,38 @@ get_plot_primer_data <- function(primer.df, template.df, identifier = NULL, rela
     # determine relative primer starts and ends depending on whether we want to
     # analyze regarding fw allowed region or rev allowed region
     if (relation == "fw") {
-        primer.start <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_Start_fw[x], 
+        primer.start <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_Start_fw[x], 
             split = ","))[s.idx[[x]]]))
-        primer.end <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_End_fw[x], 
+        primer.end <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_End_fw[x], 
             split = ","))[s.idx[[x]]]))
-        primer.start.rev <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_End_rev[x], 
+        primer.start.rev <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_End_rev[x], 
             split = ","))[s.idx[[x]]]))
-        primer.end.rev <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_Start_rev[x], 
+        primer.end.rev <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Forward_Binding_Position_Start_rev[x], 
             split = ","))[s.idx[[x]]]))
     } else {
-        primer.start <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_Start_fw[x], 
+        primer.start <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_Start_fw[x], 
             split = ","))[s.idx[[x]]]))
-        primer.end <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_End_fw[x], 
+        primer.end <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_End_fw[x], 
             split = ","))[s.idx[[x]]]))
         #print("primer posis:")
         #print(primer.start)
         #print(primer.end)
-        primer.start.rev <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_End_rev[x], 
+        primer.start.rev <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_End_rev[x], 
             split = ","))[s.idx[[x]]]))
-        primer.end.rev <- lapply(1:nrow(primer.info), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_Start_rev[x], 
+        primer.end.rev <- lapply(seq_len(nrow(primer.info)), function(x) as.numeric(unlist(strsplit(primer.info$Relative_Reverse_Binding_Position_Start_rev[x], 
             split = ","))[s.idx[[x]]]))
         
     }
     covered.seq.identifiers <- as.numeric(unlist(strsplit(primer.info$Covered_Seqs, 
         split = ",")))[sel.idx]
     # determine nbr covered for given template.df
-    nbr.covered <- sapply(seq_along(1:nrow(primer.info)), function(x) length(strsplit(primer.info$Covered_Seqs[x], 
+    nbr.covered <- sapply(seq_along(seq_len(nrow(primer.info))), function(x) length(strsplit(primer.info$Covered_Seqs[x], 
         split = ",")[[1]][s.idx[[x]]]))  # nbr of covered seqs per primer
     m <- match(covered.seq.identifiers, template.df$Identifier)
     not.na.mapping <- which(!is.na(m))
     m <- m[not.na.mapping]
     covered.seqs <- template.df[m, ]
-    not.m <- setdiff(1:nrow(template.df), m)
+    not.m <- setdiff(seq_len(nrow(template.df)), m)
     uncovered.seqs <- template.df[not.m, ]
     repeat.idx <- unlist(sapply(seq_along(nbr.covered), function(x) rep(x, each = nbr.covered[x])))  # assignment of index in primer.info to all covered seqs from each primers
     primer.info.m <- primer.info[repeat.idx, ]
@@ -755,7 +755,7 @@ get_plot_primer_data <- function(primer.df, template.df, identifier = NULL, rela
                           Map = rep(NA, total.y))
     y.idx <- 1
     mode.directionality <- get.analysis.mode(primer.info)
-    for (i in 1:nrow(template.df)) {
+    for (i in seq_len(nrow(template.df))) {
         id <- template.df$Identifier[i]
         # determine nbr of occurrences of this seq in covered.seq.identifiers vector
         count.idx <- which(covered.seq.identifiers == id)  # how often was this sequence covered?
@@ -972,7 +972,7 @@ plot_primer <- function(primer.df, template.df, identifier = NULL,
         geom_vline(xintercept = -1, colour = "red") + 
         #scale_y_continuous(limits = c(1, max(d$y, na.rm = TRUE)), 
         scale_y_continuous(
-                breaks = 1:length(labels), labels = abbreviate(labels, getOption("openPrimeR.plot_abbrev"))) + 
+                breaks = seq_along(labels), labels = abbreviate(labels, getOption("openPrimeR.plot_abbrev"))) + 
         scale_colour_manual(values = col) +
         theme(legend.title = element_text(face = "bold"),
               legend.position = "top")
@@ -1560,8 +1560,8 @@ setMethod("get_cvg_stats", signature(primers = "Primers"),
             mode <- "single"
         }
         if (mode == "single") {
-            out.df <- out.df[, cols.both[1:2]]
-            colnames(out.df) <- out.names[1:2]
+            out.df <- out.df[, cols.both[seq_len(2)]]
+            colnames(out.df) <- out.names[seq_len(2)]
         } else {
             out.df <- out.df[, cols.both]
             colnames(out.df) <- out.names

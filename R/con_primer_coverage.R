@@ -1397,7 +1397,7 @@ evaluate.cvg <- function(template.seqs, primers,
     w <- Biostrings::width(seqs)  # template lengths
     idx <- c(0, cumsum(w))
     w <- c(0, w)
-    template.mapping <- IRanges(start = idx[1:(length(idx) - 1)] + 1, width = w[2:length(w)])
+    template.mapping <- IRanges(start = idx[seq_len(length(idx) - 1)] + 1, width = w[2:length(w)])
     names(template.mapping) <- l.s
     f <- IRanges()  # forward start/end positions in the templates
     fp <- integer()  # fp: forward primer indices, one index for every template hit

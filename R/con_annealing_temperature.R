@@ -93,7 +93,7 @@ compute.covered.Ta <- function(primer.df, mode.directionality = c("fw", "rev", "
         stop("Cannot compute annealing temperature: primer coverage is not available yet!")
     }
     seq.idx <- covered.seqs.to.idx(primer.df$Covered_Seqs, template.df)
-    Ta <- na.omit(unlist(lapply(1:nrow(primer.df), function(x) {
+    Ta <- na.omit(unlist(lapply(seq_len(nrow(primer.df)), function(x) {
         compute.Ta(primer.df[x, ], template.df[seq.idx[[x]], ], 
                    mode.directionality, na_salt_conc, mg_salt_conc, 
                    k_salt_conc, tris_salt_conc, primer_conc)

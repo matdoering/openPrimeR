@@ -197,8 +197,8 @@ compute.secondary.structures <- function(primer.df, mode.directionality = c("fw"
         # add info for missing primers
         res.fw <- str.fw[FALSE, ]
         res.rev <- str.rev[FALSE, ]
-        res.fw[1:nrow(primer.df), ] <- NA
-        res.rev[1:nrow(primer.df), ] <- NA
+        res.fw[seq_len(nrow(primer.df)), ] <- NA
+        res.rev[seq_len(nrow(primer.df)), ] <- NA
         res.fw[fw.idx, ] <- str.fw
         res.rev[rev.idx, ] <- str.rev
         out$Structure_fw <- res.fw$Structure

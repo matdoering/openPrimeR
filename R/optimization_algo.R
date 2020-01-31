@@ -958,7 +958,7 @@ create.Tm.brackets <- function(primers, template.df, settings, target.temps = NU
             # ensure that 'group.df' can be constructed
             groups <- c(groups, max(primers$melting_temp, na.rm = TRUE))
         }
-        group.df <- data.frame(GroupID = 1:(length(groups) - 2), min_Tm = groups[1:(length(groups) - 
+        group.df <- data.frame(GroupID = seq_len(length(groups) - 2), min_Tm = groups[seq_len(length(groups) - 
             2)], max_Tm = groups[3:length(groups)])
         group.df$target_Tm <- group.df$min_Tm + (group.df$max_Tm - group.df$min_Tm)/2
     }

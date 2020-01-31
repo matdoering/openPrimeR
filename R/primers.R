@@ -18,7 +18,7 @@ create.kmer <- function(seq, k) {
         warning("Specified k-mer size was larger than sequence length; ",
                 "Reduced k-mer size to: ", k, ".")
     }
-    k.mers <- unique(substring(seq, 1:(nchar(seq) - k + 1), k:nchar(seq)))
+    k.mers <- unique(substring(seq, seq_len(nchar(seq) - k + 1), k:nchar(seq)))
     kmer.pos <- -seq(nchar(seq), k)
     names(k.mers) <- kmer.pos
     return(k.mers)
@@ -31,7 +31,7 @@ create.kmer <- function(seq, k) {
 create.k.mers <- function(seqs, k) {
     # generates all substrings of length k contained in the single sequence 'seq' 
     i <- NULL
-    k.mers <- foreach (i = 1:length(seqs), .combine = c) %dopar% {
+    k.mers <- foreach (i = seq_along(seqs), .combine = c) %dopar% {
         k.mer <- list(create.kmer(seqs[i], k))
     }
     return(k.mers)
@@ -1532,7 +1532,7 @@ read_primers_csv <- function(file) {
                       " Please ensure the correct format of the file!")
         my.error("TemplateFormatIncorrect", msg)
     }
-    for (i in 1:ncol(p)) {
+    for (i in seq_len(ncol(p))) {
         if (colnames(p)[i] %in% fix.cols) {
             p[, colnames(p)[i]] <- as.character(p[, colnames(p)[i]])
             na.idx <- which(is.na(p[, colnames(p)[i]]))
@@ -1703,7 +1703,7 @@ disambiguate.primers <- function(p.df) {
     # combine
     combis <- lapply(seq_along(f), function(x) expand.grid(f[[x]], r[[x]], stringsAsFactors = FALSE))
     identifiers <- unlist(lapply(seq_along(combis), function(x) paste(p.df$ID[x], 
-        "_", 1:(nrow(combis[[x]])), sep = "")))
+        "_", seq_len(nrow(combis[[x]])), sep = "")))
     df <- do.call(rbind, combis)
     new.df <- data.frame(ID = identifiers, Forward = df[, 1], Reverse = df[, 2], 
         stringsAsFactors = FALSE)

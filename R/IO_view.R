@@ -285,7 +285,7 @@ view.primers <- function(primer.df, template.df) {
                 if (as.numeric(conv[1]) > 0) { # start of binding
                     conv[1] <- paste0("+", conv[1])
                 }
-                out <- paste0(paste0(conv[1:2], collapse = " to "), " ", conv[3], collapse = " ")
+                out <- paste0(paste0(conv[seq_len(2)], collapse = " to "), " ", conv[3], collapse = " ")
             }
             return(out)
             }))
@@ -324,10 +324,10 @@ view.primers.report <- function(primer.df, template.df) {
     # determine nbr of columns
     if ("Sequence" %in% colnames(out.df)) {
         # single direction: more space available
-        out.df <- out.df[,1:6]
+        out.df <- out.df[,seq_len(6)]
     } else {
         # pairs of primers: less space available
-        out.df <- out.df[,1:4]
+        out.df <- out.df[,seq_len(4)]
     }
     col.names <- colnames(out.df) 
     # change mismatch representation to IQR representation:

@@ -588,7 +588,7 @@ read_templates_fasta <- function(fasta.file, hdr.structure = NULL, delim = NULL,
     if (length(ids) == 0) {
         return(NULL)
     }
-    d <- data.frame(ids, Identifier = 1:length(s), InputSequence = s, Sequence_Length = nchar(s), 
+    d <- data.frame(ids, Identifier = seq_along(s), InputSequence = s, Sequence_Length = nchar(s), 
         stringsAsFactors = FALSE)
     rownames(d) <- NULL
     # annotate gene groups: try to parse IMGT header structure
@@ -644,7 +644,7 @@ read.sequences <- function(fasta.file, gap.character) {
     seqs <- my.read.fasta(fasta.file, allowed.nts)
     s <- sapply(seqs, function(x) paste(x, collapse = ""))
     hdr <- sapply(seqs, function(x) attr(x, "Annot"))
-    d <- data.frame(Identifier = 1:length(s), Header = hdr, Sequence = s, Sequence_Length = nchar(s), 
+    d <- data.frame(Identifier = seq_along(s), Header = hdr, Sequence = s, Sequence_Length = nchar(s), 
         stringsAsFactors = FALSE)
     rownames(d) <- NULL
     return(d)

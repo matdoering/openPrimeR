@@ -60,7 +60,7 @@ get.cross.dimers <- function(primers.1, primers.2, ions,
         # considered combinations (e.g. if we have 1-2, we don't need to 2-1 if 2 in the
         # right set and 2 in the left set correspond to each other).
         combis <- do.call("rbind", parallel::mclapply(seq_along(primers.1), function(x) expand.grid(x, 
-            seq_along(primers.2)[-(1:x)])))
+            seq_along(primers.2)[-(seq_len(x))])))
     } else {
         # all combinations
         combis <- do.call("rbind", parallel::mclapply(seq_along(primers.1), function(x) expand.grid(x, 

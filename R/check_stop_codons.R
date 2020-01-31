@@ -183,8 +183,8 @@ split_str_by_index <- function(target, index) {
 #' @return The interleaved combination of \code{v1} and \code{v2}.
 #' @keywords internal
 interleave <- function(v1, v2) {
-    ord1 <- 2 * (1:length(v1)) - 1
-    ord2 <- 2 * (1:length(v2))
+    ord1 <- 2 * (seq_along(v1)) - 1
+    ord2 <- 2 * (seq_along(v2))
     result <- c(v1, v2)[order(c(ord1, ord2))]
     return(result)
 }

@@ -97,7 +97,7 @@ add.dimerization.constraints <- function(lprec, D.idx, indices) {
 add.coverage.constraints <- function(lprec, covered.templates, template.coverage) {
     # add coverage constraints to ILP 'lprec'
     nbr.coverage.constraints <- length(covered.templates)
-    indices <- 1:nbr.coverage.constraints
+    indices <- seq_len(nbr.coverage.constraints)
     cur.nbr.constraints <- 0
     if (nbr.coverage.constraints == 0) {
         indices <- NULL
@@ -185,7 +185,7 @@ ILPConstrained <- function(D, cvg.matrix, time.limit = NULL, presolve.active = F
     ####### for the relaxed conditions
     lprec <- make.lp(total.nbr.constraints, X)  # 0 constraints and X vars
     name.lp(lprec, "openPrimeR_set_cover_ILP")
-    for (col in 1:X) {
+    for (col in seq_len(X)) {
         # define primer vars as integer (bounds of 0,1)
         set.type(lprec, col, "binary")
     }
@@ -611,7 +611,7 @@ optimize.ILP <- function(primer.df, template.df, settings, primer_conc,
         optimal <- rep(FALSE, nrow(ILP.df))
         optimal[solution.idx] <- TRUE
         lambda.idx <- which(colnames(ILP.df) == "Objective")
-        ILP.df <- cbind(ILP.df[, 1:lambda.idx], Optimal = optimal, ILP.df[, ((lambda.idx + 
+        ILP.df <- cbind(ILP.df[, seq_len(lambda.idx)], Optimal = optimal, ILP.df[, ((lambda.idx + 
             1):ncol(ILP.df))], stringsAsFactors = FALSE)
         write.csv(ILP.df, file = file.path(diagnostic.location, "ILP_summary.csv"), 
             row.names = FALSE)
@@ -686,7 +686,7 @@ subset.ILP <- function(primer.df, template.df, k) {
     total.nbr.constraints <- 1 + nbr.coverage.constraints  # constraint for set size + template coverage constraint
     lprec <- make.lp(total.nbr.constraints, X)
     name.lp(lprec, "openPrimeR_SubsetSelection_ILP")
-    for (col in 1:X) {
+    for (col in seq_len(X)) {
         # define primer vars as integer (bounds of 0,1)
         set.type(lprec, col, "binary")
     }
@@ -825,7 +825,7 @@ subset_primer_set <- function(primer.df, template.df, k = 1, groups = NULL, iden
     if (length(out.loc) != 0) {
         dir.create(out.loc, showWarnings = FALSE)
     }
-    K <- 1:100 * k
+    K <- seq_len(100) * k
     K <- K[K <= nrow(primer.df)]
     # for (i in seq_along(K)) {
     k <- NULL

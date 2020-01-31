@@ -209,9 +209,9 @@ optimize.template.binding.regions.single <- function(template.df, annealing.temp
                 if (longest.runs == 1) {
                   sel.start <- 1
                 } else {
-                  sel.start <- sum(result$length[1:(longest.runs - 1)]) + 1
+                  sel.start <- sum(result$length[seq_len(longest.runs - 1)]) + 1
                 }
-                sel.end <- sum(result$length[1:longest.runs]) + 1
+                sel.end <- sum(result$length[seq_len(longest.runs)]) + 1
                 con <- con[sel.start:sel.end]
             }
         } else {

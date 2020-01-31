@@ -72,7 +72,7 @@ convert.to.iupac <- function(seqs) {
     }
     N <- nchar(seqs)[1]
     s <- strsplit(toupper(seqs), split = "")
-    seq <- sapply(1:N, function(x) paste(sapply(seq_along(s), function(y) s[[y]][x]), 
+    seq <- sapply(seq_len(N), function(x) paste(sapply(seq_along(s), function(y) s[[y]][x]), 
         collapse = ""))
     res <- paste(tolower(mergeIUPACLetters(seq)), collapse = "")
     return(res)

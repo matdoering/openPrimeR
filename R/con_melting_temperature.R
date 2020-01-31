@@ -156,7 +156,7 @@ compute.melting.temps.thermo <- function(primer.df, primer_conc, na_salt_conc, m
         colnames(Tm.rev) <- paste(cnames, "_rev", sep = "")
     }
     if (length(Tm.fw) != 0 && length(Tm.rev) != 0) {
-        used.Tm <- unlist(lapply(1:nrow(Tm.fw), function(x) min(c(Tm.fw$Tm_C_fw[x], Tm.rev$Tm_C_rev[x]), 
+        used.Tm <- unlist(lapply(seq_len(nrow(Tm.fw)), function(x) min(c(Tm.fw$Tm_C_fw[x], Tm.rev$Tm_C_rev[x]), 
             na.rm = TRUE)))  # use the min Tm 
     } else if (length(Tm.fw) != 0 && length(Tm.rev) == 0) {
         used.Tm <- Tm.fw$Tm_C_fw
