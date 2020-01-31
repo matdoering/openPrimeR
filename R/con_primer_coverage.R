@@ -1316,7 +1316,7 @@ predict_coverage <- function(primer.df, template.df, settings, mode = c("on_targ
         # if 'newdata' is NULL, the training data would be predicted ..
         pred <- NULL
     }
-    if (class(pred) == "try-error") {
+    if (is(pred, "try-error")) {
         stop("Could not predict coverage using the logistic model. Maybe some columns are missing in the data frame? Provided columns were: ", colnames(pred.matrix), ". Dimension of matrix:", dim(pred.matrix))
     }
     # check whether predictions are available for all primer coverage events

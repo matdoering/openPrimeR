@@ -908,7 +908,7 @@ read_settings <- function(filename = list.files(
         con.setting <- parse.constraints(xml_data)
         con.setting
     })
-    if (class(con.setting) == "try-error") {
+    if (is(con.setting, "try-error")) {
         msg <- "Error while parsing settings XML file. Please check your input."
         my.error("XML_Parsing_Error", msg)
     }

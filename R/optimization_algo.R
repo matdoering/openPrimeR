@@ -680,7 +680,7 @@ visualize.all.results <- function(sample, filtering.results.loc, opti.results.lo
     # optimization plots: differentiate between different optimization methods
     optimal.primers <- try(read_primers(file.path(opti.results.loc, paste(sample, 
         "_FINAL_optimized_primers.csv", sep = ""))))
-    if (class(optimal.primers) == "try-error") {
+    if (is(optimal.primers, "try-error")) {
         return()  # no available results here
     }
     optimal.primers[is.na(optimal.primers)] <- ""

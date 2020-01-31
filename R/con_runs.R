@@ -11,7 +11,7 @@
 #' @return The longest repeat of a single character in \code{x}.
 #' @keywords internal
 nbr.of.runs <- function(x) {
-    if (length(x) == 0 || class(x) != "character") {
+    if (length(x) == 0 || !is(x, "character")) {
         return(NULL)
     }
     # disambiguate primers

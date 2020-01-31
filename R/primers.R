@@ -148,7 +148,7 @@ classify_design_problem <- function(template.df,
     # 2. Fit a Beta distribution to the coverage ratios
     x <- c(cvg.df$fw$Coverage_Ratio, cvg.df$rev$Coverage_Ratio)
     fit.beta <- try(fitdistrplus::fitdist(x, "beta")) # beta has high error
-    if (class(fit.beta) == "try-error") {
+    if (is(fit.beta, "try-error")) {
         # if there's too few unique x values, fitdistrplus won't be able to find a fit -> stop here!
         my.warning("ProblemEstimationProblem", "Could not estimate problem difficulty, problably because the estimated coverage distribution was too narrow.")
         return(NULL)
@@ -969,12 +969,12 @@ setMethod("[", c("Primers", "ANY", "ANY"),
         } else {
             df <- asS3(x)[i, j, ..., drop = drop]
         }
-        if (class(df) == "data.frame") {
+        if (is(df, "data.frame")) {
             # only set my class if we haven't simplified.
             #options("show.error.messages" = FALSE)
             p.df <- suppressWarnings(try(Primers(df), silent = TRUE))
             #options("show.error.messages" = TRUE)
-            if (class(p.df) == "try-error") {
+            if (is(p.df, "try-error")) {
                 # removed crucial columns -> turn into data frame
                 p.df <- asS3(df)
             } 
@@ -1219,7 +1219,7 @@ setMethod("plot_primer_binding_regions",
         cbind(plot.data[[x]], Run = rep(primers[[x]]$Run[1], nrow(plot.data[[x]])))
     })
     plot.df <- do.call(rbind, plot.data)
-    if (class(plot.df) != "data.frame") {
+    if (!is(plot.df, "data.frame")) {
         return(NULL)
     }
     if (length(highlight.set) != 0) {
@@ -1401,11 +1401,11 @@ read_primers_single <- function(primer.location, fw.id = "_fw", rev.id = "_rev",
     # load the primers and at the same time determine whether it's FASTA/CSV input
     primers <- try(my.read.fasta(primer.location, 
                 tolower(names(IUPAC_CODE_MAP))), silent = TRUE)
-    if (class(primers) == "try-error") {
+    if (is(primers, "try-error")) {
         # let's try to read as CSV
         fasta.error <- attr(primers, "condition")
         primers <- try(read_primers_csv(primer.location), silent = TRUE)
-        if (class(primers) == "try-error") {
+        if (is(primers, "try-error")) {
             csv.error <- attr(primers, "condition")
             stop(paste("Could not read the file as FASTA or CSV.",
                 "The FASTA error was: ",
@@ -1527,7 +1527,7 @@ read_primers_csv <- function(file) {
                         "mean_primer_efficiency", "primer_specificity")
     factor.fix.cols <- c("ID", "Identifier")
     p <- try(read.csv(file, stringsAsFactors = FALSE, row.names = NULL), silent = TRUE)
-    if (class(p) == "try-error") {
+    if (is(p, "try-error")) {
         msg <- paste0("The csv file: '", file, "' does not seem to represent a valid object of class 'Primers'",
                       " Please ensure the correct format of the file!")
         my.error("TemplateFormatIncorrect", msg)
@@ -1548,7 +1548,7 @@ read_primers_csv <- function(file) {
         }
     }
     p <- try(Primers(p), silent = TRUE)
-    if (class(p) == "try-error") {
+    if (is(p, "try-error")) {
         my.error("TemplateFormatIncorrect", 
             paste0("The loaded primer csv data from the file '",
                    file, "' did not represent a valid 'Primers' object.",

@@ -11,7 +11,7 @@
 nbr.of.repeats <- function(x) {
     # check for dinucleotide repeats, e.g. AT AT AT AT (max nbr of repeats: 4) x:
     # vector of primers (character)
-    if (length(x) == 0 || class(x) != "character") {
+    if (length(x) == 0 || !is(x, "character")) {
         return(NULL)
     }
     nts <- c("a", "c", "g", "t")

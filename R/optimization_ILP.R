@@ -579,7 +579,7 @@ optimize.ILP <- function(primer.df, template.df, settings, primer_conc,
             #### Tm.set[1:sample.size,]
             solution.data <- solve.ILP(cur.D, cur.G, cur.settings, 
                                        cur.cvg.matrix, timeout, required.cvg, Tm.set, template.df)
-            if (length(solution.data) == 0 || class(solution.data) == "try-error") {
+            if (length(solution.data) == 0 || is(solution.data, "try-error")) {
                 # optimization was not possible for some reason (most likely due to dimerization
                 # constraints)
                 data <- build.ILP.df(NULL, NULL, Tm.set, template.df, i, target.temp)

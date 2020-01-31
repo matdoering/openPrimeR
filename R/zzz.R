@@ -102,7 +102,7 @@ check.tool.function <- function(frontend = FALSE) {
             v <- strsplit(version, " ")[[1]]
             if (length(v) >= 2) {
                 nbr <- try(as.numeric(gsub("\\.", "", v[2])))
-                if (class(nbr) != "try-error") {
+                if (!is(nbr, "try-error")) {
                     if (nbr < 241) { # version smaller than 2.4.1
                         available.tools["ViennaRNA"] <- FALSE
                     }

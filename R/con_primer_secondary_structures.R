@@ -18,7 +18,7 @@ read.secondary.structure.raw <- function(fw.out) {
 	lines <- readLines(con)
     #lines <- try(suppressWarnings(readLines(con)), silent = TRUE)
     close(con)
-    if (class(lines) == "try-error" || length(lines) == 0) {
+    if (is(lines, "try-error") || length(lines) == 0) {
         return(data.frame(Structure = character(0), deltaG = numeric(0), 
             stringsAsFactors = FALSE))
     }

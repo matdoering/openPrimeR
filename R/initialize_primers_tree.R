@@ -26,7 +26,7 @@ align.seqs <- function(seqs, names) {
     }
     system(call)  #, ignore.stderr = TRUE) # cannot be called with suppressed output ..
     seq.ali <- try(seqinr::read.alignment(out.loc, format = "fasta"), silent = FALSE)
-    if (class(seq.ali) == "try-error") {
+    if (is(seq.ali, "try-error")) {
         # alignment not possible
         warning("MAFFT wasn't able to align the templates. Returning.")
         return(NULL)
@@ -112,7 +112,7 @@ score_degen <- function(seq, gap.char = "-") {
     if (length(seq) == 0) {
         return(NA)
     }
-    if (class(seq) != "list") {
+    if (!is(seq, "list")) {
         stop("'seq' should be a list of split characters.")
     }
     gapped.codemap <- IUPAC_CODE_MAP

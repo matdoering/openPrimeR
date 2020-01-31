@@ -299,7 +299,7 @@ call.melt.single <- function(primers, complements, out.file, primer_conc, na_sal
     results <- try(read.delim(text = raw.data, header = TRUE, 
                 stringsAsFactors = FALSE), silent = FALSE)
     # raw data is empty sometime. why if there's input -> melting fails i guess?
-    if (class(results) == "try-error") {
+    if (is(results, "try-error")) {
         warning("MELTING could not compute the Tm:\n", 
             "File: ", result.file, "\n", 
             attr(results, "condition"))

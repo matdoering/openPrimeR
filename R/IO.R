@@ -118,7 +118,7 @@ render_report <- function(params, report_template, out.file) {
         res <- try(rmarkdown::render(tempReport, output_file = out.file, 
             params = params, envir = new.env(parent = globalenv()),
             quiet = TRUE))
-        if (class(res) == "try-error") {
+        if (is(res, "try-error")) {
             warning("No PDF file was produced, please check the console output and whether all Latex dependencies are installed (Texlive available?).")
         }
     } else {
@@ -178,7 +178,7 @@ my.read.fasta <- function(fasta.file, NTs) {
 my_ggsave <- function(filename, plot = ggplot2::last_plot(), ...) {
    if (length(plot) != 0) {
         check <- try(suppressMessages(ggsave(filename = filename, plot = plot, ...)))
-        if (class(check) == "try-error") {
+        if (is(check, "try-error")) {
             # downgrade error to warning
             warning(attr(check, "condition") )
         }

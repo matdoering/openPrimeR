@@ -198,12 +198,12 @@ setMethod("[", c("Templates", "ANY", "ANY"),
         } else {
             df <- asS3(x)[i, j, ..., drop = drop]
         }
-        if (class(df) == "data.frame") {
+        if (is(df, "data.frame")) {
             # only set my class if we haven't simplified.
             #options("show.error.messages" = FALSE)
             t.df <- suppressWarnings(try(Templates(df), silent = TRUE))
             #options("show.error.messages" = TRUE)
-            if (class(t.df) == "try-error") {
+            if (is(t.df, "try-error")) {
                 # we removed some crucial columns -> No Templates object anymore.
                 t.df <- asS3(df)
             }
@@ -378,7 +378,7 @@ read_templates_csv <- function(fname) {
         stop("Templates CSV file at '", fname, "' could not be found.")
     }
     templates <- try(read.csv(fname, stringsAsFactors = FALSE, row.names = NULL), silent = TRUE)
-    if (class(templates) == "try-error") {
+    if (is(templates, "try-error")) {
         my.error("TemplateFormatIncorrect", 
             paste0("Could not read the input file: ",
             " '", fname, "' as a CSV. Please check your input!"))
@@ -399,7 +399,7 @@ read_templates_csv <- function(fname) {
     # set NA to empty string for character columns since "" is converted to NA by write.csv()
     templates[, c.cols][is.na(templates[, c.cols])] <- c("") 
     templates <- try(Templates(templates))
-    if (class(templates) == "try-error") {
+    if (is(templates, "try-error")) {
         my.error("TemplateFormatIncorrect", 
             paste0("Could not construct a 'Templates' object from the",
                 " CSV input file '", fname, "'. Please check that",
@@ -446,9 +446,9 @@ read_templates_single <- function(template.file, hdr.structure = NULL, delim = N
     template.df <- try(read_templates_fasta(template.file, hdr.structure, 
                        delim, id.column, rm.keywords, remove.duplicates, 
                        fw.region, rev.region, gap.character, run), silent = TRUE)
-    if (class(template.df) == "try-error") {
+    if (is(template.df, "try-error")) {
         template.df <- try(read_templates_csv(template.file), silent = TRUE)
-        if (class(template.df) == "try-error") {
+        if (is(template.df, "try-error")) {
             my.error("TemplateFormatIncorrect", 
                 paste0("Unsupported template input file type or error reading data for file: '", template.file, "'"))
         }    
@@ -593,7 +593,7 @@ read_templates_fasta <- function(fasta.file, hdr.structure = NULL, delim = NULL,
     rownames(d) <- NULL
     # annotate gene groups: try to parse IMGT header structure
     gene.groups <- try(parse.IMGT.gene.groups(d$Group))
-    if (class(gene.groups[1]) == "try-error") {
+    if (is(gene.groups[1], "try-error")) {
             gene.groups <- NULL
     }
     if (!is.null(gene.groups)) {

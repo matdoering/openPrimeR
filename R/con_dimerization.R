@@ -498,7 +498,7 @@ parse.oligo.results <- function(deltaG.file, struct.file) {
     time <- Sys.time()
     results <- try(read.delim(deltaG.file, header = TRUE, 
                 stringsAsFactors = FALSE), silent = TRUE)
-    if (class(results) == "try-error") {
+    if (is(results, "try-error")) {
         warning("Oligo error")
     }
     deltaG <- results[,2]
@@ -512,7 +512,7 @@ parse.oligo.results <- function(deltaG.file, struct.file) {
     }
     if (file.exists(struct.file)) {
         results <- try(readLines(struct.file), silent = TRUE)
-        if (class(results) == "try-error") {
+        if (is(results, "try-error")) {
             stop("OligoArrayAux: output not produced.")
         }
         last.split <- 1
