@@ -16,9 +16,11 @@
 #' @export
 #' @return Opens the openPrimeR tutorial in a web browser.
 #' @examples
+#' \dontrun{
 #' # Open the tutorial
 #' if (interactive()) {
 #' runTutorial()
+#' }
 #' }
 runTutorial <- function(dev = FALSE) {
     # n.b.: need to manually call to create html files to be included in pkg

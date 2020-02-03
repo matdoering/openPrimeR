@@ -818,8 +818,10 @@ check_constraints <- function(primer.df, template.df, settings,
 #' @return A list with objects of class \code{Primers}.
 #' @keywords internal
 #' @examples
+#' \dontrun{
 #' data(Comparison)
 #' eval.data <- check_constraints_comparison(primer.data[1:2], template.data[1:2], settings)
+#' }
 check_constraints_comparison <- function(primer.data, template.data, settings,
     active.constraints = names(constraints(settings)),
     to.compute.constraints = active.constraints, 
