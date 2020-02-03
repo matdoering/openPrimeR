@@ -1,6 +1,5 @@
 #' @rdname Data
 #' @name Data
-#' @name Comparison
 #' @usage data(Comparison)
 #'
 #' @aliases primer.data template.data
