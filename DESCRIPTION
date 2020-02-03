@@ -21,7 +21,7 @@ Depends:
     R (>= 4.0)
 License: GPL-2
 Encoding: UTF-8
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
 Imports:
     Biostrings (>= 2.38.4),
     XML (>= 3.98-1.4),
