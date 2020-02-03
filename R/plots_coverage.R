@@ -65,7 +65,7 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
         scale_colour_manual(values = colors)
 
     # decide whether to add some jitter
-    overplotted <- sapply(seq_len(nrow(plot.df)), function(x) any(plot.df$Set_Size[x] - plot.df$Set_Size[-x] == 0 && abs(plot.df$Coverage[x] - plot.df$Coverage[-x]) < 0.2))
+    overplotted <- sapply(seq_len(nrow(plot.df)), function(x) any(plot.df$Set_Size[x] - plot.df$Set_Size[-x] == 0 & abs(plot.df$Coverage[x] - plot.df$Coverage[-x]) < 0.2))
     if (any(overplotted)) {
         # there's overplotting of points -> add some jitter
         p <- p + geom_point(aes_string(fill = "Run", color = NULL), alpha = 0.65, pch=21, position = position_jitter(width = 0.35, height = 0.0))
