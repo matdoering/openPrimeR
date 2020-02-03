@@ -6,15 +6,12 @@
 \alias{Data}
 \alias{primer.data}
 \alias{template.data}
-\alias{Data}
-\alias{Data}
 \alias{template.df}
 \alias{primer.df}
 \alias{settings}
 \alias{RefCoverage}
 \alias{feature.matrix}
 \alias{ref.data}
-\alias{Data}
 \alias{Tiller}
 \alias{tiller.template.df}
 \alias{tiller.primer.df}

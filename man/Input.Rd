@@ -5,39 +5,48 @@
 \name{Input}
 \alias{Input}
 \alias{Templates-class}
-\alias{Input}
 \alias{Templates}
-\alias{Templates-class}
-\alias{Input}
 \alias{read_templates}
-\alias{Input}
 \alias{Primers-class}
-\alias{Input}
 \alias{Primers}
-\alias{Primers-class}
-\alias{Input}
 \alias{read_primers}
-\alias{Input}
-\alias{Input}
 \alias{read_settings}
 \title{Input Functionalities.}
 \usage{
 Templates(...)
 
-read_templates(fname, hdr.structure = NULL, delim = NULL,
-  id.column = NULL, rm.keywords = NULL, remove.duplicates = FALSE,
-  fw.region = c(1, 30), rev.region = c(1, 30), gap.char = "-",
-  run = NULL)
+read_templates(
+  fname,
+  hdr.structure = NULL,
+  delim = NULL,
+  id.column = NULL,
+  rm.keywords = NULL,
+  remove.duplicates = FALSE,
+  fw.region = c(1, 30),
+  rev.region = c(1, 30),
+  gap.char = "-",
+  run = NULL
+)
 
 Primers(...)
 
-read_primers(fname, fw.id = "_fw", rev.id = "_rev",
-  merge.ambig = c("none", "merge", "unmerge"), max.degen = 16,
-  template.df = NULL, adapter.action = c("warn", "rm"),
-  sample.name = NULL, updateProgress = NULL)
+read_primers(
+  fname,
+  fw.id = "_fw",
+  rev.id = "_rev",
+  merge.ambig = c("none", "merge", "unmerge"),
+  max.degen = 16,
+  template.df = NULL,
+  adapter.action = c("warn", "rm"),
+  sample.name = NULL,
+  updateProgress = NULL
+)
 
-read_settings(filename = list.files(system.file("extdata", "settings", package
-  = "openPrimeR"), pattern = "*.xml", full.names = TRUE), frontend = FALSE)
+read_settings(
+  filename = list.files(system.file("extdata", "settings", package = "openPrimeR"),
+    pattern = "*.xml", full.names = TRUE),
+  frontend = FALSE
+)
 }
 \arguments{
 \item{...}{A data frame fulfilling the structural requirements

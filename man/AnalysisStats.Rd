@@ -3,28 +3,37 @@
 %   R/plots_comparison.R, R/plots_coverage.R
 \name{AnalysisStats}
 \alias{AnalysisStats}
-\alias{AnalysisStats}
 \alias{get_cvg_ratio}
-\alias{AnalysisStats}
 \alias{get_comparison_table}
-\alias{AnalysisStats}
 \alias{get_cvg_stats_primer}
-\alias{AnalysisStats}
 \alias{get_cvg_stats}
 \title{Primer Analysis Statistics.}
 \usage{
-get_cvg_ratio(primer.df, template.df, allowed.mismatches = NULL,
-  cvg.definition = c("constrained", "basic"), mode.directionality = NULL,
-  as.char = FALSE)
+get_cvg_ratio(
+  primer.df,
+  template.df,
+  allowed.mismatches = NULL,
+  cvg.definition = c("constrained", "basic"),
+  mode.directionality = NULL,
+  as.char = FALSE
+)
 
 get_comparison_table(templates, primers, sample.name = NULL)
 
-get_cvg_stats_primer(primer.df, template.df, cvg.definition = c("constrained",
-  "basic"))
+get_cvg_stats_primer(
+  primer.df,
+  template.df,
+  cvg.definition = c("constrained", "basic")
+)
 
-get_cvg_stats(primers, templates, for.viewing = FALSE,
-  total.percentages = FALSE, allowed.mismatches = Inf,
-  cvg.definition = c("constrained", "basic"))
+get_cvg_stats(
+  primers,
+  templates,
+  for.viewing = FALSE,
+  total.percentages = FALSE,
+  allowed.mismatches = Inf,
+  cvg.definition = c("constrained", "basic")
+)
 }
 \arguments{
 \item{primer.df}{A \code{Primers} object containing the primers.}

@@ -4,60 +4,83 @@
 \name{Plots}
 \alias{Plots}
 \alias{plot_conservation}
-\alias{Plots}
 \alias{plot_primer_binding_regions}
-\alias{Plots}
-\alias{Plots}
 \alias{plot_constraint}
-\alias{Plots}
 \alias{plot_constraint_fulfillment}
-\alias{Plots}
 \alias{plot_cvg_constraints}
-\alias{Plots}
 \alias{plot_constraint_deviation}
-\alias{Plots}
 \alias{plot_cvg_vs_set_size}
-\alias{Plots}
 \alias{plot_penalty_vs_set_size}
-\alias{Plots}
 \alias{plot_primer_subsets}
-\alias{Plots}
 \alias{plot_primer}
-\alias{Plots}
 \alias{plot_template_cvg}
-\alias{Plots}
 \alias{plot_primer_cvg}
 \title{Plotting Functions.}
 \usage{
 plot_conservation(entropy.df, alignments, template.df, gap.char = "-")
 
-plot_primer_binding_regions(primers, templates, direction = c("both", "fw",
-  "rev"), group = NULL, relation = c("fw", "rev"),
-  region.names = c("Binding region", "Amplification region"), ...)
+plot_primer_binding_regions(
+  primers,
+  templates,
+  direction = c("both", "fw", "rev"),
+  group = NULL,
+  relation = c("fw", "rev"),
+  region.names = c("Binding region", "Amplification region"),
+  ...
+)
 
-plot_constraint(primers, settings,
-  active.constraints = names(constraints(settings)), ...)
+plot_constraint(
+  primers,
+  settings,
+  active.constraints = names(constraints(settings)),
+  ...
+)
 
-plot_constraint_fulfillment(primers, settings,
-  active.constraints = names(constraints(settings)), plot.p.vals = FALSE,
-  ...)
+plot_constraint_fulfillment(
+  primers,
+  settings,
+  active.constraints = names(constraints(settings)),
+  plot.p.vals = FALSE,
+  ...
+)
 
-plot_cvg_constraints(primers, settings,
-  active.constraints = names(cvg_constraints(settings)), ...)
+plot_cvg_constraints(
+  primers,
+  settings,
+  active.constraints = names(cvg_constraints(settings)),
+  ...
+)
 
-plot_constraint_deviation(primers, settings,
-  active.constraints = names(constraints(settings)), ...)
+plot_constraint_deviation(
+  primers,
+  settings,
+  active.constraints = names(constraints(settings)),
+  ...
+)
 
-plot_cvg_vs_set_size(primer.data, template.data, show.labels = TRUE,
-  highlight.set = NULL)
+plot_cvg_vs_set_size(
+  primer.data,
+  template.data,
+  show.labels = TRUE,
+  highlight.set = NULL
+)
 
-plot_penalty_vs_set_size(primer.data, settings,
-  active.constraints = names(constraints(settings)), alpha = 0)
+plot_penalty_vs_set_size(
+  primer.data,
+  settings,
+  active.constraints = names(constraints(settings)),
+  alpha = 0
+)
 
 plot_primer_subsets(primer.subsets, template.df, required.cvg = 1)
 
-plot_primer(primer.df, template.df, identifier = NULL, relation = c("fw",
-  "rev"), region.names = c("Binding region", "Amplification region"))
+plot_primer(
+  primer.df,
+  template.df,
+  identifier = NULL,
+  relation = c("fw", "rev"),
+  region.names = c("Binding region", "Amplification region")
+)
 
 plot_template_cvg(primers, templates, per.mismatch = FALSE, ...)
 
@@ -312,3 +335,4 @@ p.cvg.mm <- plot_primer_cvg(primer.df, template.df, per.mismatch = TRUE)
 data(Comparison)
 p.cvg.cmp <- plot_primer_cvg(primer.data[1:3], template.data[1:3])
 }
+\concept{templates}

@@ -48,7 +48,7 @@ This order is maintained when loading a \code{DesignSettings} object.}
 }
 
 \author{
-\strong{Maintainer}: Matthias Döring \email{mdoering@mpi-inf.mpg.de}
+\strong{Maintainer}: Matthias Döring \email{matthias-doering@gmx.de}
 
 Authors:
 \itemize{

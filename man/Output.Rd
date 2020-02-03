@@ -4,14 +4,9 @@
 \name{Output}
 \alias{Output}
 \alias{write_templates}
-\alias{Output}
 \alias{write_primers}
-\alias{Output}
 \alias{create_coverage_xls}
-\alias{Output}
 \alias{create_report}
-\alias{Output}
-\alias{Output}
 \alias{write_settings}
 \title{Output Functionalities.}
 \usage{
@@ -21,8 +16,15 @@ write_primers(primer.df, fname, ftype = c("FASTA", "CSV"))
 
 create_coverage_xls(primer.df, template.df, fname, settings)
 
-create_report(primers, templates, fname, settings, sample.name = NULL,
-  used.settings = NULL, ...)
+create_report(
+  primers,
+  templates,
+  fname,
+  settings,
+  sample.name = NULL,
+  used.settings = NULL,
+  ...
+)
 
 write_settings(settings, fname)
 }
@@ -133,7 +135,7 @@ out.file.comp <- tempfile("comparison_report", fileext = ".pdf")
 create_report(primer.data[sel.sets], template.data[sel.sets], out.file.comp, settings)
 
 # Store settings to disk
-xml <- settings.xml <- system.file("extdata", "settings", 
+xml <- system.file("extdata", "settings", 
        "C_Taq_PCR_high_stringency.xml", package = "openPrimeR")
 settings <- read_settings(xml)
 out.file <- tempfile("my_settings", fileext = ".xml")

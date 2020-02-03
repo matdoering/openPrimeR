@@ -4,20 +4,20 @@
 \name{Scoring}
 \alias{Scoring}
 \alias{score_conservation}
-\alias{Scoring}
-\alias{Scoring}
 \alias{score_degen}
-\alias{Scoring}
 \alias{score_primers}
 \title{Scoring Functions.}
 \usage{
-score_conservation(template.df, gap.char = "-", win.len = 30,
-  by.group = TRUE)
+score_conservation(template.df, gap.char = "-", win.len = 30, by.group = TRUE)
 
 score_degen(seq, gap.char = "-")
 
-score_primers(primer.df, settings,
-  active.constraints = names(constraints(settings)), alpha = 0.5)
+score_primers(
+  primer.df,
+  settings,
+  active.constraints = names(constraints(settings)),
+  alpha = 0.5
+)
 }
 \arguments{
 \item{template.df}{A \code{Templates} object providing the set of templates.}

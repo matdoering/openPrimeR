@@ -26,8 +26,10 @@ so please ensure that you've installed openPrimeR including
 all suggested dependencies.
 }
 \examples{
+\dontrun{
 # Open the tutorial
 if (interactive()) {
 runTutorial()
+}
 }
 }

@@ -3,24 +3,31 @@
 \name{TemplatesFunctions}
 \alias{TemplatesFunctions}
 \alias{update_template_cvg}
-\alias{TemplatesFunctions}
 \alias{adjust_binding_regions}
-\alias{TemplatesFunctions}
 \alias{assign_binding_regions}
-\alias{TemplatesFunctions}
 \alias{select_regions_by_conservation}
-\alias{TemplatesFunctions}
 \title{Template Functionalities.}
 \usage{
 update_template_cvg(template.df, primer.df, mode.directionality = NULL)
 
 adjust_binding_regions(template.df, region.fw, region.rev)
 
-assign_binding_regions(template.df, fw = NULL, rev = NULL,
-  optimize.region = FALSE, primer.length = 20, gap.char = "-")
+assign_binding_regions(
+  template.df,
+  fw = NULL,
+  rev = NULL,
+  optimize.region = FALSE,
+  primer.length = 20,
+  gap.char = "-"
+)
 
-select_regions_by_conservation(template.df, gap.char = "-", win.len = 30,
-  by.group = TRUE, mode.directionality = c("both", "fw", "rev"))
+select_regions_by_conservation(
+  template.df,
+  gap.char = "-",
+  win.len = 30,
+  by.group = TRUE,
+  mode.directionality = c("both", "fw", "rev")
+)
 }
 \arguments{
 \item{template.df}{An object of class \code{Templates}.}
@@ -112,9 +119,11 @@ the target binding regions.
 
 To specify uniform binding regions,
 \code{fw} and \code{rev} should be numeric intervals indicating the allowed
-binding range for primers in the templates. The \code{fw} interval is 
-specified with respect to the 5' end, while the \code{rev} interval is
-specified with respect to the template 3' end.
+binding range for primers in the templates. Setting the forward interval
+to (1,30) indicates that the first 30 bases should be used for forward primers
+and specifying the reverse interval to (1,30) indicates that the last
+30 bases should be used for reverse primer binding.
+
 If \code{optimize.region} is \code{TRUE}, the input binding region is
 adjusted such that regions forming secondary structures are avoided.
 }

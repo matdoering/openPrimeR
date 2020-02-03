@@ -4,10 +4,15 @@
 \alias{check_cvg_constraints}
 \title{Evaluation of Coverage Constraints.}
 \usage{
-check_cvg_constraints(primer.df, template.df, settings,
+check_cvg_constraints(
+  primer.df,
+  template.df,
+  settings,
   active.constraints = names(cvg_constraints(settings)),
-  to.compute.constraints = active.constraints, for.shiny = FALSE,
-  updateProgress = NULL)
+  to.compute.constraints = active.constraints,
+  for.shiny = FALSE,
+  updateProgress = NULL
+)
 }
 \arguments{
 \item{primer.df}{A \code{Primers} object containing the primers

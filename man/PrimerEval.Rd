@@ -5,31 +5,46 @@
 \name{PrimerEval}
 \alias{PrimerEval}
 \alias{check_restriction_sites}
-\alias{PrimerEval}
-\alias{PrimerEval}
 \alias{check_constraints}
-\alias{PrimerEval}
 \alias{filter_primers}
-\alias{PrimerEval}
 \alias{subset_primer_set}
-\alias{PrimerEval}
 \alias{primer_significance}
 \title{Primer Evaluation.}
 \usage{
-check_restriction_sites(primer.df, template.df, adapter.action = c("warn",
-  "rm"), selected = NULL, only.confident.calls = TRUE,
-  updateProgress = NULL)
+check_restriction_sites(
+  primer.df,
+  template.df,
+  adapter.action = c("warn", "rm"),
+  selected = NULL,
+  only.confident.calls = TRUE,
+  updateProgress = NULL
+)
 
-check_constraints(primer.df, template.df, settings,
+check_constraints(
+  primer.df,
+  template.df,
+  settings,
   active.constraints = names(constraints(settings)),
-  to.compute.constraints = active.constraints, for.shiny = FALSE,
-  updateProgress = NULL)
+  to.compute.constraints = active.constraints,
+  for.shiny = FALSE,
+  updateProgress = NULL
+)
 
-filter_primers(primer.df, template.df, settings,
-  active.constraints = names(constraints(settings)))
+filter_primers(
+  primer.df,
+  template.df,
+  settings,
+  active.constraints = names(constraints(settings))
+)
 
-subset_primer_set(primer.df, template.df, k = 1, groups = NULL,
-  identifier = NULL, cur.results.loc = NULL)
+subset_primer_set(
+  primer.df,
+  template.df,
+  k = 1,
+  groups = NULL,
+  identifier = NULL,
+  cur.results.loc = NULL
+)
 
 primer_significance(primer.df, set.name = NULL, active.constraints = NULL)
 }

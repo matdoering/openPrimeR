@@ -4,26 +4,45 @@
 \name{PrimerDesign}
 \alias{PrimerDesign}
 \alias{classify_design_problem}
-\alias{PrimerDesign}
-\alias{PrimerDesign}
 \alias{get_initial_primers}
-\alias{PrimerDesign}
 \alias{design_primers}
 \title{Primer Design Functionalities.}
 \usage{
-classify_design_problem(template.df, mode.directionality = c("both", "fw",
-  "rev"), primer.length = 18, primer.estimate = FALSE, required.cvg = 1)
+classify_design_problem(
+  template.df,
+  mode.directionality = c("both", "fw", "rev"),
+  primer.length = 18,
+  primer.estimate = FALSE,
+  required.cvg = 1
+)
 
-get_initial_primers(sample, template.df, primer.lengths,
+get_initial_primers(
+  sample,
+  template.df,
+  primer.lengths,
   mode.directionality = c("fw", "rev"),
-  allowed.region.definition = c("within", "any"), init.algo = c("naive",
-  "tree"), max.degen = 16, conservation = 1, updateProgress = NULL)
+  allowed.region.definition = c("within", "any"),
+  init.algo = c("naive", "tree"),
+  max.degen = 16,
+  conservation = 1,
+  updateProgress = NULL
+)
 
-design_primers(template.df, mode.directionality = c("both", "fw", "rev"),
-  settings, init.algo = c("naive", "tree"), opti.algo = c("Greedy", "ILP"),
-  required.cvg = 1, timeout = Inf, max.degen = 16, conservation = 1,
-  sample.name = NULL, cur.results.loc = NULL, primer.df = NULL,
-  updateProgress = NULL)
+design_primers(
+  template.df,
+  mode.directionality = c("both", "fw", "rev"),
+  settings,
+  init.algo = c("naive", "tree"),
+  opti.algo = c("Greedy", "ILP"),
+  required.cvg = 1,
+  timeout = Inf,
+  max.degen = 16,
+  conservation = 1,
+  sample.name = NULL,
+  cur.results.loc = NULL,
+  primer.df = NULL,
+  updateProgress = NULL
+)
 }
 \arguments{
 \item{template.df}{A \code{Templates} object containing the template

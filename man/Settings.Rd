@@ -3,66 +3,38 @@
 \docType{class}
 \name{Settings}
 \alias{Settings}
-\alias{Settings}
 \alias{ConstraintSettings}
 \alias{ConstraintSettings-class}
-\alias{Settings}
 \alias{CoverageConstraints}
 \alias{CoverageConstraints-class}
-\alias{Settings}
 \alias{ConstraintOptions}
 \alias{ConstraintOptions-class}
-\alias{Settings}
 \alias{PCR_Conditions}
 \alias{PCR_Conditions-class}
-\alias{Settings}
 \alias{DesignSettings}
 \alias{DesignSettings-class}
-\alias{Settings}
 \alias{constraints}
-\alias{Settings}
 \alias{constraints,DesignSettings-method}
-\alias{Settings}
 \alias{constraints,AbstractConstraintSettings-method}
-\alias{Settings}
 \alias{cvg_constraints}
-\alias{Settings}
 \alias{cvg_constraints,DesignSettings-method}
-\alias{Settings}
 \alias{PCR}
-\alias{Settings}
 \alias{PCR,DesignSettings-method}
-\alias{Settings}
 \alias{conOptions}
-\alias{Settings}
 \alias{conOptions,DesignSettings-method}
-\alias{Settings}
 \alias{constraintLimits}
-\alias{Settings}
 \alias{constraintLimits,DesignSettings-method}
-\alias{Settings}
 \alias{constraints<-}
-\alias{Settings}
 \alias{constraints<-,DesignSettings,list-method}
-\alias{Settings}
 \alias{constraints<-,AbstractConstraintSettings,list-method}
-\alias{Settings}
 \alias{cvg_constraints<-}
-\alias{Settings}
 \alias{cvg_constraints<-,DesignSettings-method}
-\alias{Settings}
 \alias{constraintLimits<-}
-\alias{Settings}
 \alias{constraintLimits<-,DesignSettings-method}
-\alias{Settings}
 \alias{PCR<-}
-\alias{Settings}
 \alias{PCR<-,DesignSettings-method}
-\alias{Settings}
 \alias{conOptions<-}
-\alias{Settings}
 \alias{conOptions<-,DesignSettings-method}
-\alias{Settings}
 \alias{parallel_setup}
 \title{Settings Functionalities.}
 \usage{
@@ -298,8 +270,7 @@ is not provided, a suitable annealing temperature is automatically computed usin
 \item{\code{Na_concentration}:}{The molar concentration of monovalent sodium ions.}
 \item{\code{Mg_concentration}:}{The molar concentration of divalent magnesium ions.}
 \item{\code{K_concentration}:}{The molar concentration of monovalent potassium ions.}
-\item{\code{Tris_concentration}:}{The molar concentration of the Tris(hydroxymethyl)-aminomethan buffer. 
-Note that this value is the buffer concentration. To determine corresponding Tris ion concentration, the value of the buffer concentration is halved.}
+\item{\code{Tris_concentration}:}{The molar concentration of the Tris(hydroxymethyl)-aminomethan buffer.}
 \item{\code{primer_concentration}:}{The molar concentration of the PCR primers.}
 \item{\code{template_concentration}:}{The molar concentration of the PCR templates.}
 }
@@ -587,4 +558,5 @@ parallel_setup(2)
 \code{\link{conOptions}} for accessing constraint options,
 \code{\link{PCR}} for accessing the PCR conditions.
 }
+\concept{settings functions}
 \keyword{Settings}
