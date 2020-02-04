@@ -77,13 +77,21 @@ get_constraint_deviation_data <- function(constraint.df, constraint.settings) {
     myfun <- function(value, con.name, constraint.settings) {
         con.name <- as.character(con.name)
         setting <- constraint.settings[[unique(con.name)]]
-        if ("min" %in% names(setting) && value < setting["min"]) {
-            return((value - setting["min"]) / abs(setting["min"]))
-        } else if ("max" %in% names(setting) && value > setting["max"]) {
-            return((value - setting["max"]) / abs(setting["max"]))
+        newValue = value
+        if ("min" %in% names(setting) && !"max" %in% names(setting)) {
+            newValue[value < setting["min"]] = (value - setting["min"]) / abs(setting["min"])
+            newValue[value >= setting["min"]] = 0
+        } else if ("max" %in% names(setting) && !"min" %in% names(setting)) {
+            newValue[value > setting["max"]] = (value - setting["max"]) / abs(setting["max"])
+            newValue[value <= setting["max"]] = 0
+        } else if ("min" %in% names(setting) && "max" %in% names(setting)) {
+            newValue[value < setting["min"]] = (value - setting["min"]) / abs(setting["min"])
+            newValue[value > setting["max"]] = (value - setting["max"]) / abs(setting["max"])
+            newValue[value >= setting["min"] & value <= setting["max"]] = 0
         } else {
-            return(0)
+            warning("Could not transform values to deviations because min/max was missing.")
         }
+        return(newValue)
     }
     df <- ddply(plot.df, c("ID", "Constraint", "Value"), here(summarize),            
                 Deviation = myfun(substitute(Value), substitute(Constraint), 
