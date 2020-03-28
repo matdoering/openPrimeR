@@ -1,6 +1,6 @@
 Package: openPrimeR
 Title: Multiplex PCR Primer Design and Analysis
-Version: 1.9.1
+Version: 1.9.2
 Authors@R: c(person("Matthias", "Döring", 
                     email = "matthias-doering@gmx.de", 
                     role = c("aut", "cre")),
@@ -21,7 +21,7 @@ Depends:
     R (>= 4.0)
 License: GPL-2
 Encoding: UTF-8
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Imports:
     Biostrings (>= 2.38.4),
     XML (>= 3.98-1.4),
