@@ -17,7 +17,8 @@
 \alias{tiller.primer.df}
 \alias{tiller.settings}
 \title{Data Sets.}
-\format{For the \code{RefCoverage} data set, the \code{feature.matrix} data frame contains the properties
+\format{
+For the \code{RefCoverage} data set, the \code{feature.matrix} data frame contains the properties
 of the primer set from Tiller et al. as well as a primer set
 that was designed by openPrimeR. The column \code{Experimental_Coverage}
 indicates the experimentally determined coverage, while the other
@@ -48,7 +49,8 @@ For the \code{Tiller} data set, \code{tiller.primer.df}
 provides a \code{Primers} object, \code{tiller.template.df} provides 
 the corresponding \code{Templates} object, and \code{tiller.settings} 
 provides the \code{DesignSettings} object that was used
-for evaluating \code{tiller.primer.df}.}
+for evaluating \code{tiller.primer.df}.
+}
 \usage{
 data(Comparison)
 
