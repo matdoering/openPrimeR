@@ -359,7 +359,7 @@ prepare_mm_plot <- function(primer.df, template.df,
                         Position_3prime = unlist(pos.3prime),
                         Position_3terminus = unlist(pos.worst),
                         Number_of_mismatches = unlist(nbr.mismatches),
-                        Coverage_Type = rep(cvg.def, length(template.groups)))
+                        Coverage_Type = as.factor(rep(cvg.def, length(template.groups))))
 		#print(df$Template)
         # if coverage criteria are available, also include these
         for (z in seq_along(cvg.criteria)) {
@@ -1162,7 +1162,7 @@ prepare_template_cvg_mm_data <- function(primer.df, template.df, allowed.mismatc
         available.data[[i]] <- df.a
     }
     available.df <- do.call(rbind, available.data)
-    available.df$Status <- "Available"
+    available.df$Status <- as.factor("Available")
     p.df <- rbind(plot.df[, !colnames(plot.df) %in% c("Primer", "Direction")], available.df)
     cvg.groups <- c("Coverage", "Basic Coverage")
     all.groups <- c(cvg.groups, "Available Templates")
@@ -1224,6 +1224,9 @@ plot_template_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
         template.df <- template.df[idx,]
     }
     plot.df <- prepare_template_cvg_mm_data(primer.df, template.df)
+    if (nrow(plot.df) == 0) {
+        return(NULL)
+    }
     # compute cvg ratio per mismatch setting to show in facet labels:
     cvg.per.mm <- ddply(plot.df, c("Maximal_mismatches", "Status"), here(summarize),
                            Coverage_Ratio = sum(substitute(Count)) / nrow(template.df)) 
