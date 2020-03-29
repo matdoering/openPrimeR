@@ -1066,9 +1066,12 @@ binding.interval.ungapped <- function(template.df, start, end, gap.char) {
 #' @param start Start positions.
 #' @param end End positions.
 #' @param gap.char The character for gaps in alignments.
+#' @param init.from.leader Whether the binding regions are initialized
+#'        from leader sequences.
 #' @return Data frame with information on allowed binding regions.
 #' @keywords internal
-retrieve.leader.region <- function(template.df, direction = c("fw", "rev"), start, end, gap.char) {
+retrieve.leader.region <- function(template.df, direction = c("fw", "rev"), start, end, gap.char,
+                                   init.from.leader) {
     if (length(start) == 0 || length(end) == 0) {
         return(NULL)
     }
@@ -1081,8 +1084,8 @@ retrieve.leader.region <- function(template.df, direction = c("fw", "rev"), star
         start <- rep(start, nrow(template.df))
         end <- rep(end, nrow(template.df))
     } # otherwise: regions are already ok in the input.
-    if (direction == "rev") {
-        # get reverse start and ends in absolute values:
+    if (direction == "rev" && !init.from.leader) {
+        # only for uniform binding regions: need to change the interpretation of rev positions
         ori.start <- start
         start <- nchar(template.df$InputSequence) - end + 1
         end <- nchar(template.df$InputSequence) - ori.start + 1
@@ -1228,8 +1231,8 @@ create.uniform.leaders <- function(fw.interval, rev.interval, template.df, gap.c
     } else if (length(rev.interval) > 1) {
         stop("Reverse binding region was no proper interval.")
     }
-    fw.leaders <- retrieve.leader.region(template.df, "fw", fw.interval[1], fw.interval[2], gap.char)
-    rev.leaders <- retrieve.leader.region(template.df, "rev", rev.interval[1], rev.interval[2], gap.char)
+    fw.leaders <- retrieve.leader.region(template.df, "fw", fw.interval[1], fw.interval[2], gap.char, FALSE)
+    rev.leaders <- retrieve.leader.region(template.df, "rev", rev.interval[1], rev.interval[2], gap.char, FALSE)
     if (length(fw.leaders) == 0) {
         result <- rev.leaders
     } else if (length(rev.leaders) == 0) {
@@ -1518,7 +1521,7 @@ get.leader.exon.regions.single <- function(l.seq, lex.seq,
         warn.msg <- paste(warn.msg, paste(template.df$ID[idx], collapse = "\n", sep = ""))
         my.warning("LeadersNotFound", warn.msg)
     }
-    final.df <- retrieve.leader.region(template.df, direction, leader.s, leader.e, gap.char) # retrieve leader region: overwrites values of other directions
+    final.df <- retrieve.leader.region(template.df, direction, leader.s, leader.e, gap.char, TRUE) # retrieve leader region: overwrites values of other directions
     final.df <- cbind(final.df, "TemplateIdentifier" = template.df$Identifier)
     if (FALSE) {
         if (any(leader.s.ok)) {
