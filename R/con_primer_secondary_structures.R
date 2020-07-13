@@ -54,7 +54,6 @@ read.secondary.structure.raw <- function(fw.out) {
 #' @keywords internal
 compute.structure.vienna <- function(seqs, annealing.temperature, 
                                     folding.constraints = NULL, id = "") {
-    
     if (length(annealing.temperature) != 1) {
         stop("Can only call viennaRNA with a single annealing temperature!")
     }
@@ -72,12 +71,10 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     # we removed --noLP here, too slow now?
     param.string <- paste("--temp", annealing.temperature, "--noconv", "--noPS")
 	input.file <- tempfile(pattern = id, fileext = ".txt")
-    out.file <- paste0(input.file, "_out")
+    out.file <- paste0("tmp_out_", basename(input.file))  # cannot store in tempdir due to ViennaRNA
 	# clean up result files (prevents viennaRNA possibly appending to existing files)
-    ##############################
-    # removed the cleanup here: test if macOS vignette building works like this ('.fold' file removed too soon?)
 	on.exit({
-		if (file.exists(out.file)) { # remove the .fold file
+	    if (file.exists(out.file)) { # remove the .fold file
 			file.remove(out.file)
 		}
         if (file.exists(input.file)) { # remove the .txt file
@@ -102,15 +99,9 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     }
     if (length(folding.constraints) != 0) {
         # -C: necessary for having constraints
-        # --filename-delim: for MacOS -> data/out.txt isn't changed to data_out.txt by forcing to use '/' for sanitizing file names
         param.string <- paste(param.string, "-C", "--batch")
     }
-    # ensure that the right delim is used
-    param.string <- paste(param.string, "--filename-delim=/")
-    #print("VIENNARNA:")
-    #print(rna.fold)
-    #print(param.string)
-    #print(file.string)
+
 	cmd.status <- system2(rna.fold, args = c(param.string, file.string), wait = TRUE)
     if (cmd.status != 0) {
         call <- paste0(rna.fold, " ", param.string, " ", file.string)
@@ -126,13 +117,13 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     }
 	#########################
 	if (file.exists(out.file)) {
-		result <- read.secondary.structure.raw(out.file)
-	} else {
-        stop("ViennaRNA (RNAfold) did not create the expected output file: '", 
-            out.file, "'") 
+		  result <- read.secondary.structure.raw(out.file)
+    } else {
+        stop("ViennaRNA (RNAfold) did not create the expected output file: '", out.file, "'")
 	}
     return(result)
 }
+
 #' Secondary Structure Computations.
 #'
 #' Computes the secondary structures of the input primers using ViennaRNA.
