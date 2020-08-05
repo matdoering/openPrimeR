@@ -75,15 +75,12 @@ check.tool.installation <- function(frontend = FALSE) {
 check.tool.function <- function(frontend = FALSE) {
     available.tools <- check.tool.installation(frontend)
     # check for oligoArrayAux
-    if (available.tools["OligoArrayAux"] && Sys.getenv("UNAFOLDDAT") == "") {
-        available.tools["OligoArrayAux"] <- FALSE
-        warning("Please define the UNAFOLDDAT variable in your path before using OligoArrayAux.")
-    } else if (available.tools["OligoArrayAux"] && Sys.getenv("UNAFOLDDAT") != "") {
+    if (available.tools["OligoArrayAux"]) {
         out <- system("hybrid-min -n DNA -t 50 -T 50 -N 0.05 -E -q ACAGGTGCCCACTCCCAGGTGCAG CTGCACCTGGGAGTGGGCACCTGT", 
                     intern = FALSE, ignore.stdout = TRUE)
        if (out != 0) {
             # there was an error
-            warning("oligoArrayAux failed checks: disabled. ")
+            warning("oligoArrayAux failed checks: disabled. Do you have the UNAFOLDDAT environment variable set?")
             available.tools["OligoArrayAux"] <- FALSE
         }
     }
@@ -104,15 +101,19 @@ check.tool.function <- function(frontend = FALSE) {
                 nbr <- try(as.numeric(gsub("\\.", "", v[2])))
                 if (!is(nbr, "try-error")) {
                     if (nbr < 241) { # version smaller than 2.4.1
+                        warning("ViennaRNA had version < 2.4.1. Disabling ViennaRNA.")
                         available.tools["ViennaRNA"] <- FALSE
                     }
                 } else {
+                    warning("ViennaRNA version unknown. Disabling.")
                     available.tools["ViennaRNA"] <- FALSE # unknown version
                 }
             } else {
+                warning("ViennaRNA version unknown. Disabling")
                 available.tools["ViennaRNA"] <- FALSE # unknown version
             }
         } else {
+            warning("ViennaRNA version unknown. Disabling")
             available.tools["ViennaRNA"] <- FALSE # could not get version info
         }
     }
@@ -156,8 +157,6 @@ copy.melt.config <- function(melt.bin = NULL) {
 }
 # actions to be performed when loading the package namespace
 .onLoad <- function(libname, pkgname) {
-    # copy melting config file if required
-    #copy.melt.config() # not necessary anymore
     ################
     # Define package options
     #######
@@ -169,6 +168,7 @@ copy.melt.config <- function(melt.bin = NULL) {
     # order in which constraints are relaxed (start with least important constraint)
     relax.order <- c("primer_length", "primer_coverage", "no_repeats", "no_runs", "gc_clamp", "primer_specificity", "secondary_structure", "self_dimerization", "cross_dimerization", "gc_ratio", "melting_temp_range", "melting_temp_diff")
     available.constraints <- select.constraints(con.order) # select constraints that can be computed by installed software
+    # message("Available constraints:", available.constraints)
     con.order <- con.order[con.order %in% available.constraints]
     relax.order <- relax.order[relax.order %in% available.constraints]
     plot.colors <- c("Constraint" = "Set1", "Group" = "Set2", 
