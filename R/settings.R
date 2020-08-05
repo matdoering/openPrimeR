@@ -161,7 +161,6 @@ setMethod("show", "DesignSettings", function(object) {
     opt.result <- list("Active" = opt.tab, "Inactive" = inactive.options)
     out <- list("Constraints" = con.result, "Coverage Constraints" = cvg.con.result,
                 "PCR conditions" = PCR.result, "Options" = opt.result)
-    print(out)
 })
 
 setMethod("initialize", "DesignSettings",
@@ -1587,12 +1586,15 @@ select.constraints <- function(active.constraints) {
     vienna.constraints <- c("secondary_structure")
     oligo.constraints <- c("primer_efficiency", "self_dimerization", "cross_dimerization", "annealing_DeltaG", "coverage_model")
     if (!melting.available) {
+        message("Melting not available")
         rm.constraints <- c(rm.constraints, melting.constraints)
     }
     if (!vienna.available) {
+        message("ViennaRNA not available")
         rm.constraints <- c(rm.constraints, vienna.constraints)
     }
     if (!oligo.available) {
+        message("OligoArrayAux not available")
         rm.constraints <- c(rm.constraints, oligo.constraints)
     }
     ignore.constraints <- intersect(active.constraints, rm.constraints)
