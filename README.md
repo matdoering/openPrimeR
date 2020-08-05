@@ -15,6 +15,7 @@ most suitable set by performing comparative analyses. The R package includes a S
 provides a comprehensive and intuitive user interface for the core functionalites of the package.
 
 ## More information
+There is a [Conda repository for openPrimeR available](https://anaconda.org/bioconda/bioconductor-openprimer/badges).
 For more information on how to install openPrimeR, we refer to the corresponding [user-space repository](https://github.com/matdoering/openPrimeR-User), which provides several installation routines.
 
 ## Changelog
