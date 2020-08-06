@@ -16,7 +16,17 @@ provides a comprehensive and intuitive user interface for the core functionalite
 
 ## More information
 There is a [Conda repository for openPrimeR available](https://anaconda.org/bioconda/bioconductor-openprimer/badges).
-For more information on how to install openPrimeR, we refer to the corresponding [user-space repository](https://github.com/matdoering/openPrimeR-User), which provides several installation routines.
+A [Docker container](https://hub.docker.com/r/mdoering88/openprimer/) for running openPrimeR/openPrimeRui is available. Usage:
+
+```
+docker pull mdoering88/openprimer
+# for openPrimeRui
+docker run -rm -p 3838:3838 mdoering88/openPrimeR
+# to work with openPrimeR via the CLI
+docker run -rm -it mdoering88/openPrimeR bash
+```
+
+For more information on how to install openPrimeR, we refer to the corresponding [user-space repository](https://github.com/matdoering/openPrimeR-User), which provides installation routines.
 
 ## Changelog
 
