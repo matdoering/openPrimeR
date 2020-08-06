@@ -71,7 +71,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
     # we removed --noLP here, too slow now?
     param.string <- paste("--temp", annealing.temperature, "--noconv", "--noPS")
 	input.file <- tempfile(pattern = id, fileext = ".txt")
-    out.file <- paste0("tmp_out_", basename(input.file))  # cannot store in tempdir due to ViennaRNA
+    out.file <- paste0(pattern = paste0("out_", id), fileext = ".txt")
 	# clean up result files (prevents viennaRNA possibly appending to existing files)
 	on.exit({
 	    if (file.exists(out.file)) { # remove the .fold file
@@ -81,7 +81,7 @@ compute.structure.vienna <- function(seqs, annealing.temperature,
             file.remove(input.file) 
         }
 	})
-	file.string <- paste0("--infile=", input.file, " --outfile=", out.file)
+	file.string <- paste0("--infile=", input.file, " >", out.file)
     seqs <- toupper(seqs)
     if (length(folding.constraints) != 0) {
         # add constraints to input file for viennaRNA 
