@@ -21,9 +21,9 @@ A [Docker container](https://hub.docker.com/r/mdoering88/openprimer/) for runnin
 ```
 docker pull mdoering88/openprimer
 # for openPrimeRui
-docker run -rm -p 3838:3838 mdoering88/openPrimeR
+docker run -rm -p 3838:3838 mdoering88/openprimer
 # to work with openPrimeR via the CLI
-docker run -rm -it mdoering88/openPrimeR bash
+docker run -rm -it mdoering88/openprimer bash
 ```
 
 For more information on how to install openPrimeR, we refer to the corresponding [user-space repository](https://github.com/matdoering/openPrimeR-User), which provides installation routines.
