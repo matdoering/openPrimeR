@@ -273,6 +273,11 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
 		message("#####\n# (BOTH) Aggregating results\n#####")
         opti.fw <- optimal.primer.data.fw$all_results # base consideration of templates on the best set from the 'fw' run
         opti.rev <- optimal.primer.data.rev$all_results
+
+        # ensure that fw/rev have the same Tm entries
+        Tms <- intersect(names(opti.fw), names(opti.rev))
+        opti.fw <- opti.fw[Tms]
+        opti.rev <- opti.rev[Tms]
         if ("melting_temp_diff" %in% names(constraints(settings))) {
             # match fw and rev primers for melting temps if melting temp diff is active
             # matching of sets should be improved ...?
@@ -280,7 +285,7 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
             allowed.diff.rev <- max(sapply(optimal.primer.data.fw$all_used_constraints, function(x) constraints(x)$melting_temp_diff))
             allowed.diff <- max(c(allowed.diff.fw, allowed.diff.rev))
             fw.tm <- as.numeric(names(opti.fw))
-            rev.tm <- unlist(lapply(seq_along(optimal.primer.data.rev$all_results), function(x) mean(optimal.primer.data.rev$all_results[[x]][,"melting_temp"], na.rm= TRUE)))
+            rev.tm <- as.numeric(names(opti.rev))
             # create a matrix indicating whether the i-th forward set is compatible with the j-th reverse set
             compatible <- do.call(rbind, lapply(fw.tm, function(x) abs(x - rev.tm) < allowed.diff))
             compatible.df <- data.frame(which(compatible, arr.ind = TRUE))
@@ -383,15 +388,6 @@ select.best.primer.set <- function(stats) {
 #' as well as the combined data frames themselves.
 #' @keywords internal
 evaluate.fw.rev.combinations <- function(opti.fw, opti.rev, compatible.df, template.df) {
-    # given optimized fw and rev primers with corresponding target temperatures,
-    # determines properties of the corresponding sets
-    # opti.fw: list with data frames giving fw optimized primers opti.rev: list with
-    # data frames giving rev optimized primers template.df: templates
-    if (length(opti.fw) != length(opti.rev)) {
-        stop("Forward/reverse primer sets did not correspond to each other.
-            Number of fw primer sets: ", length(opti.fw), "\n",
-            "Number of rev primer sets: ", length(opti.rev))
-    }
     stat.df <- vector("list", nrow(compatible.df)) # stats of compatible sets
     # select compatible combinations of sets via the indices
     primer.sets <- vector("list", length(opti.fw))
