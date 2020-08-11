@@ -366,6 +366,9 @@ select.primers.by.cvg <- function(primers, settings, template.df, mode.direction
     }
     opti.results <- lapply(opti.results.data, function(x) x$data)  # extract optimized sets
     names(opti.results) <- Tm.group.df$target_Tm # uses the target Tm's before relaxation
+    # remove empty results
+    opti.results <- opti.results[lengths(opti.results) != 0]
+
     best.idx <- select.best.opti.result(opti.results, template.df)
     if (length(best.idx) == 0) {
         # could not determine a solution, arbitrarily return the first opti.result
