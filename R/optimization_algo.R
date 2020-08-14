@@ -264,7 +264,6 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
         rev.required.cvg <- min(length(cvg.idx) / required.nbr, 1) # update required cvg to the new value considering only the already-covered templates
         rev.template.df <- template.df[cvg.idx[order(cvg.idx)],] # update template data frame to retain only the already covered templates
         primers.fw <- optimal.primer.data.fw$all_results  # arg for cross dimerization considerations between fw/rev primers
-        #print(target.temps)
 		message("#####\n# (REV) Primer design for reverse primers\n#####")
         optimal.primer.data.rev <- design_primers.single(rev.template.df, sample.name, "rev", 
             settings, timeout, opti.algo, allowed.region.definition, init.algo,
@@ -274,10 +273,13 @@ design_primers <- function(template.df, mode.directionality = c("both", "fw", "r
         opti.fw <- optimal.primer.data.fw$all_results # base consideration of templates on the best set from the 'fw' run
         opti.rev <- optimal.primer.data.rev$all_results
 
-        # ensure that fw/rev have the same Tm entries
-        Tms <- intersect(names(opti.fw), names(opti.rev))
-        opti.fw <- opti.fw[Tms]
-        opti.rev <- opti.rev[Tms]
+        if ("melting_temp_diff" %in% names(opti(settings))) {
+            # ensure that fw/rev have the same Tm entries.
+            # if melting temp diff is not active, the names will be NA, so we don't care.
+            Tms <- intersect(names(opti.fw), names(opti.rev))
+            opti.fw <- opti.fw[Tms]
+            opti.rev <- opti.rev[Tms]
+        }
         if ("melting_temp_diff" %in% names(constraints(settings))) {
             # match fw and rev primers for melting temps if melting temp diff is active
             # matching of sets should be improved ...?
@@ -983,8 +985,6 @@ create.Tm.brackets <- function(primers, template.df, settings, target.temps = NU
         # the melting temp range doesn't need to be computed in this case
         # no adjustment of groups necessary
     }
-    #print("Tm brackets: primer Tms:")
-    #print(primers$melting_temp) # check whether all have a melting temperature
     return(list(group_idx = group.assignment, df = group.df, primers = primers))
 }
 #' Cross-Dimerization Filtering
@@ -1072,10 +1072,6 @@ compute.Tm.sets <- function(primer.df, template.df, Tm.brackets, settings, mode.
     if (length(mode.directionality) == 0) {
         stop("Please supply the 'mode.directionality' arg.")
     }
-    #print("compute.Tm.sets: nrow is:")
-    #print(nrow(primer.df))
-    #print("compute.Tm.sets: nrow is:")
-    #print(nrow(primer.df))
     mode.directionality <- match.arg(mode.directionality) 
     # load initial settings:
     opti.constraints <- opti(settings)
@@ -1114,9 +1110,6 @@ compute.Tm.sets <- function(primer.df, template.df, Tm.brackets, settings, mode.
         } else {
             cur.sel <- seq_len(nrow(primer.df))  # select all
         }
-        #print("current selection:")
-        #print(cur.sel)
-         # message(paste('Available primers in Tm set:', length(cur.sel), sep = '')) no
         # available primers for current temp
         Tm.set <- primer.df[cur.sel, ]
         message("Melting temperature set @ ", target.temps[i], " with ",
