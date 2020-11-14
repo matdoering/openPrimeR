@@ -1,6 +1,6 @@
 Package: openPrimeR
 Title: Multiplex PCR Primer Design and Analysis
-Version: 1.11.5
+Version: 1.12.1
 Authors@R: c(person("Matthias", "Döring", 
                     email = "matthias-doering@gmx.de", 
                     role = c("aut", "cre")),
@@ -18,10 +18,10 @@ Description: An implementation of methods for designing, evaluating,
     are selected. A Shiny app providing a user interface for the functionalities
     of this package is provided by the 'openPrimeRui' package.
 Depends:
-    R (>= 4.0)
+    R (>= 4.0.0)
 License: GPL-2
 Encoding: UTF-8
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Imports:
     Biostrings (>= 2.38.4),
     XML (>= 3.98-1.4),
