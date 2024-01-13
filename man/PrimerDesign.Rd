@@ -151,12 +151,6 @@ of covered templates using the smallest possible number of primers.
 The algorithm tries to ensure that the designed set of primers 
 achieves a coverage ratio not lower than \code{required.cvg}.
 To this end, the constraints for designing primers may be relaxed.}
-\item{\code{classify_design_problem}}{Uses reference beta distributions
-of primer coverage ratios to classify a primer design task into 
-groups ranging from \emph{easy} to \emph{hard}. For \emph{easy} tasks, 
-it should not be a problem to design a small primer set. For
-\emph{hard} tasks, however, a small set of primers may not be
-achievable.}
 \item{\code{get_initial_primers}}{Creates a set of primer candidates 
 based on the input template sequences. This set of primers can 
 be used to create custom primer design algorithms.}
@@ -218,13 +212,6 @@ the multiple alignment program MAFFT
 (http://mafft.cbrc.jp/alignment/software/).
 }
 \examples{
-
-# Classify the difficulty of a primer design task
-data(Ippolito)
-design.estimate <- classify_design_problem(template.df[1:30,])
-# Estimate the number of required primers to amplify the first 5 templates
-design.estimate.nbr <- classify_design_problem(template.df[1:5,], mode.directionality = "fw",
-                         primer.length = 20, primer.estimate = TRUE)
 
 data(Ippolito)
 # Naive primer initialization

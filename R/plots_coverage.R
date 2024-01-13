@@ -51,7 +51,7 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
     }))
     #print(fulfilled.rate)
     plot.df$Constraint_Fulfillment_Rate <- fulfilled.rate
-    p <- ggplot(plot.df, aes_string(x = "Set_Size", y = "Coverage", size = "Constraint_Fulfillment_Rate"), key = substitute(Run)) + 
+    p <- ggplot(plot.df, aes(x = .data[["Set_Size"]], y = .data[["Coverage"]], size = .data[["Constraint_Fulfillment_Rate"]]), key = substitute(Run)) + 
     # trans = scales::probability_trans("exp")
         scale_radius(limits = c(0,1), range = c(1,10),
             labels = scales::percent, 
@@ -68,12 +68,12 @@ plot_cvg_vs_set_size <- function(primer.data, template.data, show.labels = TRUE,
     overplotted <- sapply(seq_len(nrow(plot.df)), function(x) any(plot.df$Set_Size[x] - plot.df$Set_Size[-x] == 0 & abs(plot.df$Coverage[x] - plot.df$Coverage[-x]) < 0.2))
     if (any(overplotted)) {
         # there's overplotting of points -> add some jitter
-        p <- p + geom_point(aes_string(fill = "Run", color = NULL), alpha = 0.65, pch=21, position = position_jitter(width = 0.35, height = 0.0))
+        p <- p + geom_point(aes(fill = .data[["Run"]], color = NULL), alpha = 0.65, pch=21, position = position_jitter(width = 0.35, height = 0.0))
     } else {
-        p <- p + geom_point(aes_string(fill = "Run", color = NULL), alpha = 0.65, pch=21)
+        p <- p + geom_point(aes(fill = .data[["Run"]], color = NULL), alpha = 0.65, pch=21)
     }
     if (show.labels) {
-        p <- p + geom_text(aes_string(label = "Run",
+        p <- p + geom_text(aes(label = .data[["Run"]],
                   hjust = 0, vjust = 0), check_overlap = TRUE, size = 3) 
     }
     if (length(highlight.set) != 0) {
@@ -113,7 +113,7 @@ plot_penalty_vs_set_size <- function(primer.data, settings,
     pal <- getOption("openPrimeR.plot_colors")["Run"] # the RColorBrewer palette to use
     colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(plot.df[, "Run"])))
     # determine rate of constraint fulfillment:
-    p <- ggplot(plot.df, aes_string(x = "Set_Size", y = "Penalty", fill = "Run", group = "Run")) + 
+    p <- ggplot(plot.df, aes(x = .data[["Set_Size"]], y = .data[["Penalty"]], fill = .data[["Run"]], group = .data[["Run"]])) + 
         geom_boxplot() + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
         xlab("Number of primers") +
@@ -124,6 +124,7 @@ plot_penalty_vs_set_size <- function(primer.data, settings,
    return(p)
 }
 
+#' @export
 cbind.fill <- function(...){
     nm <- list(...) 
     nm <- lapply(nm, as.matrix)
@@ -615,8 +616,8 @@ plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
     p <- ggplot() + 
     # add bars for individual cvg
         geom_bar(data = single.df, stat = 'identity', 
-                aes_string(x = "Set_Size", y = "Single_Coverage", 
-                           fill = "ID", colour = "Type"), 
+                aes(x = .data[["Set_Size"]], y = .data[["Single_Coverage"]], 
+                           fill = .data[["ID"]], colour = .data[["Type"]]), 
                 alpha = 0.80) +
         scale_color_manual(values=c("Individual"= NA, "Overall" = "grey30"),
             guide = ggplot2::guide_legend(override.aes = list(linetype = c(0, 1), 
@@ -624,9 +625,9 @@ plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
                                 colour = c(NA, "grey20")),
                                 title = "Coverage type")) +
         scale_fill_manual(values = colors) +
-        geom_point(data = subset.df, size = 1.5, aes_string(x = "Set_Size", y = "Coverage", colour = "Type"))  +
-        geom_line(data = subset.df, size = 1, aes_string(x = "Set_Size", 
-                  y = "Coverage", colour = "Type")) +
+        geom_point(data = subset.df, size = 1.5, aes(x = .data[["Set_Size"]], y = .data[["Coverage"]], colour = .data[["Type"]]))  +
+        geom_line(data = subset.df, size = 1, aes(x = .data[["Set_Size"]], 
+                  y = .data[["Coverage"]], colour = .data[["Type"]])) +
         xlab("Subset size") + ylab("Coverage of templates") + 
         ggtitle("Primer subset coverage") + 
         scale_y_continuous(labels = scales::percent, 
@@ -637,7 +638,7 @@ plot_primer_subsets <- function(primer.subsets, template.df, required.cvg = 1) {
         theme(axis.text.x = element_text(angle = 60, hjust = 1))
     if (length(unique(single.df$ID)) > 30) {
         # don't show individual primer legend if nbr of primers exceeds 30
-        p <- p + guides(fill = FALSE)
+        p <- p + guides(fill = "none")
     }
     return(p)
 }
@@ -940,18 +941,18 @@ plot_primer <- function(primer.df, template.df, identifier = NULL,
         # need show.legend = FALSE for the segment, otherwise arrow shows
         geom_segment(data = primer.data, show.legend = FALSE,
             lineend = "butt", size = arrow.size,  
-            aes_string(x = "x_start", xend = "x_end", y = "y", 
-                       yend = "y", colour = "Type"),
+            aes(x = .data[["x_start"]], xend = .data[["x_end"]], y = .data[["y"]], 
+                       yend = .data[["y"]], colour = .data[["Type"]]),
             arrow = arrow(angle = arrow.angle, ends = "last", type = "closed")) + 
              geom_segment(data = template.data, 
-                     aes_string(x = "x_start", xend = "x_end", 
-                                y = "y", yend = "y", colour = "Type"), 
+                     aes(x = .data[["x_start"]], xend = .data[["x_end"]], 
+                                y = .data[["y"]], yend = .data[["y"]], colour = .data[["Type"]]), 
                     lineend = "square", size = segment.size) + 
 
         # x-axis rectangles to annotate binding/amplification region:
         geom_rect(data = region.df, 
-            mapping = aes_string(xmin="xmin", xmax="xmax", 
-                        ymin="ymin", ymax="ymax"), 
+            mapping = aes(xmin=.data[["xmin"]], xmax=.data[["xmax"]], 
+                        ymin=.data[["ymin"]], ymax=.data[["ymax"]]), 
             fill = r.colors, alpha = 0.5,
             colour = "#3d3835", 
             size = segment.size) +
@@ -968,7 +969,7 @@ plot_primer <- function(primer.df, template.df, identifier = NULL,
                             breaks = x.ticks,
                             labels = x.labels) + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-        geom_vline(data = region.df, aes_string(xintercept = "RelStartPosition"), colour = "red") + # start of binding region
+        geom_vline(data = region.df, aes(xintercept = .data[["RelStartPosition"]]), colour = "red") + # start of binding region
         geom_vline(xintercept = -1, colour = "red") + 
         #scale_y_continuous(limits = c(1, max(d$y, na.rm = TRUE)), 
         scale_y_continuous(
@@ -1006,7 +1007,7 @@ plot.excluded.hist <- function(excluded.df, filtered.stats, template.df) {
     tit <- "Excluded primer coverage"
     plot.df <- excluded.df
     plot.df$Filter_Reason <- factor(plot.df$Exclusion_Reason, levels = unique(filtered.stats$Constraint))
-    ggplot(plot.df, aes_string(x = "Filter_Reason", y = "Coverage_Ratio", colour = "Coverage_Ratio")) + 
+    ggplot(plot.df, aes(x = .data[["Filter_Reason"]], y = .data[["Coverage_Ratio"]], colour = .data[["Coverage_Ratio"]])) + 
         ylab(ylab) + xlab(xlab) + ggtitle(tit) + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
         scale_colour_gradient(name = "Coverage") + 
@@ -1121,7 +1122,7 @@ plot_template_cvg_unstratified <- function(primers, templates, groups = NULL) {
     cols.2 <- brewer.pal(8, "Blues")[3]
     colors <- c(cols.2, cols.1)
     names(colors) <- levels(plot.df$Status)
-    p <- ggplot(plot.df) + geom_bar(aes_string(x = "Group", y = "Count", fill = "Status"), stat = "identity", 
+    p <- ggplot(plot.df) + geom_bar(aes(x = .data[["Group"]], y = .data[["Count"]], fill = .data[["Status"]]), stat = "identity", 
         position = "dodge") + xlab(xlab) + ggtitle(title) + 
         ylab(ylab) + 
         theme(axis.text.x = element_text(
@@ -1241,7 +1242,7 @@ plot_template_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
     colors <- c(cols.1[1], cols.2, cols.1[2])
     names(colors) <- levels(plot.df$Status)
     p <- ggplot(plot.df) + 
-        geom_bar(aes_string(x = "Group", y = "Count", fill = "Status"),
+        geom_bar(aes(x = .data[["Group"]], y = .data[["Count"]], fill = "Status"),
                  position = "dodge", stat = "identity") + 
         xlab(xlab) + ggtitle(title) + 
         ylab(ylab) + 
@@ -1358,7 +1359,7 @@ plot_template_cvg_comparison_unstratified <- function(primers, templates, highli
     }
     plot.df$Label <- ifelse(is.na(labels), "", paste0(round(labels * 100, 1), "%"))
 
-    p <- ggplot(plot.df, aes_string(x = "Run", y = "Coverage_Ratio", fill = "Group")) + 
+    p <- ggplot(plot.df, aes(x = .data[["Run"]], y = .data[["Coverage_Ratio"]], fill = .data[["Group"]])) + 
         geom_bar(stat = "identity") + 
         theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
         scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
@@ -1430,7 +1431,7 @@ plot_template_cvg_comparison_mismatch <- function(primers, templates,
     }
     pal <- getOption("openPrimeR.plot_colors")["Group"] # the RColorBrewer palette to use
     colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(plot.df$Group)))
-    p <- ggplot(plot.df, aes_string(x = "Run", y = "Coverage_Ratio", fill = "Group", group = "Group")) + 
+    p <- ggplot(plot.df, aes(x = .data[["Run"]], y = .data[["Coverage_Ratio"]], fill = .data[["Group"]], group = .data[["Group"]])) + 
         geom_bar(stat = "identity") + 
         facet_wrap(~Maximal_mismatches,
             labeller = label_bquote("Mismatches"<=.(substitute(Maximal_mismatches)))
@@ -1798,9 +1799,9 @@ plot_primer_cvg_unstratified <- function(p.df, template.df, groups = NULL) {
     rects <- rects[rects$col == 0, ]
     p <- ggplot() +
         geom_bar(data = plot.df, stat = "identity", position = "dodge", 
-                    aes_string(x = "ID", y = "primer_coverage",
-                    fill = strat), width = bar.width, show.legend = TRUE) + 
-        geom_rect(data = rects, aes_string(xmin = "xstart", xmax = "xend", ymin = "ymin", ymax = "ymax"), 
+                    aes(x = .data[["ID"]], y = .data[["primer_coverage"]],
+                    fill = .data[[strat]]), width = bar.width, show.legend = TRUE) + 
+        geom_rect(data = rects, aes(xmin = .data[["xstart"]], xmax = .data[["xend"]], ymin = .data[["ymin"]], ymax = .data[["ymax"]]), 
                   fill = "grey60", alpha = 0.15, inherit.aes = FALSE, show.legend = FALSE) +
         xlab(xlab) + ggtitle(title) + ylab(ylab) + 
         theme(axis.text.x = element_text(angle = 60, 
@@ -1882,9 +1883,9 @@ plot_primer_cvg_mismatches <- function(primer.df, template.df, groups = NULL,
     group.colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(count.df[, "Group"])))
     p <- ggplot(count.df) + 
         geom_bar(width = 0.75, position = "stack", stat = "identity",
-            aes_string("Primer", 
-                "Cumulative_Coverage",
-                fill = "Group")) + 
+            aes(.data[["Primer"]], 
+                .data[["Cumulative_Coverage"]],
+                fill = .data[["Group"]])) + 
         xlab("Primer") + ggtitle("Mismatch primer coverage") + 
         ylab("Number of covered templates") + 
         theme(axis.text.x = element_text(

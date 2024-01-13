@@ -21,7 +21,7 @@ Depends:
     R (>= 4.0.0)
 License: GPL-2
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.0
 Imports:
     Biostrings (>= 2.38.4),
     XML (>= 3.98-1.4),
@@ -45,9 +45,6 @@ Imports:
     S4Vectors (>= 0.8.11),
     foreach (>= 1.4.3),
     magrittr (>= 1.5),
-    distr (>= 2.6),
-    distrEx (>= 2.6),
-    fitdistrplus (>= 1.0-7),
     uniqtag (>= 1.0),
     openxlsx (>= 4.0.17),
     grid (>= 3.1.0),

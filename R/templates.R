@@ -1748,9 +1748,9 @@ plot_conservation <- function(entropy.df, alignments, template.df, gap.char = "-
     # select only unique old regions
     allowed.old <- allowed.old[row.names(unique(allowed.old[, c("Start", "End")])), ]
     p <- ggplot() + 
-        geom_bar(data = plot.df, aes_string(x = "Position", 
-                 y = "Conservation",
-                 fill = "Conservation"),
+        geom_bar(data = plot.df, aes(x = .data[["Position"]], 
+                 y = .data[["Conservation"]],
+                 fill = .data[["Conservation"]]),
                  stat = "identity",
                  position = "stack") +
         xlab("Position") +
@@ -1759,8 +1759,8 @@ plot_conservation <- function(entropy.df, alignments, template.df, gap.char = "-
         facet_wrap(~Group, ncol = 2) 
     # add rectangles for binding region annotation
     p <- p + geom_rect(data = allowed.new, 
-                      aes_string(xmin = "Start", 
-                                 xmax = "End", 
+                      aes(xmin = .data[["Start"]], 
+                                 xmax = .data[["End"]], 
                                  ymax = box.ymax,
                                  ymin = box.ymin),
                                  #color = "Type",

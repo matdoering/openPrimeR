@@ -3,9 +3,8 @@
 \name{cbind2,Templates,ANY-method}
 \alias{cbind2,Templates,ANY-method}
 \alias{rbind2,Templates,ANY-method}
-\alias{[,Templates,ANY,ANY,ANY-method}
-\alias{[,Templates-method}
 \alias{[,Templates,ANY-method}
+\alias{[,Templates-method}
 \alias{$<-,Templates-method}
 \title{S4 cbind for Templates.}
 \usage{
@@ -13,7 +12,7 @@
 
 \S4method{rbind2}{Templates,ANY}(x, y, ...)
 
-\S4method{[}{Templates,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{Templates,ANY}(x, i, j, ..., drop = TRUE)
 
 \S4method{$}{Templates}(x, name) <- value
 }

@@ -126,98 +126,12 @@ estimate.cvg <- function(lex.df, k = 18, mode.directionality, sample = "") {
 #' required forward and reverse primers if \code{primer.estimate} was set to \code{TRUE}.}
 #' }
 #' @export
-#' @examples
-#'
-#' # Classify the difficulty of a primer design task
-#' data(Ippolito)
-#' design.estimate <- classify_design_problem(template.df[1:30,])
-#' # Estimate the number of required primers to amplify the first 5 templates
-#' design.estimate.nbr <- classify_design_problem(template.df[1:5,], mode.directionality = "fw",
-#'                          primer.length = 20, primer.estimate = TRUE)
 classify_design_problem <- function(template.df, 
                                     mode.directionality = c("both", "fw", "rev"),
                                     primer.length = 18, 
                                     primer.estimate = FALSE,
                                     required.cvg = 1) {
-    if (!is(template.df, "Templates")) {
-        stop("Please supply a valid template data frame")
-    }
-    mode.directionality <- match.arg(mode.directionality)
-    # 1. Estimate lower bound of possible primer coverage ratios
-    cvg.df <- estimate.cvg(template.df, k = primer.length, mode.directionality)
-    # 2. Fit a Beta distribution to the coverage ratios
-    x <- c(cvg.df$fw$Coverage_Ratio, cvg.df$rev$Coverage_Ratio)
-    fit.beta <- try(fitdistrplus::fitdist(x, "beta")) # beta has high error
-    if (is(fit.beta, "try-error")) {
-        # if there's too few unique x values, fitdistrplus won't be able to find a fit -> stop here!
-        my.warning("ProblemEstimationProblem", "Could not estimate problem difficulty, problably because the estimated coverage distribution was too narrow.")
-        return(NULL)
-    }
-    fit <- distr::Beta(fit.beta$estimate[1], fit.beta$estimate[2])
-    #print("fit is: ")
-    #print(fit.beta)
-    #hist(rbeta(10000, shape1 = fit.beta$estimate[1], shape2 = fit.beta$estimate[2]))
-    # 3. Compare the beta distribution to the reference distributions
-    dists <- unlist(lapply(cvg.ref.dists, function(x) {
-                    distrEx::TotalVarDist(x, fit)
-    }))
-    # 4. Classify
-    best.idx <- which.min(dists)
-    names(dists) <- names(cvg.ref.dists)
-    classification <- names(cvg.ref.dists)[best.idx]
-    # 5. Confidence of classification
-    if (classification %in% c("very_easy", "easy")) {
-        check.cols <- c("hard", "very_hard")
-    } else if (classification %in% c("very_hard", "hard")) {
-        check.cols <- c("easy", "very_easy")
-    } else {
-       check.cols <- c("easy", "very_easy", "hard", "very_hard") 
-    }
-    other.dist <- mean(dists[names(dists) %in% check.cols]) # mean of completely different distributions
-    selected.dist <- dists[best.idx] # lowest distance
-    confidence <- 1 - (selected.dist / other.dist)
-    # refuse to give a classification if the standard error was too high, we're too uncertain of the real distribution in this case
-    std.cutoff <- 10
-    uncertain.class <- FALSE
-    if (any(fit.beta$sd > std.cutoff)) {
-        warning("Fit of distribution had a maximal standard error of: ",
-                max(fit.beta$sd), ". Classification may be highly uncertain.")
-        uncertain.class <- TRUE
-    }
-    nbr.fw.primers <- NA
-    nbr.rev.primers <- NA
-    if (primer.estimate) {
-        # Identify the required nbr of primers
-        primers.fw <- NULL
-        primers.rev <- NULL
-        if (mode.directionality == "fw") {
-            primers.fw <- greedy.primers(cvg.df$fw, template.df, required.cvg)
-        } else if (mode.directionality == "rev") {
-            primers.rev <- greedy.primers(cvg.df$rev, template.df, required.cvg)
-        } else {
-            primers.fw <- greedy.primers(cvg.df$fw, template.df, required.cvg)
-            # adjust rev requirement by forward cvg -> should capture the same templates!
-            cvg.idx <- unique(unlist(covered.seqs.to.idx(primers.fw$Covered_Seqs, template.df)))
-            required.nbr <- required.cvg * nrow(template.df)
-            new.required.cvg <- min(length(cvg.idx) / required.nbr, 1)
-            new.template.df <- template.df[cvg.idx[order(cvg.idx)],]
-            primers.rev <- greedy.primers(cvg.df$rev, new.template.df, new.required.cvg)
-        }
-        if (length(primers.fw) != 0) {
-            nbr.fw.primers <- nrow(primers.fw)
-        } 
-        if (length(primers.rev) != 0) {
-            nbr.rev.primers <- nrow(primers.rev)
-        } 
-    }
-    # Prepare output:
-    result <- list("Classification" = classification,
-                   "Class-Distances" = dists,
-                   "Confidence" = confidence,
-                   "Uncertain" = uncertain.class,
-                   "Nbr_primers_fw" = nbr.fw.primers,
-                   "Nbr_primers_rev" = nbr.rev.primers)
-    return(result)
+    .Defunct("Unavailable due to removal of `distr` from CRAN")
 }
 greedy.primers <- function(binding.df, template.df, required.cvg = 1) {
     # lower bound on the number of required primers
@@ -1279,25 +1193,25 @@ setMethod("plot_primer_binding_regions",
                            breaks = x.ticks,
                            labels = x.labels) + 
         geom_vline(xintercept = -1, colour = "red") + # end of binding region
-        geom_vline(data = region.df, aes_string(xintercept = "RelStartPosition"), colour = "red") + # start of binding region
+        geom_vline(data = region.df, aes(xintercept = .data[["RelStartPosition"]]), colour = "red") + # start of binding region
         # rectangles for histogram of binding events:
         geom_rect(data = plot.df, 
-                  mapping = aes_string(xmin = "xmin", xmax = "xmax",
-                                      ymin = "ymin", ymax = "ymax",
-                                      fill = "ID"),
+                  mapping = aes(xmin = .data[["xmin"]], xmax = .data[["xmax"]],
+                                      ymin = .data[["ymin"]], ymax = .data[["ymax"]],
+                                      fill = .data[["ID"]]),
                     linetype = "blank", alpha = 0.35) + # rectangles show some overlap due to the transparency!!
        scale_fill_manual(values = primer.colors, breaks = unique(plot.df$ID)) + 
         # x-axis rectangles to annotate binding/amplification region:
         geom_rect(data = region.df, 
-            mapping = aes_string(xmin="xmin", xmax="xmax", 
-                        ymin="ymin", ymax="ymax", fill = "Region"),
+            mapping = aes(xmin=.data[["xmin"]], xmax=.data[["xmax"]], 
+                        ymin=.data[["ymin"]], ymax=.data[["ymax"]], fill = .data[["Region"]]),
             alpha = 0.5,
             colour = "#3d3835", 
             size = 0.3, show.legend = FALSE)
     if (length(unique(plot.df$Run)) > 1) {
         # show facets and don't show individual primer legend
         p <- p + facet_wrap(~Run, ncol = 2) +
-            guides(fill = FALSE)
+            guides(fill = "none")
     } else {
         # only show rectangle text for single plot
         p <- p + geom_text(data=region.df, 
@@ -1308,7 +1222,7 @@ setMethod("plot_primer_binding_regions",
     }
     if (length(unique(plot.df$ID)) > 15) {
         # don't show legend for many primers
-        p <- p + guides(fill = FALSE)
+        p <- p + guides(fill = "none")
     }
     if (length(highlight.set) != 0) {
         # highlight selected sets

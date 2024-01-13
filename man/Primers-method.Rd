@@ -3,9 +3,8 @@
 \name{cbind2,Primers,ANY-method}
 \alias{cbind2,Primers,ANY-method}
 \alias{rbind2,Primers,ANY-method}
-\alias{[,Primers,ANY,ANY,ANY-method}
-\alias{[,Primers-method}
 \alias{[,Primers,ANY-method}
+\alias{[,Primers-method}
 \alias{$<-,Primers-method}
 \title{S4 cbind for Primers.}
 \usage{
@@ -13,7 +12,7 @@
 
 \S4method{rbind2}{Primers,ANY}(x, y, ...)
 
-\S4method{[}{Primers,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{Primers,ANY}(x, i, j, ..., drop = TRUE)
 
 \S4method{$}{Primers}(x, name) <- value
 }

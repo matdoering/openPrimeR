@@ -290,11 +290,11 @@ plot_primer.comparison.box <- function(primer.data,
     }
     plot.df$Run <- abbreviate(plot.df$Run, getOption("openPrimeR.plot_abbrev"))
     plot.df$Run <- factor(plot.df$Run, levels = unique(plot.df$Run)[order(as.character(unique(plot.df$Run)))])
-    p <- ggplot(plot.df, aes_string(x = "Run", y = "Value", colour = "Run")) + 
+    p <- ggplot(plot.df, aes(x = .data[["Run"]], y = .data[["Value"]], colour = .data[["Run"]])) + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
         ggtitle(title) + ylab("Value") +
         geom_boxplot(outlier.shape = NA) +
-        guides(colour = FALSE) # remove legend: is redundant here
+        guides(colour = "none") # remove legend: is redundant here
     if (length(con.identifier) > 1) {
         # multiple constraints are plotted
         p <- p + facet_wrap(as.formula("~Constraint"), 
@@ -313,8 +313,8 @@ plot_primer.comparison.box <- function(primer.data,
     colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(plot.df$Run)))
     p <- p + scale_colour_manual(values = colors)
     if (length(boundary.data) != 0) {
-        p <- p + geom_hline(data = boundary.data, aes_string(yintercept = "Z"),
-                    size = 0.25, 
+        p <- p + geom_hline(data = boundary.data, aes(yintercept = .data[["Z"]]),
+                    linewidth = 0.25, 
                     colour = "red", linetype = 2)
     }
     if (length(y.limits) != 0) {

@@ -108,8 +108,8 @@ primer_significance <- function(primer.df, set.name = NULL, active.constraints =
     # reference sysdata is available within the package automatically: REF.pass.counts, REF.fail.counts
     m.ok <- match(constraint.names, names(REF.pass.counts))
     m.fail <- match(constraint.names, names(REF.fail.counts))
-    ref.ok <- unlist(REF.pass.counts[, m.ok[!is.na(m.ok)]])
-    ref.fail <- unlist(REF.fail.counts[, m.fail[!is.na(m.fail)]])
+    ref.ok <- sum(unlist(REF.pass.counts[, m.ok[!is.na(m.ok)]]))
+    ref.fail <- sum(unlist(REF.fail.counts[, m.fail[!is.na(m.fail)]]))
     # test primers:
     tab <- matrix(c(my.ok, my.fail, ref.ok, ref.fail), nrow = 2, 
                   ncol = 2,byrow = TRUE)

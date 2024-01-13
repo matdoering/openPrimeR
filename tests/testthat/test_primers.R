@@ -22,8 +22,8 @@ test_that("Primer Set Significance", {
     primers <- read_primers(primer.location, "_fw", "_rev")
     expect_warning(primer_significance(primers)) # nothing evaluated -> warning
     expect_warning(primer_significance(primer.df, active.constraints = "primer_coverage"))
-    p <- primer_significance(primer.df) # should be significant
-    expect_lt(as.numeric(p), 1e-3)
+    p <- primer_significance(primer.df) # should not be significant
+    expect_gt(as.numeric(p), 5e-2)
 })
 
 test_that("Primer fw+rev", {

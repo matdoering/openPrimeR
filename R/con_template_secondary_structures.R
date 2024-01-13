@@ -284,9 +284,9 @@ plot.Delta.DeltaG <- function(constrained.foldings, stratify = FALSE) {
         g = groups)[-1]
     
     if (!stratify) {
-        p <- ggplot(plot.df, aes_string(x = "Binding_Region", y = "Delta_Delta_G")) + geom_bar(stat = "summary")
+        p <- ggplot(plot.df, aes(x = .data[["Binding_Region"]], y = .data[["Delta_Delta_G"]])) + geom_bar(stat = "summary")
     } else {
-        p <- ggplot(plot.df, aes_string(x = "Binding_Region", y = "Delta_Delta_G")) + geom_boxplot() + 
+        p <- ggplot(plot.df, aes(x = .data[["Binding_Region"]], y = .data[["Delta_Delta_G"]])) + geom_boxplot() + 
             facet_wrap(~Group)
     }
     x.names <- unique(paste(plot.df$Constraint_Region_Start, "-", plot.df$Constraint_Region_End, 

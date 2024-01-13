@@ -26,7 +26,7 @@ plot_template_structure <- function(fold.df) {
     fold.df$Region <- intervals
     ylab <- expression(paste(Delta, " G (no structure) - ", Delta, " G (structure) [kcal/mol]", sep = ""))
     p <- ggplot(fold.df) + 
-        geom_boxplot(aes_string(x = "Region", y = "Delta_Delta_G", fill = "Group")) +
+        geom_boxplot(aes(x = .data[["Region"]], y = .data[["Delta_Delta_G"]], fill = .data[["Group"]])) +
         facet_wrap(~Direction, scales = "free_x") +
         ggtitle("Template secondary structures") + 
         ylab(ylab)
@@ -209,7 +209,7 @@ plot_constraint.histogram <- function(primer.df, con.cols, con.identifier, bound
                                 Z = bound)
         boundary.data <- rbind(boundary.data, cur.bound)
     }
-    p <- ggplot(plot.df, aes_string(x = "Value", fill = "Direction")) +
+    p <- ggplot(plot.df, aes(x = .data[["Value"]], fill = .data[["Direction"]])) +
         xlab("Value") + 
         ylab("Count") + ggtitle("Constraints") + 
         scale_fill_manual(values = plot.colors) + 
@@ -225,7 +225,7 @@ plot_constraint.histogram <- function(primer.df, con.cols, con.identifier, bound
     }
     if (length(boundary.data) != 0) {
         p <- p + geom_vline(data = boundary.data, 
-                    aes_string(xintercept = "Z"),
+                    aes(xintercept = .data[["Z"]]),
                     size = 0.25, colour = "red", linetype = 2)
     }
     if (length(x.limits) != 0) {
@@ -422,7 +422,7 @@ plot.dimer.dist <- function(dimer.data, deltaG.cutoff) {
     } else if (all(dimer.df$Decision == "No Dimer")) {
         colors <- colors[2]
     }
-    p <- ggplot(dimer.df, aes_string(x = "DeltaG")) + geom_histogram(aes_string(fill = "Decision"), 
+    p <- ggplot(dimer.df, aes(x = .data[["DeltaG"]])) + geom_histogram(aes(fill = .data[["Decision"]]), 
         colour = "grey") + geom_vline(xintercept = deltaG.cutoff, colour = "red") + 
         ggtitle(expression(paste("Dimerization ", Delta, " G values", 
             sep = ""))) + xlab(expression(paste(Delta, " G", sep = ""))) + scale_fill_manual(values = colors) + 
@@ -680,13 +680,13 @@ setMethod("plot_constraint_fulfillment",
     nbr.constraints <- length(unique(eval.m$Constraint))
     eval.m$ID <- factor(unique(eval.m$ID))
     levels(eval.m$ID) = abbreviate(levels(eval.m$ID), getOption("openPrimeR.plot_abbrev"))
-    p <- ggplot(eval.m, aes_string(x = "Constraint", y = "ID")) + geom_tile(aes_string(fill = "Outcome"), 
-        colour = "black") + scale_fill_manual(values = colors) + 
-        theme(axis.text.x = element_text(angle = 60, 
+    p <- ggplot(eval.m, aes(x = .data[["Constraint"]], y = .data[["ID"]])) + geom_tile(aes(fill = .data[["Outcome"]]),
+        colour = "black") + scale_fill_manual(values = colors) +
+        theme(axis.text.x = element_text(angle = 60,
                 hjust = 1)) +
         ggtitle(title) + xlab(xlab) + ylab(ylab) + 
-        theme(legend.title = element_text(face = "bold")) + 
-        scale_x_discrete(labels = constraint.names) + 
+        theme(legend.title = element_text(face = "bold")) +
+        scale_x_discrete(labels = constraint.names) +
         scale_y_discrete(limits = rev(levels(eval.m$ID))) # top primer should be the first entry in the plot
     return(p)
 })
@@ -733,14 +733,14 @@ setMethod("plot_constraint_fulfillment",
     colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(new.df[, "Constraint"])))
     # plot
     p <- ggplot(new.df) + 
-            geom_bar(mapping = aes_string(x = "Constraint", y = "Ratio", 
-            fill = "Constraint"), position = "dodge", stat = "identity") +
+            geom_bar(mapping = aes(x = .data[["Constraint"]], y = .data[["Ratio"]], 
+            fill = .data[["Constraint"]]), position = "dodge", stat = "identity") +
             scale_y_continuous(labels = scales::percent) + ylab("Fulfillment ratio") + 
             xlab("Constraint") + ggtitle("Evaluation of constraints") + 
             theme(
             axis.text.x = element_text(angle = 90, hjust = 1)) +
             facet_wrap(~Run, ncol = ncol) + 
-            guides(fill = FALSE) + # remove legend: is redundant here
+            guides(fill = "none") + # remove legend: is redundant here
             scale_x_discrete(labels = constraint.names) + 
            scale_fill_manual(labels = constraint.names, values = colors)
 
@@ -933,7 +933,7 @@ setMethod("plot_constraint_deviation",
         # set up colors
         pal <- getOption("openPrimeR.plot_colors")["Constraint"] # the RColorBrewer palette to use
         colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(df$Constraint)))
-        p <- ggplot(df, aes_string(x = "Constraint", y = "Deviation", colour = "Constraint")) + 
+        p <- ggplot(df, aes(x = .data[["Constraint"]], y = .data[["Deviation"]], colour = .data[["Constraint"]])) + 
             theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
             ggtitle(title) +
             ylab("Deviation from target") +
@@ -942,7 +942,7 @@ setMethod("plot_constraint_deviation",
                 height = 0)) + 
             scale_y_continuous(labels = scales::percent) +
             scale_x_discrete(labels = constraint.names) +
-            guides(colour = FALSE) + 
+            guides(colour = "none") + 
             scale_colour_manual(values = colors)
         return(p)
 })
@@ -1000,7 +1000,7 @@ setMethod("plot_constraint_deviation",
         # set up colors
         pal <- getOption("openPrimeR.plot_colors")[col.id] # the RColorBrewer palette to use
         colors <- colorRampPalette(brewer.pal(8, pal))(length(unique(df[, col.id])))
-        p <- ggplot(plot.data, aes_string(x = "Run", y = "Mean_Deviation", colour = col.id)) + 
+        p <- ggplot(plot.data, aes(x = .data[["Run"]], y = .data[["Mean_Deviation"]], colour = .data[[col.id]])) + 
             theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
             ggtitle(title) +
             ylab(ylab) + 
@@ -1011,7 +1011,7 @@ setMethod("plot_constraint_deviation",
         if (deviation.per.primer) {
             # show deviation per primer -> don't show legend for each primer
             p <- p +
-                guides(colour = FALSE) 
+                guides(colour = "none") 
         } else {
             constraint.names <- constraints_to_unit(levels(plot.data$Constraint), FALSE)
             # change names of constraints

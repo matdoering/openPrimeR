@@ -74,10 +74,11 @@ check.tool.installation <- function(frontend = FALSE) {
 #' @keywords internal
 check.tool.function <- function(frontend = FALSE) {
     available.tools <- check.tool.installation(frontend)
+    out <- NULL
     # check for oligoArrayAux
     if (available.tools["OligoArrayAux"]) {
-        out <- system("hybrid-min -n DNA -t 50 -T 50 -N 0.05 -E -q ACAGGTGCCCACTCCCAGGTGCAG CTGCACCTGGGAGTGGGCACCTGT", 
-                    intern = FALSE, ignore.stdout = TRUE)
+        try(out <- system("hybrid-min -n DNA -t 50 -T 50 -N 0.05 -E -q ACAGGTGCCCACTCCCAGGTGCAG CTGCACCTGGGAGTGGGCACCTGT", 
+                    intern = FALSE, ignore.stdout = TRUE))
        if (out != 0) {
             # there was an error
             warning("oligoArrayAux failed checks: disabled. Do you have the UNAFOLDDAT environment variable set?")
@@ -93,7 +94,8 @@ check.tool.function <- function(frontend = FALSE) {
     # check for ViennaRNA version
     if (available.tools["ViennaRNA"]) {
         # need to require a specific version (2.4.1) of viennaRNA for support of the used commands
-        version <- system2("RNAfold", "--version", stdout = TRUE, stderr = TRUE)
+	version <- NULL
+    	try (version <- system2("RNAfold", "--version", stdout = TRUE, stderr = TRUE))
         if (length(attr(version, "status")) == 0) {
             # the command worked -> check the version string
             v <- strsplit(version, " ")[[1]]

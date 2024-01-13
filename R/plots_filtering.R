@@ -12,7 +12,7 @@ plot.filtering.runtime <- function(filtered.stats) {
     if (nrow(filtered.stats) == 0) {
         return(NULL)
     }
-    ggplot(plot.stats, aes_string(y = "Time", x = "Constraint", fill = "Time")) + geom_bar(stat = "identity") + 
+    ggplot(plot.stats, aes(y = .data[["Time"]], x = .data[["Constraint"]], fill = .data[["Time"]])) + geom_bar(stat = "identity") + 
         coord_flip() + xlab("Applied constraint") + ylab("Required computation time [s]") + 
         ggtitle("Runtime for each filtering step") + 
         theme(axis.text.x = element_text(hjust = 1)) +
@@ -43,7 +43,7 @@ plot.filtering.stats.cvg <- function(stats, stats.relax = NULL) {
     color <- c("Filtering" = filter.color, "Relaxation" = relax.color)
 
     constraint.names <- unlist(constraints_to_unit(levels(plot.stats$Constraint), FALSE))
-    ggplot(plot.stats, aes_string(y = "Current_Coverage", x = "Constraint", fill = "Type")) + 
+    ggplot(plot.stats, aes(y = .data[["Current_Coverage"]], x = .data[["Constraint"]], fill = .data[["Type"]])) + 
         geom_bar(stat = "identity") + coord_flip() + xlab("Applied constraint") + 
         ylab(yl) + ggtitle(ttl) + 
         scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
@@ -113,7 +113,7 @@ plot.filtering.stats <- function(stats, stats.relax = NULL) {
     filter.color <- brewer.pal(8, "Accent")[5]
     relax.color <- brewer.pal(8, "Blues")[4]
     color <- c("Filtering" = filter.color, "Relaxation" = relax.color)
-    ggplot(plot.stats, aes_string(y = "Ratio", x = "Constraint", fill = "Type")) + 
+    ggplot(plot.stats, aes(y = .data[["Ratio"]], x = .data[["Constraint"]], fill = .data[["Type"]])) + 
         geom_bar(stat = "identity") + coord_flip() + xlab("Filtering constraint") + 
         ylab("Remaining primers") + 
         ggtitle("Filtering overview") + 
