@@ -96,7 +96,7 @@ check.tool.function <- function(frontend = FALSE) {
         # need to require a specific version (2.4.1) of viennaRNA for support of the used commands
 	version <- NULL
     	try (version <- system2("RNAfold", "--version", stdout = TRUE, stderr = TRUE))
-        if (length(attr(version, "status")) == 0) {
+        if (!is(version, "try-error")) {
             # the command worked -> check the version string
             v <- strsplit(version, " ")[[1]]
             if (length(v) >= 2) {
