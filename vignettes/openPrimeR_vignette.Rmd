@@ -10,6 +10,7 @@ vignette: >
 ---
 
 ```{r vignette_options, echo = FALSE, message = FALSE, warning = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(openPrimeR)
 ggplot2::theme_set(ggplot2::theme_grey(base_size = 12)) 
