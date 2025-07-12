@@ -400,10 +400,11 @@ read_templates_csv <- function(fname) {
     templates[, c.cols][is.na(templates[, c.cols])] <- c("") 
     templates <- try(Templates(templates))
     if (is(templates, "try-error")) {
+	error_message <- attr(templates, "condition")$message
         my.error("TemplateFormatIncorrect", 
             paste0("Could not construct a 'Templates' object from the",
                 " CSV input file '", fname, "'. Please check that",
-                " the structure of the input file is correct."), silent = TRUE)
+                " the structure of the input file is correct. Error:, ", error_message), silent = TRUE)
     }
     return(templates)
 }
@@ -447,10 +448,12 @@ read_templates_single <- function(template.file, hdr.structure = NULL, delim = N
                        delim, id.column, rm.keywords, remove.duplicates, 
                        fw.region, rev.region, gap.character, run), silent = TRUE)
     if (is(template.df, "try-error")) {
+	message("read_templates_csv since fasta failed")
         template.df <- try(read_templates_csv(template.file), silent = TRUE)
         if (is(template.df, "try-error")) {
+	    error_message <- attr(template.df, "condition")$message
             my.error("TemplateFormatIncorrect", 
-                paste0("Unsupported template input file type or error reading data for file: '", template.file, "'"))
+                paste0("Unsupported template input file type or error reading data for file: '", template.file, "'. Error: ", error_message))
         }    
     }
     # check template quality: degeneration
@@ -1321,7 +1324,7 @@ parse.IMGT.gene.groups <- function(IDs) {
     g <- sapply(s, function(x) x[1])
     idx[, "Gene"] <- g
     # remove localization from Subgroup
-    s <- strsplit(idx[, "Subgroup"], "Subgroup", split = "-")
+    s <- strsplit(idx[, "Subgroup"],  split = "-")
     g <- sapply(s, function(x) x[1])
     idx[, "Subgroup"] <- g
     identifier <- paste(idx[, "Gene"], idx[, "Subgroup"], sep = "-")
